@@ -1,0 +1,10 @@
+#import { Module } into PwrApp from "wrap://ens/pwr-app.eth"
+#import { Module } into Logger from "wrap://ens/logger.core.polywrap.eth"
+#import { Module, Response, KeyValuePair, Request } into HttpServer from "wrap://ens/http-server.eth"
+#import { Module } into Ipfs from "wrap://ens/wrap-ipfs.eth"
+
+type Module implements PwrApp_Module {
+  onStart: Boolean!
+  routeHome(request: HttpServer_Request!): HttpServer_Response!
+  routeResolve(request: HttpServer_Request!): HttpServer_Response!
+}

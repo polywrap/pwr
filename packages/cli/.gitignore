@@ -1,0 +1,17 @@
+node_modules
+bin
+build
+dist
+
+#Polywrap
+wrap
+.polywrap
+
+# Environment
+.env
+
+# Logging
+*.log
+
+# Test
+coverage

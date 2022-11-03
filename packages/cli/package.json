@@ -1,0 +1,64 @@
+{
+  "name": "@nerfzael/pwr",
+  "version": "0.2.0",
+  "main": "build/main.js",
+  "types": "build/main.d.ts",
+  "author": "nerfZael",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "/build"
+  ],
+  "bin": {
+    "pwr": "./build/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nerfZael/polywrap-wrapper-runner.git"
+  },
+  "keywords": [
+    "polywrap",
+    "cli",
+    "wrapper",
+    "runner"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "ts-node src/main.ts",
+    "start": "node bin/main.js",
+    "test": "jest test --passWithNoTests"
+  },
+  "dependencies": {
+    "@nerfzael/ens-contenthash-resolver-plugin-wrapper": "0.2.0",
+    "@nerfzael/http-plugin-wrapper": "0.3.0",
+    "@nerfzael/ipfs-ens-contenthash-resolver-plugin-wrapper": "0.2.0",
+    "@nerfzael/ocr-core": "0.4.0",
+    "@nerfzael/ocr-ens-contenthash-resolver-plugin-wrapper": "0.2.0",
+    "@nerfzael/ocr-resolver-plugin-wrapper": "0.4.0",
+    "@nerfzael/wrap-client-plugin-wrapper": "0.4.1",
+    "@nerfzael/http-server-plugin-wrapper": "0.4.0",
+    "@nerfzael/ipfs-plugin-wrapper": "0.1.0",
+    "@polywrap/client-js": "0.8.0",
+    "@polywrap/ethereum-plugin-js": "0.8.0",
+    "@polywrap/ipfs-plugin-js": "0.8.0",
+    "@polywrap/ipfs-resolver-plugin-js": "0.8.0",
+    "@polywrap/logger-plugin-js": "0.8.0",
+    "@polywrap/msgpack-js": "0.8.0",
+    "@polywrap/uri-resolver-extensions-js": "0.8.0",
+    "@polywrap/uri-resolvers-js": "0.8.0",
+    "awilix": "7.0.3",
+    "commander": "9.4.0",
+    "dotenv": "16.0.2",
+    "prompts": "2.4.2"
+  },
+  "devDependencies": {
+    "@types/jest": "29.0.3",
+    "@types/node": "16.11.11",
+    "@types/prompts": "^2.0.14",
+    "axios": "0.27.2",
+    "jest": "29.0.3",
+    "ts-jest": "29.0.1",
+    "ts-node": "10.9.1",
+    "typescript": "4.8.3"
+  }
+}

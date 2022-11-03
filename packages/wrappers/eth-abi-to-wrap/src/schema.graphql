@@ -1,0 +1,5 @@
+#import { Module } into Logger from "wrap://ens/logger.core.polywrap.eth"
+#import { Module } into PwrApp from "wrap://ens/pwr-app.eth"
+
+type Module implements PwrApp_Module {
+}

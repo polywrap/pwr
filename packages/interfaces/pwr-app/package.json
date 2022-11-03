@@ -1,0 +1,16 @@
+{
+  "name": "pwr-app-interface",
+  "description": "PWR App Interface",
+  "private": false,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "npx polywrap build",
+    "test:env:up": "npx polywrap infra up --modules=eth-ens-ipfs",
+    "test:env:down": "npx polywrap infra down --modules=eth-ens-ipfs",
+    "deploy": "npx polywrap deploy",
+    "test": "yarn test:env:up && yarn deploy && yarn test:env:down"
+  },
+  "devDependencies": {
+    "polywrap": "0.8.0"
+  }
+}

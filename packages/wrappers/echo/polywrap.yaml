@@ -1,0 +1,13 @@
+format: 0.2.0
+project:
+  name: echo
+  type: wasm/rust
+source:
+  schema: ./src/schema.graphql
+  module: ./Cargo.toml
+  import_abis:
+    - uri: "wrap://ens/logger.core.polywrap.eth"
+      abi: ./src/logger.graphql
+extensions:
+  build: ./polywrap.build.yaml
+  deploy: ./polywrap.deploy.yaml

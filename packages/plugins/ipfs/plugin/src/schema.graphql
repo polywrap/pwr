@@ -1,0 +1,4 @@
+#import { Module } into Ipfs from "wrap://ens/wrap-ipfs.eth"
+
+type Module implements Ipfs_Module {
+}

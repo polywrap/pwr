@@ -1,0 +1,42 @@
+type Module {
+  create: Boolean!
+
+  """
+  Returns content of the file addressed by a valid IPFS Path or CID
+  """
+  cat(ipfsPath: String!, options: AbortOptions): Bytes!
+
+  """
+  Fetch a file or an entire directory tree from IPFS that is addressed by a
+  valid IPFS Path
+  """
+  get(ipfsPath: String!, options: AbortOptions): Bytes!
+  
+  """
+  Start the node
+  """
+  start: Boolean!
+
+  """
+  Stop the node
+  """
+  stop: Boolean!
+
+  resolve(name: String!, options: AbortOptions): String!
+
+  """
+  Returns true if this IPFS node is online - that is, it's listening on network addresses
+  for incoming connections
+  """
+  isOnline: Boolean!
+}
+
+type CreateOptions {
+  start: Boolean!
+  offline: Boolean!
+  silent: Boolean!
+}
+
+type AbortOptions {
+  timeout: UInt32
+}

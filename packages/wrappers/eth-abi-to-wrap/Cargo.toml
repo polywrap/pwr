@@ -1,0 +1,22 @@
+[package]
+name = "eth-abi-to-wrap"
+version = "0.1.0"
+description = "PWR App for generating a wrapper from Ethereum contract ABI"
+repository = "https://github.com/nerfZael/polywrap-wrapper-runner"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+polywrap-wasm-rs = { version = "0.8.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.82"
+mustache = "0.9.0"
+itertools = "0.10.5"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 's'
+lto = true
+panic = 'abort'

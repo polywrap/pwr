@@ -1,0 +1,17 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/**"
+  ],
+  "scripts": {
+    "reset": "yarn clean && yarn && yarn build",
+    "clean": "npx rimraf ./**/node_modules ./**/yarn.lock ./**/build ./**/coverage",
+    "build": "lerna run build",
+    "test": "lerna run test"
+  },
+  "devDependencies": {
+    "lerna": "5.5.1",
+    "rimraf": "3.0.2"
+  }
+}
