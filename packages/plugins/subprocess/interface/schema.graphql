@@ -1,0 +1,27 @@
+type Module {
+  exec(command: String!, options: ExecOptions): ExecOutput!
+}
+
+enum BufferEncoding {
+  ascii,
+  utf8,
+  utf16le,
+  ucs2,
+  base64,
+  base64url,
+  latin1,
+  binary,
+  hex
+}
+
+type ExecOptions {
+  cwd: String
+  env: Map @annotate(type: "Map<String!, String!>")
+  encoding: BufferEncoding
+  shell: String
+}
+
+type ExecOutput {
+  stdout: String
+  stderr: String
+}
