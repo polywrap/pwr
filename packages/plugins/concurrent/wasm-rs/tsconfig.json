@@ -22,7 +22,7 @@
     "target": "es5",
     "resolveJsonModule": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
   },
   "typeAcquisition": { "include": ["jest"] }
 }

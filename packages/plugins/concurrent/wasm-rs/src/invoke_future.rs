@@ -36,7 +36,7 @@ impl<T: DeserializeOwned> Future for InvokeFuture<T> {
                 Err(e) => Poll::Ready(Err(e.to_string())),
             },
             Ok(None) => {
-                cx.waker().wake(); // Reschedule in the queue to run in the future
+                cx.waker().clone().wake(); // Reschedule in the queue to run in the future
                 Poll::Pending
             },
             Err(err) => Poll::Ready(Err(err)),
@@ -74,12 +74,13 @@ impl<T: DeserializeOwned> InvokeFuture<T> {
 }
 
 
-Executor task1 (3), task2 (2)
+// Executor task1 (3), task2 (2)
 
-ready_queue -> [task1, task2]
+// ready_queue -> [task1, task2]
 
-executor -> task1.poll(waker) 
-waker.wake -> ready_queue.push(task1)
+// executor -> task1.poll(waker) 
+// waker.wake -> ready_queue.push(task1)
 
-ready_queue -> [task2, task1]
+// ready_queue -> [task2, task1]
 
+// InvokeFuture::new(task: ).await;

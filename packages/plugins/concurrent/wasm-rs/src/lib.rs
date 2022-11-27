@@ -1,103 +1,31 @@
-pub mod wrap;
+pub mod executor;
 pub mod invoke_future;
+pub mod wrap;
 
+use JSON::json;
+pub use executor::*;
 pub use invoke_future::*;
+pub use polywrap_wasm_rs::JSON;
+use wrap::*;
 
-use futures::{
-    future::{BoxFuture, FutureExt},
-    task::{waker_ref, ArcWake, Waker},
-};
-use polywrap_wasm_rs::InvokeArgs;
-use serde_json::json;
-use std::{
-    future::Future,
-    sync::mpsc::{sync_channel, Receiver, SyncSender},
-    task::{Context, Waker},
-};
-
-
-/// Task executor that receives tasks off of a channel and runs them.
-struct Executor {
-    ready_queue: Receiver<Task>,
-}
-
-/// `Spawner` spawns new futures onto the task channel.
-#[derive(Clone)]
-struct Spawner {
-    task_sender: SyncSender<Task>,
-}
-
-/// A future that can reschedule itself to be polled by an `Executor`.
-struct Task {
-    future: Option<BoxFuture<'static, ()>>,
-    task_sender: SyncSender<Task>,
-}
-
-fn new_executor_and_spawner() -> (Executor, Spawner) {
-    // Maximum number of tasks to allow queueing in the channel at once.
-    // This is just to make `sync_channel` happy, and wouldn't be present in
-    // a real executor.
-    const MAX_QUEUED_TASKS: usize = 10_000;
-    let (task_sender, ready_queue) = sync_channel(MAX_QUEUED_TASKS);
-    (Executor { ready_queue }, Spawner { task_sender })
-}
-
-impl Spawner {
-    fn spawn<T>(&self, future: impl Future<Output = T> + 'static + Send) {
-        let future = future.boxed();
-        let task = Task {
-            future: Some(future),
-            task_sender: self.task_sender.clone(),
-        };
-        self.task_sender.send(task).expect("too many tasks queued");
-    }
-}
-
-impl ArcWake for Task {
-    fn wake_by_ref(arc_self: &Arc<Self>) {
-        // Implement `wake` by sending this task back onto the task channel
-        // so that it will be polled again by the executor.
-        let cloned = arc_self.clone();
-        arc_self
-            .task_sender
-            .send(cloned)
-            .expect("too many tasks queued");
-    }
-}
-
-impl Executor {
-    fn run(&self) {
-        while let Ok(task) = self.ready_queue.recv() {
-            // Take the future, and if it has not yet completed (is still Some),
-            // poll it in an attempt to complete it.
-            let mut future_slot = task.future.lock().unwrap();
-            if let Some(mut future) = future_slot.take() {
-                // Create a `LocalWaker` from the task itself
-                let waker = waker_ref(&task);
-                let context = &mut Context::from_waker(&*waker);
-                // `BoxFuture<T>` is a type alias for
-                // `Pin<Box<dyn Future<Output = T> + Send + 'static>>`.
-                // We can get a `Pin<&mut dyn Future + Send + 'static>`
-                // from it by calling the `Pin::as_mut` method.
-                if future.as_mut().poll(context).is_pending() {
-                    // We're not done processing the future, so put it
-                    // back in its task to be run again in the future.
-                    *future_slot = Some(future);
-                }
-            }
-        }
-    }
-}
-
-
-fn main() {
+pub fn run(_: ArgsRun) -> bool {
     let (executor, spawner) = new_executor_and_spawner();
 
     // Spawn a task to print before and after waiting on a timer.
     spawner.spawn(async {
-        println!("howdy!");
+        println!("spawn!");
         // Wait for our timer future to complete after two seconds.
-        let fut = InvokeFuture::<String>::new(ConcurrentTask { uri: "a".to_string(), method: "b".to_string(), args: json!([])}, 1000).await;
+        let result = InvokeFuture::<String>::new(
+            ConcurrentTask {
+                uri: "ens/hello.eth".to_string(),
+                method: "hello".to_string(),
+                args: json!({"greet": "Hello World!"}),
+            },
+            1000,
+        )
+        .await;
+        println!("result!");
+        println!("{}", &result.unwrap());
         println!("done!");
     });
 
@@ -108,4 +36,6 @@ fn main() {
     // Run the executor until the task queue is empty.
     // This will print "howdy!", pause, and then print "done!".
     executor.run();
+
+    return true;
 }
