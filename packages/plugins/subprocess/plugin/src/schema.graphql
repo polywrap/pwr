@@ -1,0 +1,4 @@
+#import { Module } into Subprocess from "wrap://ens/goerli/interface.subprocess.polywrap.eth"
+
+type Module implements Subprocess_Module {
+}

@@ -46,6 +46,8 @@
     "@polywrap/msgpack-js": "0.8.0",
     "@polywrap/uri-resolver-extensions-js": "0.8.0",
     "@polywrap/uri-resolvers-js": "0.8.0",
+    "@wraplib/subprocess-plugin-js": "0.1.0",
+    "@wraplib/concurrent-promise-plugin": "0.4.0",
     "awilix": "7.0.3",
     "commander": "9.4.0",
     "dotenv": "16.0.2",
