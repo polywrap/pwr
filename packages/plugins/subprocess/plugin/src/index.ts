@@ -48,7 +48,7 @@ export class SubprocessPlugin extends Module<NoConfig> {
 
   async exec(args: Args_exec, client: Client) {
     return await cpExec(args.command, {
-      cwd: args.options?.cwd ? args.options.cwd : undefined,
+      cwd: args.options?.cwd ? args.options.cwd : (this.env.cwd as string),
       env: args.options?.env ? Object.fromEntries(args.options.env.entries()) : undefined,
       encoding: args.options?.encoding ? toBufferEncodingString(args.options.encoding) : "utf8",
       shell: args.options?.shell ? args.options.shell : undefined

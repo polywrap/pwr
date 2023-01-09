@@ -25,3 +25,7 @@ type ExecOutput {
   stdout: String
   stderr: String
 }
+
+type Env {
+  cwd: String
+}

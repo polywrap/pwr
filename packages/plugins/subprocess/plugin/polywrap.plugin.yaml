@@ -4,5 +4,5 @@ name: ipfs
 module: ./src/index.ts
 schema: ./src/schema.graphql
 import_redirects:
-  - uri: ens/goerli/subprocess.polywrap.eth
+  - uri: ens/goerli/interface.subprocess.polywrap.eth
     schema: ../interface/build/wrap.info
