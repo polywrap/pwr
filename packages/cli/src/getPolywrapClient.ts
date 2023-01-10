@@ -42,8 +42,8 @@ export const allAccessControlledUris = [
   "wrap://ens/fs-resolver.polywrap.eth",
   "wrap://ens/http-server.eth",
   "wrap://ens/wrap-ipfs.eth",
-  "wrap://ens/v2.interface.concurrent.polywrap.eth",
-  "wrap://ens/interface.subprocess.polywrap.eth",
+  "wrap://ens/goerli/v2.interface.concurrent.polywrap.eth",
+  "wrap://ens/goerli/interface.subprocess.polywrap.eth",
 ];
 
 export let accessControlledUris: string[] = [
@@ -201,11 +201,19 @@ export const getPolywrapClient = () => {
     )
   );
 
+  const redirects = [
+    {
+      from: "wrap://ens/monowrap.eth",
+      to: "fs/Users/niraj/Documents/projects/polywrap/monowrap/build"
+    }
+  ]
+
   const client = process.env.INFURA_PROJECT_ID
     ? new CustomPolywrapClient(
       {
         envs,
         interfaces,
+        redirects,
         plugins: [
           ...plugins,
           {
@@ -238,6 +246,7 @@ export const getPolywrapClient = () => {
     : new CustomPolywrapClient({
         envs,
         interfaces,
+        redirects,
         plugins: [
           ...plugins,
           {

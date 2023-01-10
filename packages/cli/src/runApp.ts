@@ -6,8 +6,8 @@ import { invokeWithAccessControl } from "./getPolywrapClient";
 
 export const runApp = async (uri: string, args: string[], polywrapClient: PolywrapClient) => {
   const acessControlledUris: string[] = [];
-  const visitedUris = new Set<string>();
-  await extractAccessControlledUris(uri, polywrapClient, acessControlledUris, visitedUris);
+  // const visitedUris = new Set<string>();
+  // await extractAccessControlledUris(uri, polywrapClient, acessControlledUris, visitedUris);
 
   if (acessControlledUris.length > 0) {
     const response = await prompts({
