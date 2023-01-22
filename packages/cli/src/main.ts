@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { program } from "commander";
 import * as dotenv from "dotenv"
 import { getPolywrapClient } from "./getPolywrapClient";
 import { runApp } from "./runApp";
@@ -22,20 +21,15 @@ export const paths = {
 (async () => {
   initAppData();
 
-  program
-    .arguments("<string...>")
-    .action(async (args) => {
-      const uri = args[0];
-      const appArgs = args.slice(1);
+  const args = process.argv.slice(2);
+  const uri = args[0];
+  const appArgs = args.slice(1);
 
-      await runApp(
-        parseUri(uri), 
-        appArgs,
-        getPolywrapClient()
-      );
-    });
-    
-  program.parse(process.argv);
+  await runApp(
+    parseUri(uri), 
+    appArgs,
+    getPolywrapClient()
+  );
 })();
 
 function parseUri(uri: string): string {

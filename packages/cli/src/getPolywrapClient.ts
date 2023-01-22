@@ -167,7 +167,7 @@ export const getPolywrapClient = () => {
       plugin: fileSystemResolverPlugin({}),
     },
     {
-      uri: "wrap://ens/logger.core.polywrap.eth",
+      uri: "wrap://ens/goerli/logger.polywrap.eth",
       plugin: loggerPlugin({})
     },
     {
@@ -179,11 +179,11 @@ export const getPolywrapClient = () => {
       plugin: wrapIpfsPlugin({})
     },
     {
-      uri: "wrap://ens/interface.subprocess.polywrap.eth",
+      uri: "wrap://ens/goerli/interface.subprocess.polywrap.eth",
       plugin: subprocessPlugin({})
     },
     {
-      uri: "wrap://ens/v2.interface.concurrent.polywrap.eth",
+      uri: "wrap://ens/goerli/v2.interface.concurrent.polywrap.eth",
       plugin: concurrentPromisePlugin({})
     }
   ];

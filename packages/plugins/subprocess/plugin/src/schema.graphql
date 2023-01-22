@@ -1,4 +1,5 @@
 #import { Module } into Subprocess from "wrap://ens/goerli/interface.subprocess.polywrap.eth"
+#import { Module } into Logger from "wrap://ens/goerli/logger.polywrap.eth"
 
 type Module implements Subprocess_Module {
 }

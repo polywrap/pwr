@@ -1,5 +1,6 @@
 type Module {
   exec(command: String!, options: ExecOptions): ExecOutput!
+  spawn(command: String!, args: [String!]!, options: SpawnOptions): Boolean!
 }
 
 enum BufferEncoding {
@@ -14,10 +15,24 @@ enum BufferEncoding {
   hex
 }
 
+enum IOType {
+  overlapped,
+  pipe,
+  ignore,
+  inherit
+}
+
 type ExecOptions {
   cwd: String
   env: Map @annotate(type: "Map<String!, String!>")
   encoding: BufferEncoding
+  shell: String
+}
+
+type SpawnOptions {
+  cwd: String
+  env: Map @annotate(type: "Map<String!, String!>")
+  stdio: IOType
   shell: String
 }
 
@@ -27,5 +42,6 @@ type ExecOutput {
 }
 
 type Env {
+  processId: String
   cwd: String
 }
