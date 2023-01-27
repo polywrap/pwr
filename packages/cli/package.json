@@ -39,6 +39,7 @@
     "@nerfzael/http-server-plugin-wrapper": "0.4.0",
     "@nerfzael/ipfs-plugin-wrapper": "0.1.0",
     "@polywrap/client-js": "0.8.0",
+    "@polywrap/core-js": "0.8.0",
     "@polywrap/ethereum-plugin-js": "0.8.0",
     "@polywrap/ipfs-plugin-js": "0.8.0",
     "@polywrap/ipfs-resolver-plugin-js": "0.8.0",

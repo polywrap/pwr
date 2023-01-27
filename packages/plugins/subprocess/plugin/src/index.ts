@@ -91,23 +91,31 @@ export class SubprocessPlugin extends Module<NoConfig> {
         ? parseStdioOption(args.options.stdio)
         : undefined,
     });
-    const logName = this.env.processId ? `subprocess.${this.env.processId}` : "subprocess";
+    const logName = this.env.processId
+      ? `subprocess.${this.env.processId}`
+      : "subprocess";
 
     if (child.stdout) {
       for await (const data of child.stdout) {
-        Logger_Module.log({
-          message: `${logName}: INFO - ${data}`,
-          level: Logger_LogLevelEnum.INFO,
-        }, client);
+        Logger_Module.log(
+          {
+            message: `${logName}: INFO - ${data}`,
+            level: Logger_LogLevelEnum.INFO,
+          },
+          client
+        );
       }
     }
 
     if (child.stderr) {
       for await (const error of child.stderr) {
-        Logger_Module.log({
-          message: `${logName}: ERROR - ${error}`,
-          level: Logger_LogLevelEnum.ERROR,
-        }, client);
+        Logger_Module.log(
+          {
+            message: `${logName}: ERROR - ${error}`,
+            level: Logger_LogLevelEnum.ERROR,
+          },
+          client
+        );
       }
     }
 

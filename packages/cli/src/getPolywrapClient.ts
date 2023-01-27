@@ -1,4 +1,4 @@
-import { coreInterfaceUris, InvokerOptions, PolywrapClient, PolywrapClientConfig, Uri } from "@polywrap/client-js";
+import { Client, coreInterfaceUris, InvokerOptions, PolywrapClient, PolywrapClientConfig, Uri } from "@polywrap/client-js";
 import { Connection, Connections, ethereumPlugin } from "@polywrap/ethereum-plugin-js";
 import { ipfsPlugin } from "@polywrap/ipfs-plugin-js";
 import { ipfsResolverPlugin } from "@polywrap/ipfs-resolver-plugin-js";
@@ -76,7 +76,7 @@ export const defaultIpfsProviders = [
   "https://ipfs.io",
 ];
 
-export const getPolywrapClient = () => {
+export const getPolywrapClient = (): PolywrapClient => {
   const config = {
     ethereum: {
       providers: {
@@ -184,7 +184,7 @@ export const getPolywrapClient = () => {
     },
     {
       uri: "wrap://ens/goerli/v2.interface.concurrent.polywrap.eth",
-      plugin: concurrentPromisePlugin({})
+      plugin: concurrentPromisePlugin({ clientFactory: getPolywrapClient })
     }
   ];
 
