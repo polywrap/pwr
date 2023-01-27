@@ -28,6 +28,8 @@ export class PwrCommandsResolver extends ResolverWithHistory<unknown> {
     switch (path) {
       case "echo":
         return UriResolutionResult.ok(new Uri(`wrap://ens/wrap-echo.eth`));
+      case "monowrap":
+        return UriResolutionResult.ok(new Uri(`wrap://ens/goerli/monowrap.eth`));
       default:
         return UriResolutionResult.ok(new Uri(`wrap://ens/${path}.pwr-app.eth`));
     }

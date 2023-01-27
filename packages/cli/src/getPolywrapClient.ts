@@ -23,8 +23,8 @@ import { FileSystemCacheResolver } from "./resolvers/FileSystemCacheResolver";
 import { loggerPlugin } from "@polywrap/logger-plugin-js";
 import { CustomWrapperCache } from "./CustomWrapperCache";
 import { PwrCommandsResolver } from "./resolvers/PwrCommandsResolver";
-import { httpServerPlugin } from "@nerfzael/http-server-plugin-wrapper";
-import { ipfsPlugin as wrapIpfsPlugin } from "@nerfzael/ipfs-plugin-wrapper";
+import { httpServerPlugin } from "@wraplib/http-server-plugin-wrapper";
+import { ipfsPlugin as wrapIpfsPlugin } from "@wraplib/ipfs-plugin-wrapper";
 import { CustomPolywrapClient } from "./CustomPolywrapClient";
 
 export const allAccessControlledUris = [

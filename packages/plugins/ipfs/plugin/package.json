@@ -1,5 +1,5 @@
 {
-  "name": "@nerfzael/ipfs-plugin-wrapper",
+  "name": "@wraplib/ipfs-plugin-wrapper",
   "description": "IPFS node plugin wrapper",
   "version": "0.1.0",
   "license": "MIT",

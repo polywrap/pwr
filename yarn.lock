@@ -3628,10 +3628,10 @@
   resolved "https://registry.yarnpkg.com/@vascosantos/moving-average/-/moving-average-1.1.0.tgz#8d5793b09b2d6021ba5e620c6a0f876c20db7eaa"
   integrity sha512-MVEJ4vWAPNbrGLjz7ITnHYg+YXZ6ijAqtH5/cHwSoCpbvuJ98aLXwFfPKAUfZpJMQR5uXB58UJajbY130IRF/w==
 
-"@wraplib/concurrent-promise-plugin@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@wraplib/concurrent-promise-plugin/-/concurrent-promise-plugin-0.4.0.tgz#a98fc9a4ce15333e1c5c731504631a8774aae45c"
-  integrity sha512-iN6nFcEwdGt37rrdJ4jjw1w17Bx/PMIg8avKjwW16e1bMhUheAHxPZTiENXuPdgpf+1yMZVUcClZsYPM+DjcFg==
+"@wraplib/concurrent-promise-plugin@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@wraplib/concurrent-promise-plugin/-/concurrent-promise-plugin-0.5.1.tgz#a1afff8e9cb7046099b7b5927e26d3a44bedac98"
+  integrity sha512-dgn1sZAHi3jCuFNXrouXsfRs/ZjysuXQApuTs2d1aHS9i92Ou4bdcTpE6MnWYhPL+0scbz9KbM7iDg1LrX5iLA==
   dependencies:
     "@polywrap/core-js" "0.8.0"
     "@polywrap/msgpack-js" "0.8.0"

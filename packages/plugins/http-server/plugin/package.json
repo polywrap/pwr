@@ -1,5 +1,5 @@
 {
-  "name": "@nerfzael/http-server-plugin-wrapper",
+  "name": "@wraplib/http-server-plugin-wrapper",
   "description": "HTTP Server plugin wrapper",
   "version": "0.4.0",
   "license": "MIT",
