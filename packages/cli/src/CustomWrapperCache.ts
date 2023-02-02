@@ -11,7 +11,7 @@ export class CustomWrapperCache implements IWrapperCache {
 
   async set(uri: Uri, wrapper: Wrapper): Promise<void> {
     if (uri.uri.startsWith("wrap://ipfs/")) {
-      cacheWrapper(uri.uri, wrapper);  
+      await cacheWrapper(uri.uri, wrapper);  
     }
   
     this._map.set(uri.uri, wrapper);
