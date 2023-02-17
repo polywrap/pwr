@@ -9,6 +9,8 @@ import { ensContenthashResolverPlugin } from "@nerfzael/ens-contenthash-resolver
 import { ipfsEnsContenthashResolverPlugin } from "@nerfzael/ipfs-ens-contenthash-resolver-plugin-wrapper";
 import { ocrEnsContenthashResolverPlugin } from "@nerfzael/ocr-ens-contenthash-resolver-plugin-wrapper";
 import { wrapClientPlugin } from "@nerfzael/wrap-client-plugin-wrapper";
+import { subprocessPlugin } from "@wraplib/subprocess-plugin-js";
+import { concurrentPromisePlugin } from "@wraplib/concurrent-promise-plugin";
 import {
   PackageToWrapperCacheResolver,
   RecursiveResolver,
@@ -40,6 +42,8 @@ export const allAccessControlledUris = [
   "wrap://ens/fs-resolver.polywrap.eth",
   "wrap://ens/http-server.eth",
   "wrap://ens/wrap-ipfs.eth",
+  "wrap://ens/v2.interface.concurrent.polywrap.eth",
+  "wrap://ens/interface.subprocess.polywrap.eth",
 ];
 
 export let accessControlledUris: string[] = [
@@ -173,6 +177,14 @@ export const getPolywrapClient = () => {
     {
       uri: "wrap://ens/wrap-ipfs.eth",
       plugin: wrapIpfsPlugin({})
+    },
+    {
+      uri: "wrap://ens/interface.subprocess.polywrap.eth",
+      plugin: subprocessPlugin({})
+    },
+    {
+      uri: "wrap://ens/v2.interface.concurrent.polywrap.eth",
+      plugin: concurrentPromisePlugin({})
     }
   ];
 

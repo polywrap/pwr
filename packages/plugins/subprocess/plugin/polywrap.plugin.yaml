@@ -1,0 +1,8 @@
+format: 0.1.0
+language: plugin/typescript
+name: ipfs
+module: ./src/index.ts
+schema: ./src/schema.graphql
+import_redirects:
+  - uri: ens/goerli/interface.subprocess.polywrap.eth
+    schema: ../interface/build/wrap.info
