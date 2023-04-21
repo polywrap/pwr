@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+
+echo Installing pwrup...
+
+PWR_DIR=${PWR_DIR-"$HOME/.pwr"}
+PWR_BIN_DIR="$PWR_DIR/bin"
+
+BIN_URL="https://raw.githubusercontent.com/polywrap/pwr/main/pwrup/pwrup"
+BIN_PATH="$PWR_BIN_DIR/pwrup"
+
+# Create the .pwr bin directory and pwrup binary if it doesn't exist.
+mkdir -p $PWR_BIN_DIR
+curl -# -L $BIN_URL -o $BIN_PATH
+chmod +x $BIN_PATH
+
+# Store the correct profile file (i.e. .profile for bash or .zshenv for ZSH).
+case $SHELL in
+*/zsh)
+    PROFILE=${ZDOTDIR-"$HOME"}/.zshenv
+    PREF_SHELL=zsh
+    ;;
+*/bash)
+    PROFILE=$HOME/.bashrc
+    PREF_SHELL=bash
+    ;;
+*/fish)
+    PROFILE=$HOME/.config/fish/config.fish
+    PREF_SHELL=fish
+    ;;
+*/ash)
+    PROFILE=$HOME/.profile
+    PREF_SHELL=ash
+    ;;
+*)
+    echo "pwrup: could not detect shell, manually add ${PWR_BIN_DIR} to your PATH."
+    exit 1
+esac
+
+# Only add pwrup if it isn't already in PATH.
+if [[ ":$PATH:" != *":${PWR_BIN_DIR}:"* ]]; then
+    # Add the pwrup directory to the path and ensure the old PATH variables remain.
+    echo >> $PROFILE && echo "export PATH=\"\$PATH:$PWR_BIN_DIR\"" >> $PROFILE
+fi
+
+echo && echo "Detected your preferred shell is ${PREF_SHELL} and added pwrup to PATH. Run 'source ${PROFILE}' or start a new terminal session to use pwrup."
+echo "Then, simply run 'pwrup' to install PWR (Polywrap Wrapper Runner)."
