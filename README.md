@@ -33,3 +33,16 @@ Output: `Hello world!`
 
 Input: `pwr QmebzauKAXoYbywLAYdBvKyPhWsDoHfkUC4wffWvjighKT Hello world!`
 Output: `Hello world!`
+
+## Rust version
+### Installation 
+Run the following command in the terminal:
+```bash
+curl -L https://raw.githubusercontent.com/polywrap/pwr/main/pwrup/install | bash
+```
+Which will install `pwrup`.
+
+Then, to install `pwr`, run:
+```bash
+pwrup
+```
