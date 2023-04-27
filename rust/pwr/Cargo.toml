@@ -1,8 +1,14 @@
 [package]
 name = "pwr"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+polywrap_client = "0.1.6-beta.1"
+dirs = "5.0.0"
+polywrap_msgpack = "0.1.6-beta.1"
+polywrap_client_builder = "0.1.6-beta.1"
+polywrap_client_default_config = "0.0.2"
+wrap_manifest_schemas = "0.1.6-beta.1"
