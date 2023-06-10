@@ -53,7 +53,7 @@ impl AppManager {
             }
         }
     
-        let serialization_result = polywrap_msgpack::serialize(args);
+        let serialization_result = polywrap_msgpack::serialize(&args);
         let args = match serialization_result {
             Ok(args) => args,
             Err(serializeError) => {

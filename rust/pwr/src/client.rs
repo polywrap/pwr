@@ -1,13 +1,14 @@
-use polywrap_client::client::*;
-use polywrap_client::core::env::Env;
+use std::sync::{Mutex, Arc};
+
+use polywrap_client::builder::helpers::build_resolver;
+use polywrap_client::builder::types::BuilderConfig;
+use polywrap_client::core::resolution::uri_resolution_context::UriResolutionContext;
+use polywrap_client::core::uri_resolver_handler::UriResolverHandler;
+use polywrap_client::{client::*, core::wrap_loader::WrapLoader};
 use polywrap_client::core::error::Error;
-use polywrap_client::core::loader::Loader;
-use polywrap_client::core::resolvers::uri_resolution_context::UriResolutionContext;
-use polywrap_client::core::resolvers::uri_resolver::UriResolverHandler;
 use polywrap_client::core::uri::Uri;
 use polywrap_client::core::wrapper::GetFileOptions;
-use polywrap_client_builder::{types::{ClientBuilder, BuilderConfig}, helpers::build_resolver};
-use polywrap_client_default_config::{build as build_default_config};
+use polywrap_client_default_config::build as build_default_config;
 
 struct SimpleError {
     message: String
@@ -20,8 +21,8 @@ pub trait CoreClient {
         uri: &Uri,
         method: &str,
         args: Option<&[u8]>,
-        env: Option<Env>,
-        resolution_context: Option<&mut UriResolutionContext>,
+        env: Option<&[u8]>,
+        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error>;
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error>;
 }
@@ -43,8 +44,8 @@ impl CoreClient for CoreClientMock {
         uri: &Uri,
         method: &str,
         args: Option<&[u8]>,
-        env: Option<Env>,
-        resolution_context: Option<&mut UriResolutionContext>,
+        env: Option<&[u8]>,
+        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
@@ -60,8 +61,7 @@ pub struct PwrClient {
 
 impl PwrClient {
     pub fn new() -> Self {
-        let default_config = build_default_config();
-        let mut builder = BuilderConfig::new(Some(default_config));
+        let mut builder = BuilderConfig::new(Some(build_default_config()));
 
         let config = build_resolver(builder);
         
@@ -87,8 +87,8 @@ impl CoreClient for PwrClient {
         uri: &Uri,
         method: &str,
         args: Option<&[u8]>,
-        env: Option<Env>,
-        resolution_context: Option<&mut UriResolutionContext>,
+        env: Option<&[u8]>,
+        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error> {
         self.client.invoke(uri, method, args, env, resolution_context)
     }
@@ -98,10 +98,6 @@ impl CoreClient for PwrClient {
 
         match wrapper {
             Ok(wrapper) => {
-                let wrapper = wrapper
-                    .lock()
-                    .unwrap();
-
                 let manifest = wrapper.get_file(
                     &GetFileOptions {
                         path: String::from("wrap.info"),

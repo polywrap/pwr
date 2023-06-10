@@ -3,7 +3,7 @@ mod logger;
 mod client;
 mod prompter;
 
-use std::{env, fmt::Display};
+use std::{env, fmt::Display, fs};
 
 use polywrap_client::core::uri::Uri;
 
@@ -23,7 +23,7 @@ fn get_pwr_dir() -> Result<String, String> {
 
     // Check if the .pwr directory exists
     if !app_dir.exists() {
-        return Err(String::from("Error: Could not find .pwr directory"));
+        fs::create_dir(&app_dir).unwrap();
     }
 
     let pwr_dir = app_dir.into_os_string().into_string().unwrap();
