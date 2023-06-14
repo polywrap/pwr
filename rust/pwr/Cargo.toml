@@ -3,13 +3,10 @@ name = "pwr"
 version = "0.1.2"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-polywrap_client = { path = "/home/nerfzael/dev/web3api/repos/tool2/rust-client/packages/client" }
-polywrap_client_default_config = { path = "/home/nerfzael/dev/web3api/repos/tool2/rust-client/packages/default-config" }
-wrap_manifest_schemas = { path = "/home/nerfzael/dev/web3api/repos/tool2/rust-client/packages/manifest" }
-polywrap_msgpack = { path = "/home/nerfzael/dev/web3api/repos/tool2/rust-client/packages/msgpack" }
+polywrap_client = "0.1.6-beta.5"
+wrap_manifest_schemas = "0.1.6-beta.5"
+polywrap_msgpack = "0.1.6-beta.5"
 dirs = "5.0.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11"

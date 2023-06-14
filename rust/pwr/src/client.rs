@@ -12,7 +12,6 @@ use polywrap_client::{client::*, core::wrap_loader::WrapLoader};
 use polywrap_client::core::error::Error;
 use polywrap_client::core::uri::Uri;
 use polywrap_client::core::wrapper::GetFileOptions;
-use polywrap_client_default_config::build as build_default_config;
 use polywrap_msgpack::msgpack;
 
 struct SimpleError {
@@ -66,15 +65,15 @@ pub struct PwrClient {
 
 impl PwrClient {
     pub fn new() -> Self {
-        let mut builder = BuilderConfig::new(Some(build_default_config()));
-        builder.add_env(Uri::try_from("wrap://ens/wraps.eth:async-ipfs-uri-resolver-ext@1.0.1").unwrap(), msgpack!({
-            "provider": "https://ipfs.wrappers.io",
-            "fallbackProviders": ["https://ipfs.io"],
-            "retries": { "tryResolveUri": 2, "getFile": 2 },
-        }).to_vec());
-        let config = build_resolver(builder);
+        // let mut builder = BuilderConfig::new(Some(build_default_config()));
+        // builder.add_env(Uri::try_from("wrap://ens/wraps.eth:async-ipfs-uri-resolver-ext@1.0.1").unwrap(), msgpack!({
+        //     "provider": "https://ipfs.wrappers.io",
+        //     "fallbackProviders": ["https://ipfs.io"],
+        //     "retries": { "tryResolveUri": 2, "getFile": 2 },
+        // }).to_vec());
+        // let config = build_resolver(builder);
         
-        let client = PolywrapClient::new(config);
+        let client = PolywrapClient::new(get_config());
         Self {
             client
         }
