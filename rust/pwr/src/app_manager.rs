@@ -1,11 +1,18 @@
 use std::collections::HashSet;
 
 use polywrap_client::core::uri::Uri;
+use polywrap_msgpack::msgpack;
 use wrap_manifest_schemas::deserialize::{deserialize_wrap_manifest, DeserializeManifestOptions};
 
 use crate::client::CoreClient;
 use crate::prompter::Prompter;
 use crate::logger::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)] 
+struct AppArgs {
+    args: Vec<String>,
+}
 
 pub struct AppManager;
 impl AppManager {
@@ -23,16 +30,16 @@ impl AppManager {
         logger: &dyn Logger,
     ) -> i32 {
         let access_controlled_uris: Vec<String> = vec![];
-        let mut visited_uris = HashSet::new();
+        let mut visited_uris: HashSet<String> = HashSet::new();
         
-        extract_access_controlled_uris(
-            uri, 
-            &all_access_controlled_uris, 
-            &access_controlled_uris, 
-            &mut visited_uris,
-            client, 
-            logger,
-        );
+        // extract_access_controlled_uris(
+        //     uri, 
+        //     &all_access_controlled_uris, 
+        //     &access_controlled_uris, 
+        //     &mut visited_uris,
+        //     client, 
+        //     logger,
+        // );
     
         if access_controlled_uris.len() > 0 {
             let response = prompter.confirm(
@@ -53,7 +60,9 @@ impl AppManager {
             }
         }
     
-        let serialization_result = polywrap_msgpack::serialize(&args);
+        let serialization_result = polywrap_msgpack::serialize(&AppArgs {
+            args: args.to_vec(),
+        });
         let args = match serialization_result {
             Ok(args) => args,
             Err(serializeError) => {
@@ -61,6 +70,8 @@ impl AppManager {
                 return 1;
             }
         };
+
+        println!("args: {:?}", args);
 
         let result = invoke_with_access_control(
             uri,
