@@ -1,40 +1,136 @@
-use std::{fs, io, sync::Arc, path::PathBuf};
+use std::{fs::{self, File}, io::{self, Write}, sync::Arc, path::{PathBuf, Path}};
 mod utils;
 use clap::{arg, Command, value_parser};
-use polywrap_client::{client::PolywrapClient, core::uri::Uri};
+use colored::Colorize;
+use polywrap_client::{client::PolywrapClient, core::uri::Uri, wasm::wasm_wrapper::WasmWrapper};
+use serde_json::{Value, json};
 use utils::*;
 use serde::{Deserialize, Serialize};
+use wrap_manifest_schemas::{versions::{WrapManifestAbi, WrapManifest}, deserialize::{deserialize_wrap_manifest, DeserializeManifestOptions, self}};
+// const DEFAULT_TEMPLATE_CID: &str = "QmSYr5FuZ49BbRqg8W1gmU5UtEaJmhxMn58SzvVmAgEkKm";
+const DEFAULT_TEMPLATE_CID: &str = "QmTzgDRWiSsux4463gz3h9kXfXkLaUq5gzqdJr7cSmG3Hx";
+const DEFAULT_JS_ENGINE_CID: &str = "QmQGWzyd6bsbErRgSdNXsDskvy6VTSaLBUYjZK5zDZVZwC";
+const DEFAULT_PY_ENGINE_CID: &str = "QmRhaCMunjt6DcgkSrwAxumWMHDK9UZATJgUrPaJJ2Zmb7";
 
-const DEFAULT_JS_ENGINE_CID: &str = "QmZwhcANeoZCn9An61d4uPfLtNznxyz85TsBf5AcqHeWVk";
-const DEFAULT_TEMPLATE_CID: &str = "QmbRVyK6yGu11iCiUqC2YeRQRo9xMCk2jVKxMQcuuaYgmc";
+pub enum ScriptLanguage {
+    JavaScript,
+    Python,
+}
 
-pub async fn run_js_pwr_app(
+pub async fn run_script_pwr_app(
     args: &[String], 
+    language: ScriptLanguage,
 ) -> i32 {
-    println!("Running JS PWR App");
-
-    let matches = Command::new("js") 
+    let matches = Command::new("script") 
         .subcommand(
-            Command::new("eval")
-                .about("evaluates a file")
-                .arg(arg!(-f --file <FILE> "File to input").required(true).value_parser(value_parser!(PathBuf)))
-                .arg(arg!(-m --method <METHOD> "Method to execute").required(false))
+            Command::new("invoke")
+                .about("invokes a method from a script")
+                .arg(arg!(-f --file <FILE> "Path to script file").required(true).value_parser(value_parser!(PathBuf)))
+                .arg(arg!(-m --method <METHOD> "Method to invoke").required(false))
                 .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
                 .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+                .arg(arg!(-r --release "Release").required(false))
+        )
+        .subcommand(
+            Command::new("build")
+                .about("builds a into a wrap")
+                .arg(arg!(-f --file <FILE> "File to build").required(true).value_parser(value_parser!(PathBuf)))
+                .arg(arg!(-o --output <OUTPUT> "Directory for the build artifacts").required(false).value_parser(value_parser!(PathBuf)))
+                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
+                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+        )
+        .subcommand(
+            Command::new("deploy")
+                .about("deploys a wrap")
+                .arg(arg!(-f --file <FILE> "File to deploy").required(false).value_parser(value_parser!(PathBuf)))
+                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
+                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+        )
+        .subcommand(
+            Command::new("repl")
+                .about("Starts the repl")
+                .arg(arg!(-f --file <FILE> "File to input").required(false).value_parser(value_parser!(PathBuf)))
+                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
+                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+                .arg(arg!(-r --release "Release").required(false))
         )
         .get_matches_from(args);
 
     if let Some(matches) = matches.subcommand_matches("eval") {
         let file = matches.get_one::<PathBuf>("file");
         let method = matches.get_one::<String>("method");
+
         let engine_cid = matches.get_one::<String>("engine")
             .and_then(|x| Some(x.as_str()))
-            .unwrap_or(DEFAULT_JS_ENGINE_CID);
+            .unwrap_or(
+                match language {
+                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                }
+            );
+
         let template_cid = matches.get_one::<String>("template")
             .and_then(|x| Some(x.as_str()))
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
-        return run_eval_vm(file, method, &engine_cid, &template_cid).await;
+        let is_release = matches.get_flag("release");
+
+        return execute_eval_command(file, method, &engine_cid, &template_cid, is_release).await;
+    } else if let Some(matches) = matches.subcommand_matches("build") {
+        let file = matches.get_one::<PathBuf>("file").unwrap();
+        let output = matches.get_one::<PathBuf>("output");
+
+        let engine_cid = matches.get_one::<String>("engine")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(
+                match language {
+                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                }
+            );
+
+        let template_cid = matches.get_one::<String>("template")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(DEFAULT_TEMPLATE_CID);
+
+        return execute_build_command(file, output, &engine_cid, &template_cid).await;
+    }  else if let Some(matches) = matches.subcommand_matches("deploy") {
+        let file = matches.get_one::<PathBuf>("file");
+        let output = matches.get_one::<PathBuf>("output");
+
+        let engine_cid = matches.get_one::<String>("engine")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(
+                match language {
+                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                }
+            );
+
+        let template_cid = matches.get_one::<String>("template")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(DEFAULT_TEMPLATE_CID);
+
+        return execute_deploy_command(file, output, &engine_cid, &template_cid).await;
+    } else if let Some(matches) = matches.subcommand_matches("repl") {
+        let file = matches.get_one::<PathBuf>("file");
+
+        let engine_cid = matches.get_one::<String>("engine")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(
+                match language {
+                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                }
+            );
+
+        let template_cid = matches.get_one::<String>("template")
+            .and_then(|x| Some(x.as_str()))
+            .unwrap_or(DEFAULT_TEMPLATE_CID);
+
+        let is_release = matches.get_flag("release");
+
+        return execute_repl_command(file, &engine_cid, &template_cid, is_release).await;
     } else {
         println!("Command not found!");
     }
@@ -42,10 +138,9 @@ pub async fn run_js_pwr_app(
     return 1;
 } 
 
-async fn run_eval_vm(file: Option<&PathBuf>, method: Option<&String>, engine_cid: &str, template_cid: &str) -> i32 {
+async fn execute_eval_command(file: Option<&PathBuf>, method: Option<&String>, engine_cid: &str, template_cid: &str, is_release: bool) -> i32 {
     println!("VM loading...");
     let client = Arc::new(get_client_with_wraps(vec![
-        (Uri::try_from("mock/engine").unwrap(), load_wrap_from_ipfs(engine_cid).await),
     ]));
     loop {
         println!("VM ready");
@@ -58,31 +153,115 @@ async fn run_eval_vm(file: Option<&PathBuf>, method: Option<&String>, engine_cid
             input.to_string()
         };
 
-         let mut args = input.split(" ").map(|s| s.to_string()).collect::<Vec<String>>();
-         if let Some(method) = &method {
-             args.insert(0, method.to_string());
-         }
-         if let Some(file) = &file {
-             args.insert(0, file.to_string_lossy().into_owned());
-         }
+        let mut args = input.split(" ").map(|s| s.to_string()).collect::<Vec<String>>();
+        if let Some(method) = &method {
+            args.insert(0, method.to_string());
+        }
+        if let Some(file) = &file {
+            args.insert(0, file.to_string_lossy().into_owned());
+        }
 
-        deploy_with_args(&args, template_cid, client.clone()).await;
+        if !is_release {
+            eval_with_args(&args, client.clone(), engine_cid).await;
+        } else {
+            deploy_with_args(&args, template_cid, engine_cid, client.clone()).await;
+        }
     }
 }
 
-async fn deploy_with_args(args: impl AsRef<Vec<String>>, template_cid: &str, client: Arc<PolywrapClient>) -> i32 {
+async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_cid: &str, template_cid: &str) -> i32 {
+    println!("Building the WRAP...");
+
+    let script = get_script_info(&file.to_string_lossy().into_owned()).unwrap();
+    let module = build_wasm_module_from_script(&script, template_cid);
+
+    let default_output = PathBuf::from("./build");
+    let output = output.unwrap_or(&default_output);
+
+    if !Path::exists(output) {
+        fs::create_dir(output).unwrap();
+    }
+
+    let wrap_name = Path::new(&file).file_stem().unwrap().to_str().unwrap();
+    println!("WRAP name: {}", wrap_name);
+    let manifest = WrapManifest {
+        name: wrap_name.to_string(),
+        type_: "wasm".to_string(),
+        version: "0.1".to_string(),
+        abi: wrap_manifest_schemas::versions::WrapManifest01Abi {
+            ..Default::default()
+        },
+    };
+    let manifest = rmp_serde::to_vec_named(&manifest).unwrap();
+    let manifest = deserialize_wrap_manifest(&manifest, None).unwrap();
+    let manifest = rmp_serde::to_vec_named(&manifest).unwrap();
+
+    let mut file = File::create("./build/wrap.info").unwrap();
+    file.write_all(&manifest).unwrap();
+
+
+    let mut file = File::create("./build/wrap.wasm").unwrap();
+    file.write_all(&module).unwrap();
+
+    println!("WRAP built successfully!");
+    return 0;
+}
+
+async fn execute_deploy_command(file: Option<&PathBuf>, output: Option<&PathBuf>, engine_cid: &str, template_cid: &str) -> i32 {
+    println!("Deploying the WRAP...");
+
+    if file.is_some() {
+        execute_build_command(file.unwrap(), output, engine_cid, template_cid).await;
+    }
+
+    let output = output.unwrap_or(&PathBuf::from("./build")).to_string_lossy().into_owned();
+
+    let cid = deploy_package_to_ipfs(&output).await.unwrap();
+    println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
+
+    let manifest = fs::read(format!("{output}/wrap.info")).unwrap();
+    let manifest = deserialize_wrap_manifest(&manifest, None).unwrap();
+
+    deploy_uri_to_http(&manifest.name, &Uri::try_from("wrap://ipfs/".to_string() + &cid).unwrap()).await.unwrap();
+    println!("WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}", &manifest.name);
+    println!("WRAP deployed successfully!");
+    return 0;
+}
+
+async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, is_release: bool) -> i32 {
+    println!("VM loading...");
+    let client = Arc::new(get_client_with_wraps(vec![
+    ]));
+    let mut total_input = "".to_string();
+    loop {
+        println!("VM ready");
+        let input = {
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read line");
+            let input = input.trim(); // Remove whitespace
+            input.to_string()
+        };
+
+        let new_total_input = total_input.clone() + "\n" + &input;
+        if !is_release {
+            let result = invoke_eval(&new_total_input, vec![], engine_cid, client.clone()).await;
+            
+            if result == 0 {
+                total_input = new_total_input;
+            }
+        } else {
+            panic!("Repl not yet supported in release mode");
+        }
+    }
+}
+
+async fn deploy_with_args(args: impl AsRef<Vec<String>>, template_cid: &str, engine_cid: &str, client: Arc<PolywrapClient>) -> i32 {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
    
-    let gateway = "https://ipfs.wrappers.io/api/v0/cat?arg=";
-    let template_wrap_endpoint = format!("{gateway}{template_cid}");
-
-    let user_code = fs::read_to_string(user_file).unwrap();
-    let user_code = format!("{user_code}");
-
-    let PackageContent { mut module, .. } = load_package_from_url(&template_wrap_endpoint).await;
-
-    replace_user_module(&mut module, &user_code);
+    let user_wrap = create_wrap_from_file(&user_file, template_cid).unwrap();
 
     let args = {
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
@@ -98,16 +277,96 @@ async fn deploy_with_args(args: impl AsRef<Vec<String>>, template_cid: &str, cli
 
         args
     };
-    let result = invoke_client("mock/test", &method, &args, client, &module);
+
+    let result = user_wrap.invoke(method, Some(&args), None, client, None)
+        .map_err(|e| format!("Error invoking method: {}", e));
 
     if let Err(error) = result {
         println!("{:?}", error);
-        return 1;
+        return 0;
     }
 
     let result = msgpack_to_json_pretty(&result.unwrap());
 
     println!("{}", result);
+
+    return 0;
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ArgsEvalWithGlobals {
+    pub src: String,
+    pub globals: Vec<JsEngineGlobalVar>,
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct JsEngineGlobalVar {
+    pub name: String,
+    pub value: String,
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct JsEngineEvalResult {
+    pub value: Option<String>,
+    pub error: Option<String>,
+}
+
+async fn eval_with_args(args: impl AsRef<Vec<String>>, client: Arc<PolywrapClient>, engine_cid: &str) -> i32 {
+    let user_file = args.as_ref()[0].clone();
+    let method = &args.as_ref()[1];
+
+    let args = json!({
+        "args": args.as_ref().iter().skip(2).cloned().collect::<Vec<String>>(),
+    });
+
+    invoke_eval(
+        &fs::read_to_string(user_file).unwrap(),
+        vec![
+            JsEngineGlobalVar {
+                name: "wrap_method".to_string(),
+                value: serde_json::to_string(method).unwrap(),
+            },
+            JsEngineGlobalVar {
+                name: "wrap_args".to_string(),
+                value: serde_json::to_string(&args).unwrap(),
+            }
+        ],
+        engine_cid,
+        client
+    ).await
+}
+
+async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &str, client: Arc<PolywrapClient>) -> i32 {
+    let result = client.invoke::<JsEngineEvalResult>(&Uri::try_from(format!("ipfs/{}", engine_cid)).unwrap(), "evalWithGlobals", Some(
+       &rmp_serde::encode::to_vec_named(& ArgsEvalWithGlobals{
+            src: src.to_string(),
+            globals,
+       }).unwrap()
+    ), None, None);
+
+    let result = result.map_err(|e| format!("Error invoking method: {}", e));
+
+    if let Err(error) = result {
+        println!("{}", format!("93mRuntime error: {:?}", error).red());
+        return 1;
+    }
+
+    let result = result.unwrap();
+
+    if let None = result.value {
+        if let None = result.error {
+            println!("{}", "No value".yellow());
+        } else {
+            let error = result.error.unwrap();
+            println!("{}", format!("Eval error: {:?}", error).red());
+            return 1;
+        }
+
+        return 1;
+    }
+
+    let value = result.value.unwrap();
+    let value = serde_json::from_str::<serde_json::Value>(&value).unwrap();
+    let result = serde_json::to_string_pretty(&value).unwrap();
+
+    println!("{}", format!("{}", result).green());
 
     return 0;
 }

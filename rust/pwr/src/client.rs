@@ -1,22 +1,14 @@
 use std::fs;
 use std::sync::{Mutex, Arc};
 
-use polywrap_client::builder::helpers::build_resolver;
-use polywrap_client::builder::types::{BuilderConfig, ClientBuilder, ClientConfigHandler};
 use polywrap_client::core::client::ClientConfig;
-use polywrap_client::core::file_reader::SimpleFileReader;
 use polywrap_client::core::resolution::uri_resolution_context::UriResolutionContext;
 use polywrap_client::core::uri_resolver_handler::UriResolverHandler;
-use polywrap_client::wasm::wasm_wrapper::WasmWrapper;
 use polywrap_client::{client::*, core::wrap_loader::WrapLoader};
 use polywrap_client::core::error::Error;
 use polywrap_client::core::uri::Uri;
 use polywrap_client::core::wrapper::GetFileOptions;
-use polywrap_msgpack::msgpack;
-
-struct SimpleError {
-    message: String
-}
+use polywrap_client_builder::PolywrapClientConfig;
 
 pub trait CoreClient {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error>;
@@ -84,18 +76,7 @@ fn get_config() -> ClientConfig {
     let manifest = fs::read("/home/nerfzael/dev/web3api/repos/pwr/packages/wrappers/echo/build/wrap.info").expect("Unable to read file");
     let mut bytes = fs::read("/home/nerfzael/dev/web3api/repos/pwr/packages/wrappers/echo/build/wrap.wasm").expect("Unable to read file");
 
-    let config = {
-        BuilderConfig {
-            interfaces: None,
-            envs: None,
-            wrappers: Some(vec![
-            ]),
-            packages: None,
-            redirects: None,
-            resolvers: None,
-        }
-    };
-    config.build()
+    PolywrapClientConfig::default().into()
 }
 impl CoreClient for PwrClient {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error> {

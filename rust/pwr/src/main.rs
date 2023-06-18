@@ -75,7 +75,8 @@ pub async fn internal_main(
     logger.debug(format!("Parsed URI: {}", uri.to_string())).unwrap();
 
     match uri.to_string().as_str() {
-        "wrap://pwr/js" => return run_js_pwr_app(args).await,
+        "wrap://pwr/js" => return run_script_pwr_app(args, ScriptLanguage::JavaScript).await,
+        "wrap://pwr/py" => return run_script_pwr_app(args, ScriptLanguage::Python).await,
         _ => {}
     }
 
