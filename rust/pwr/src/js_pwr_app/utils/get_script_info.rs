@@ -1,6 +1,4 @@
-use std::{sync::{Arc}, fs, path::Path};
-
-use polywrap_client::{core::{file_reader::SimpleFileReader, wrapper::Wrapper}, wasm::{wasm_wrapper::WasmWrapper, wasm_module::CompiledWasmModule}};
+use std::{fs, path::Path};
 
 use crate::js_pwr_app::ScriptLanguage;
 

@@ -11,7 +11,7 @@ pub async fn load_wrap_from_ipfs(cid: &str) -> Arc::<dyn Wrapper> {
   let PackageContent { module, .. } = load_package_from_url(&template_wrap_endpoint);
 
 
-  let compiled_module = CompiledWasmModule::from_byte_code(&module).unwrap();
+  let compiled_module = CompiledWasmModule::try_from_bytecode(&module).unwrap();
   let wrap = WasmWrapper::new(compiled_module, Arc::new(SimpleFileReader::new()));
   Arc::new(wrap)
 }

@@ -2,7 +2,7 @@ use std::{sync::{Arc, Mutex}, path::Path};
 
 use polywrap_client::{client::PolywrapClient, core::{uri::Uri, wrapper::Wrapper, resolution::{uri_resolver::UriResolver, uri_resolution_context::{UriResolutionContext, UriPackageOrWrapper}}, invoker::Invoker, client::ClientConfig}, resolvers::resolution_result_cache_resolver::ResolutionResultCacheResolverOptions};
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
-use polywrap_client_builder::{PolywrapClientConfig, PolywrapBaseResolverOptions, build_static_resolver, PolywrapBaseResolver, PolywrapClientConfigBuilder};
+use polywrap_client_builder::{PolywrapClientConfig, PolywrapBaseResolverOptions, PolywrapBaseResolver, PolywrapClientConfigBuilder};
 
 use crate::js_pwr_app::DEFAULT_TEMPLATE_CID;
 
@@ -24,8 +24,8 @@ impl UriResolver for LocalResolver {
         _client: Arc<dyn Invoker>,
         _resolution_context: Arc<Mutex<UriResolutionContext>>,
     ) -> Result<UriPackageOrWrapper, polywrap_client::core::error::Error> {
-        if uri.authority == "script" {
-            let path = uri.path.clone();
+        if uri.authority() == "script" {
+            let path = uri.path().clone();
 
             if Path::new(&path).extension().is_none() {
                 return Ok(UriPackageOrWrapper::Uri(uri.clone()));
@@ -59,6 +59,10 @@ pub fn get_client_with_wraps(wraps: Vec<(Uri, Arc<dyn Wrapper>)>) -> PolywrapCli
         Uri::try_from("wrap://ipfs/Qmbokxv3S2UFvkM569Gu4XCi4KvVCn138U7xBFCxfGQipo").unwrap(), 
         Uri::try_from("wrap://mock/engine").unwrap()
     );
+    config.add_interface_implementation(
+        Uri::try_from("wrap://ens/uri-resolver.core.polywrap.eth").unwrap(), 
+        Uri::try_from("wrap://http/http.wrappers.dev/u/test/polywrap-resolver").unwrap()
+    );
 
     for wrap in wraps {
         config.add_wrapper(wrap.0, wrap.1);
@@ -68,13 +72,10 @@ pub fn get_client_with_wraps(wraps: Vec<(Uri, Arc<dyn Wrapper>)>) -> PolywrapCli
 
     let config = ClientConfig {
         resolver: PolywrapBaseResolver::new(PolywrapBaseResolverOptions {
-            static_resolver: build_static_resolver(&config),
+            static_resolver: config.build_static_resolver(),
             dynamic_resolvers: config.resolvers,
             cache_resolver_options: Some(ResolutionResultCacheResolverOptions {
-                skip_cache: Some(|uri| uri.authority == "script" 
-                                    || uri.authority == "fs" 
-                                    || uri.authority == "file"
-                            ),
+                skip_cache: Some(|uri| uri.authority() != "ipfs"),
                 ..Default::default()
             }),
             ..Default::default()

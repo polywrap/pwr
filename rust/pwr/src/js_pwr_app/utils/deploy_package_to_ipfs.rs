@@ -19,7 +19,6 @@ pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, Box<dyn std::e
     let mut form = multipart::Form::new();
     while let Some(entry) = dir.next_entry().await? {
         let file_path = entry.path();
-        println!("{:?}", file_path);
         if file_path.is_file() {
             // Strip the parent path
             let file_name = file_path.strip_prefix(path).to_owned().expect("Failed to strip prefix").to_string_lossy().into_owned();
@@ -35,7 +34,7 @@ pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, Box<dyn std::e
 
     // Send the request
     let client = reqwest::Client::new();
-    let resp = client.post("http://localhost:8081/api/v0/add")
+    let resp = client.post("https://ipfs.wrappers.io/api/v0/add")
         .multipart(form)
         .send().await?;
 

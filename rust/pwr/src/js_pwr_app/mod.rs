@@ -1,12 +1,14 @@
-use std::{fs::{self, File}, io::{self, Write}, sync::Arc, path::{PathBuf, Path}};
+use std::{fs::{self, File}, io::{self, Write}, sync::{Arc}, path::{PathBuf, Path}, time::Duration};
 mod utils;
 use clap::{arg, Command, value_parser};
 use colored::Colorize;
-use polywrap_client::{client::PolywrapClient, core::uri::Uri, wasm::wasm_wrapper::WasmWrapper};
-use serde_json::{Value, json};
+use notify::RecursiveMode;
+use notify_debouncer_mini::{new_debouncer};
+use polywrap_client::{client::PolywrapClient, core::uri::Uri};
+use serde_json::json;
 use utils::*;
 use serde::{Deserialize, Serialize};
-use wrap_manifest_schemas::{versions::{WrapManifestAbi, WrapManifest}, deserialize::{deserialize_wrap_manifest, DeserializeManifestOptions, self}};
+use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
 // const DEFAULT_TEMPLATE_CID: &str = "QmSYr5FuZ49BbRqg8W1gmU5UtEaJmhxMn58SzvVmAgEkKm";
 const DEFAULT_TEMPLATE_CID: &str = "QmTzgDRWiSsux4463gz3h9kXfXkLaUq5gzqdJr7cSmG3Hx";
 const DEFAULT_JS_ENGINE_CID: &str = "QmQGWzyd6bsbErRgSdNXsDskvy6VTSaLBUYjZK5zDZVZwC";
@@ -53,10 +55,11 @@ pub async fn run_script_pwr_app(
                 .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
                 .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
                 .arg(arg!(-r --release "Release").required(false))
+                .arg(arg!(-w --watch "Watch the file for changes").required(false))
         )
         .get_matches_from(args);
 
-    if let Some(matches) = matches.subcommand_matches("eval") {
+    if let Some(matches) = matches.subcommand_matches("invoke") {
         let file = matches.get_one::<PathBuf>("file");
         let method = matches.get_one::<String>("method");
 
@@ -129,8 +132,9 @@ pub async fn run_script_pwr_app(
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         let is_release = matches.get_flag("release");
+        let should_watch = matches.get_flag("watch");
 
-        return execute_repl_command(file, &engine_cid, &template_cid, is_release).await;
+        return execute_repl_command(file, &engine_cid, &template_cid, is_release, should_watch).await;
     } else {
         println!("Command not found!");
     }
@@ -193,8 +197,6 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_
         },
     };
     let manifest = rmp_serde::to_vec_named(&manifest).unwrap();
-    let manifest = deserialize_wrap_manifest(&manifest, None).unwrap();
-    let manifest = rmp_serde::to_vec_named(&manifest).unwrap();
 
     let mut file = File::create("./build/wrap.info").unwrap();
     file.write_all(&manifest).unwrap();
@@ -208,11 +210,11 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_
 }
 
 async fn execute_deploy_command(file: Option<&PathBuf>, output: Option<&PathBuf>, engine_cid: &str, template_cid: &str) -> i32 {
-    println!("Deploying the WRAP...");
-
     if file.is_some() {
         execute_build_command(file.unwrap(), output, engine_cid, template_cid).await;
     }
+
+    println!("Deploying the WRAP...");
 
     let output = output.unwrap_or(&PathBuf::from("./build")).to_string_lossy().into_owned();
 
@@ -227,14 +229,44 @@ async fn execute_deploy_command(file: Option<&PathBuf>, output: Option<&PathBuf>
     println!("WRAP deployed successfully!");
     return 0;
 }
+async fn read_file_and_eval(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) -> String {
+    let total_input = if let Some(file) = &file {
+        if Path::exists(file) {
+            fs::read_to_string(file).unwrap()
+        } else {
+            "".to_string()
+        }
+    } else {
+        "".to_string()
+    };
+    if total_input.len() > 0 {
+        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+    }
 
-async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, is_release: bool) -> i32 {
-    println!("VM loading...");
+    total_input
+}
+
+async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, is_release: bool, should_watch: bool) -> i32 {
+    println!("REPL loading...");
     let client = Arc::new(get_client_with_wraps(vec![
     ]));
-    let mut total_input = "".to_string();
+    
+    if should_watch {
+        if let Some(file) = file {
+            println!("Watching file: {:?}", file);
+            read_file_and_eval(Some(file), engine_cid, template_cid, client.clone()).await;
+            watch(file, engine_cid, template_cid, client.clone()).await;
+            return 0;
+        } else {
+            write_err("File not specified".to_string());
+
+            return 1;
+        }
+    }
+
+    let mut total_input = read_file_and_eval(file, engine_cid, template_cid, client.clone()).await;
+
     loop {
-        println!("VM ready");
         let input = {
             let mut input = String::new();
             io::stdin()
@@ -244,15 +276,76 @@ async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template
             input.to_string()
         };
 
-        let new_total_input = total_input.clone() + "\n" + &input;
         if !is_release {
+            total_input = if let Some(file) = &file {
+                if Path::exists(file) {
+                    fs::read_to_string(file).unwrap()
+                } else {
+                    total_input
+                }
+            } else {
+                total_input
+            };
+
+            match input.as_str() {
+                "" => {
+                    if total_input.len() > 0 {
+                        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+                    }
+
+                    continue;
+                }
+                _ => {}
+            };
+
+            let new_total_input = total_input.clone() + "\n" + &input;
             let result = invoke_eval(&new_total_input, vec![], engine_cid, client.clone()).await;
             
             if result == 0 {
                 total_input = new_total_input;
+                if let Some(file) = &file {
+                    let mut file = File::create(file).unwrap();
+                    file.write_all(total_input.as_bytes()).unwrap();
+                }
             }
         } else {
             panic!("Repl not yet supported in release mode");
+        }
+    }
+}
+
+async fn watch(path: &PathBuf, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) {
+    // setup debouncer
+    let (tx, rx) = std::sync::mpsc::channel();
+
+    // No specific tickrate, max debounce time 2 seconds
+    let mut debouncer = new_debouncer(Duration::from_millis(200), None, tx).unwrap();
+
+    debouncer
+        .watcher()
+        .watch(path, RecursiveMode::Recursive)
+        .unwrap();
+
+    // print all events, non returning
+    for result in rx {
+        match result {
+            Ok(events) => {
+                for _ in events {
+                    let total_input = if let Some(file) = &path.to_str() {
+                        if Path::exists(path) {
+                            fs::read_to_string(file).unwrap()
+                        } else {
+                            "".to_string()
+                        }
+                    } else {
+                        "".to_string()
+                    };
+                    if total_input.len() > 0 {
+                        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+                    }
+                }
+            },
+            Err(errors) => errors.iter().for_each(|error| write_warn(format!("Watch error: {:?}", error))),
         }
     }
 }
@@ -333,6 +426,18 @@ async fn eval_with_args(args: impl AsRef<Vec<String>>, client: Arc<PolywrapClien
     ).await
 }
 
+fn write_ok(str: impl AsRef<str>) {
+    println!("{}", str.as_ref().green());
+}
+
+fn write_err(str: impl AsRef<str>) {
+    println!("{}", str.as_ref().red());
+}
+
+fn write_warn(str: impl AsRef<str>) {
+    println!("{}", str.as_ref().yellow());
+}
+
 async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &str, client: Arc<PolywrapClient>) -> i32 {
     let result = client.invoke::<JsEngineEvalResult>(&Uri::try_from(format!("ipfs/{}", engine_cid)).unwrap(), "evalWithGlobals", Some(
        &rmp_serde::encode::to_vec_named(& ArgsEvalWithGlobals{
@@ -344,7 +449,7 @@ async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &st
     let result = result.map_err(|e| format!("Error invoking method: {}", e));
 
     if let Err(error) = result {
-        println!("{}", format!("93mRuntime error: {:?}", error).red());
+        write_err(format!("Runtime error: {:?}", error));
         return 1;
     }
 
@@ -352,10 +457,10 @@ async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &st
 
     if let None = result.value {
         if let None = result.error {
-            println!("{}", "No value".yellow());
+            write_warn("No value");
         } else {
             let error = result.error.unwrap();
-            println!("{}", format!("Eval error: {:?}", error).red());
+            write_err(format!("Eval error: {:?}", error));
             return 1;
         }
 
@@ -366,7 +471,7 @@ async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &st
     let value = serde_json::from_str::<serde_json::Value>(&value).unwrap();
     let result = serde_json::to_string_pretty(&value).unwrap();
 
-    println!("{}", format!("{}", result).green());
+    write_ok(format!("{}", result));
 
     return 0;
 }
