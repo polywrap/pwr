@@ -1,14 +1,13 @@
 use std::collections::HashSet;
 
 use polywrap_client::core::uri::Uri;
-use wrap_manifest_schemas::deserialize::{deserialize_wrap_manifest, DeserializeManifestOptions};
 
 use crate::client::CoreClient;
-use crate::prompter::Prompter;
 use crate::logger::*;
+use crate::prompter::Prompter;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)] 
+#[derive(Serialize, Deserialize)]
 struct AppArgs {
     args: Vec<String>,
 }
@@ -21,25 +20,25 @@ impl AppManager {
 
     pub fn run_app(
         &self,
-        uri: &Uri, 
-        args: &[String], 
-        client: &impl CoreClient, 
-        _prompter: &impl Prompter, 
+        uri: &Uri,
+        args: &[String],
+        client: &impl CoreClient,
+        _prompter: &impl Prompter,
         logger: &impl Logger,
         _all_access_controlled_uris: Vec<String>,
     ) -> i32 {
         let access_controlled_uris: Vec<String> = vec![];
         let mut _visited_uris: HashSet<String> = HashSet::new();
-        
+
         // extract_access_controlled_uris(
-        //     uri, 
-        //     &all_access_controlled_uris, 
-        //     &access_controlled_uris, 
+        //     uri,
+        //     &all_access_controlled_uris,
+        //     &access_controlled_uris,
         //     &mut visited_uris,
-        //     client, 
+        //     client,
         //     logger,
         // );
-    
+
         // if access_controlled_uris.len() > 0 {
         //     let response = prompter.confirm(
         //         format!("App requested access to: \n{}. \nDo you want to grant access?", access_controlled_uris.join("\n"))
@@ -52,13 +51,13 @@ impl AppManager {
         //             return 1;
         //         }
         //     };
-    
+
         //     if !response {
         //         logger.error(format!("Denied access for {}", uri.to_string()));
         //         return 1;
         //     }
         // }
-    
+
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
             args: args.to_vec(),
         });
@@ -77,34 +76,34 @@ impl AppManager {
             "main",
             Some(&args),
             client,
-            access_controlled_uris.clone(), 
-            access_controlled_uris, 
+            access_controlled_uris.clone(),
+            access_controlled_uris,
         );
-    
+
         match result {
             Ok(data) => {
                 let exit_code = polywrap_msgpack::decode::<i32>(&data);
 
                 match exit_code {
                     Ok(exit_code) => {
-                        return exit_code;
-                    },
+                        exit_code
+                    }
                     Err(e) => {
                         logger.error(format!("{:?}", e)).unwrap();
-                        return 1;
+                        1
                     }
                 }
-            },
+            }
             Err(e) => {
-                logger.error(format!("{}", e)).unwrap();
-                return 1;
+                logger.error(e).unwrap();
+                1
             }
         }
     }
 }
 
 // fn extract_access_controlled_uris(
-//     uri: &Uri, 
+//     uri: &Uri,
 //     _all_access_controlled_uris: &[String],
 //     _acess_controlled_uris: &[String],
 //     visited_uris: &mut HashSet<String>,
@@ -139,7 +138,7 @@ impl AppManager {
 //     };
 
 //     let imported_module_types = if manifest.abi.imported_module_types != None {
-//         manifest.abi.imported_module_types.unwrap() 
+//         manifest.abi.imported_module_types.unwrap()
 //     } else {
 //         [].to_vec()
 //     };
@@ -166,18 +165,12 @@ fn invoke_with_access_control(
     _allowed_uris: Vec<String>,
     _all_access_controlled_uris: Vec<String>,
 ) -> Result<Vec<u8>, String> {
-    match client.invoke_raw(
-        uri, 
-        method, 
-        args, 
-        None,
-        None
-    ) {
+    match client.invoke_raw(uri, method, args, None, None) {
         Ok(data) => {
-            return Ok(data);
-        },
+            Ok(data)
+        }
         Err(e) => {
-            return Err(format!("{}", e));
-        }   
+            Err(format!("{}", e))
+        }
     }
 }
