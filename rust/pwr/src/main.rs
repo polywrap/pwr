@@ -2,7 +2,7 @@ mod app_manager;
 mod logger;
 mod client;
 mod prompter;
-
+mod js_pwr_app;
 use std::{env, fmt::Display, fs};
 
 use polywrap_client::{core::uri::Uri, client::PolywrapClient, builder::{PolywrapClientConfig, PolywrapClientConfigBuilder}};
@@ -12,10 +12,11 @@ use logger::*;
 use client::*;
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 use prompter::*;
+use js_pwr_app::*;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-fn main() {
+#[tokio::main]
     println!("Version: {}", VERSION);
 
     let _pwr_dir = get_pwr_dir().map_err(print_and_exit).unwrap();
@@ -30,12 +31,12 @@ fn main() {
 
     let all_access_controlled_uris: Vec<String> = vec![];
 
-    let exit_code = internal_main(&args, all_access_controlled_uris, manager, &client, &logger, &prompter);
+    let exit_code = internal_main(&args, all_access_controlled_uris, manager, &client, &logger, &prompter).await;
 
     std::process::exit(exit_code);
 }
 
-pub fn internal_main(
+pub async fn internal_main(
     args: &[String], 
     all_access_controlled_uris: Vec<String>, 
     manager: AppManager, 
@@ -50,6 +51,12 @@ pub fn internal_main(
     let uri = parse_uri(&uri);
 
     logger.debug(format!("Parsed URI: {}", uri.to_string())).unwrap();
+
+    match uri.to_string().as_str() {
+        "wrap://pwr/js" => return run_script_pwr_app(args, ScriptLanguage::JavaScript).await,
+        "wrap://pwr/py" => return run_script_pwr_app(args, ScriptLanguage::Python).await,
+        _ => {}
+    }
 
     manager.run_app(&uri, args, client, prompter, logger, all_access_controlled_uris)
 }

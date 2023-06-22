@@ -5,8 +5,31 @@ edition = "2021"
 
 [dependencies]
 polywrap_client = "0.1.6-beta.5"
+polywrap_client_builder = "0.1.6-beta.5"
+polywrap_client_default_config = "0.1.6-beta.5"
 wrap_manifest_schemas = "0.1.6-beta.5"
 polywrap_msgpack = "0.1.6-beta.5"
+polywrap_fs_plugin = { version  = "0.0.1-beta.4" }
+polywrap_http_plugin = { version  = "0.0.1-beta.4" }
 dirs = "5.0.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11"
+serde_json = "1.0"
+reqwest = { version = "0.11.18", features = ["multipart", "json"] }
+rmp-serde = "1.1.1"
+tokio = { version = "1", features = ["full"] }
+rmpv = { version = "1.0.0", features = ["with-serde"] }
+clap = { version = "4.3.4", features = ["cargo"] }
+tokio-tar = "0.3"
+tokio-util = "0.6"
+futures = "0.3"
+colored = "2.0.0"
+notify = "6.0.1"
+notify-debouncer-mini = "0.3.0"
+
+[patch.crates-io]
+polywrap_core = "0.1.6-beta.5"
+polywrap_client = "0.1.6-beta.5"
+polywrap_plugin = "0.1.6-beta.5"
+wrap_manifest_schemas = "0.1.6-beta.5"
+polywrap_msgpack = "0.1.6-beta.5"
