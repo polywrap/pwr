@@ -11,8 +11,8 @@ impl LoggerMock {
     }
 }
 impl Logger for LoggerMock {
-    fn debug(&self, message: String) -> Result<(), String> {
-        println!("DEBUG: {}", message);
+    fn debug(&self, _message: String) -> Result<(), String> {
+        // println!("DEBUG: {}", message);
         Ok(())
     }
 
