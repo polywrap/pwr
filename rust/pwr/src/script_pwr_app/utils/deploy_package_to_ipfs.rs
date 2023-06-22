@@ -50,12 +50,12 @@ pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, Box<dyn std::e
         return Err("Failed to upload to IPFS".into());
     }
     let body = resp.text().await?;
-    let body = body.split("\n").collect::<Vec<&str>>();
+    let body = body.split('\n').collect::<Vec<&str>>();
     // find the item that starts with "added"
     let cid = body
         .iter()
         .map(|x| serde_json::from_str::<AddedIpfsFile>(x).unwrap())
-        .find(|x| x.name == "")
+        .find(|x| x.name.is_empty())
         .unwrap()
         .hash;
 

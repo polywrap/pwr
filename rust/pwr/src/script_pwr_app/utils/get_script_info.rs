@@ -9,7 +9,6 @@ pub struct ScriptInfo {
 
 pub fn get_script_info(script_path: &str) -> Result<ScriptInfo, String> {
     let code = fs::read_to_string(script_path).map_err(|e| format!("Error reading file: {}", e))?;
-    let code = format!("{code}");
     let language = match Path::new(&script_path).extension() {
         Some(ext) => match ext.to_str().unwrap() {
             "js" => ScriptLanguage::JavaScript,

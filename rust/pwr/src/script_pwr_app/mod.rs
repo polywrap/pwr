@@ -105,21 +105,19 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let method = matches.get_one::<String>("method");
 
         let engine_cid = matches
-            .get_one::<String>("engine")
-            .and_then(|x| Some(x.as_str()))
+            .get_one::<String>("engine").map(|x| x.as_str())
             .unwrap_or(match language {
                 ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
                 ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
             });
 
         let template_cid = matches
-            .get_one::<String>("template")
-            .and_then(|x| Some(x.as_str()))
+            .get_one::<String>("template").map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         let is_release = matches.get_flag("release");
 
-        return execute_eval_command(file, method, &engine_cid, &template_cid, is_release).await;
+        return execute_eval_command(file, method, engine_cid, template_cid, is_release).await;
     } else if let Some(matches) = matches.subcommand_matches("build") {
         let file = matches.get_one::<PathBuf>("file").unwrap();
         let output = matches.get_one::<PathBuf>("output");
@@ -137,7 +135,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             .map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
-        return execute_build_command(file, output, &engine_cid, &template_cid).await;
+        return execute_build_command(file, output, engine_cid, template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
@@ -168,20 +166,19 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             });
 
         let template_cid = matches
-            .get_one::<String>("template")
-            .and_then(|x| Some(x.as_str()))
+            .get_one::<String>("template").map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         let is_release = matches.get_flag("release");
         let should_watch = matches.get_flag("watch");
 
-        return execute_repl_command(file, &engine_cid, template_cid, is_release, should_watch)
+        return execute_repl_command(file, engine_cid, template_cid, is_release, should_watch)
             .await;
     } else {
         println!("Command not found!");
     }
 
-    return 1;
+    1
 }
 
 async fn execute_eval_command(
@@ -226,7 +223,7 @@ async fn execute_eval_command(
 async fn execute_build_command(
     file: &PathBuf,
     output: Option<&PathBuf>,
-    engine_cid: &str,
+    _engine_cid: &str,
     template_cid: &str,
 ) -> i32 {
     println!("Building the WRAP...");
@@ -260,7 +257,7 @@ async fn execute_build_command(
     file.write_all(&module).unwrap();
 
     println!("WRAP built successfully!");
-    return 0;
+    0
 }
 
 async fn execute_deploy_command(
@@ -303,7 +300,7 @@ async fn execute_deploy_command(
 async fn read_file_and_eval(
     file: Option<&PathBuf>,
     engine_cid: &str,
-    template_cid: &str,
+    _template_cid: &str,
     client: Arc<PolywrapClient>,
 ) -> String {
     let total_input = if let Some(file) = &file {
@@ -395,7 +392,7 @@ async fn execute_repl_command(
     }
 }
 
-async fn watch(path: &Path, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) {
+async fn watch(path: &Path, engine_cid: &str, _template_cid: &str, client: Arc<PolywrapClient>) {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -436,7 +433,7 @@ async fn watch(path: &Path, engine_cid: &str, template_cid: &str, client: Arc<Po
 async fn deploy_with_args(
     args: impl AsRef<Vec<String>>,
     template_cid: &str,
-    engine_cid: &str,
+    _engine_cid: &str,
     client: Arc<PolywrapClient>,
 ) -> i32 {
     let user_file = args.as_ref()[0].clone();
@@ -448,15 +445,15 @@ async fn deploy_with_args(
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
             args: args.as_ref().iter().skip(2).cloned().collect(),
         });
-        let args = match serialization_result {
+        
+
+        match serialization_result {
             Ok(args) => args,
             Err(serialize_error) => {
                 println!("{:?}", serialize_error);
                 return 1;
             }
-        };
-
-        args
+        }
     };
 
     let result = user_wrap
@@ -472,7 +469,7 @@ async fn deploy_with_args(
 
     println!("{}", result);
 
-    return 0;
+    0
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ArgsEvalWithGlobals {
@@ -577,7 +574,7 @@ async fn invoke_eval(
     let value = serde_json::from_str::<serde_json::Value>(&value).unwrap();
     let result = serde_json::to_string_pretty(&value).unwrap();
 
-    write_ok(format!("{}", result));
+    write_ok(result);
 
     0
 }
@@ -588,6 +585,6 @@ struct AppArgs {
 }
 
 fn msgpack_to_json_pretty(bytes: &[u8]) -> String {
-    let value: rmpv::Value = rmp_serde::from_slice(&bytes).unwrap();
+    let value: rmpv::Value = rmp_serde::from_slice(bytes).unwrap();
     serde_json::to_string_pretty(&value).unwrap()
 }

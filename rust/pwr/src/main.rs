@@ -6,15 +6,13 @@ mod script_pwr_app;
 use std::{env, fmt::Display, fs};
 
 use polywrap_client::{
-    builder::{PolywrapClientConfig, PolywrapClientConfigBuilder},
-    client::PolywrapClient,
     core::uri::Uri,
 };
 
 use app_manager::*;
 use client::*;
 use logger::*;
-use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
+
 use prompter::*;
 use script_pwr_app::*;
 
@@ -37,7 +35,7 @@ async fn main() {
     let all_access_controlled_uris: Vec<String> = vec![];
 
     let exit_code = internal_main(
-        &args,
+        args,
         all_access_controlled_uris,
         manager,
         &client,
@@ -61,10 +59,10 @@ pub async fn internal_main(
 
     let uri = &args[0];
 
-    let uri = parse_uri(&uri);
+    let uri = parse_uri(uri);
 
     logger
-        .debug(format!("Parsed URI: {}", uri.to_string()))
+        .debug(format!("Parsed URI: {}", uri))
         .unwrap();
 
     match uri.to_string().as_str() {
@@ -86,7 +84,7 @@ pub async fn internal_main(
 fn get_pwr_dir() -> Result<String, String> {
     let app_dir = dirs::home_dir();
 
-    if app_dir == None {
+    if app_dir.is_none() {
         return Err(String::from("Error: Could not find home directory"));
     }
 
@@ -104,18 +102,18 @@ fn get_pwr_dir() -> Result<String, String> {
 
 fn parse_uri(uri: &String) -> Uri {
     if uri.ends_with(".eth") && !uri.starts_with("wrap://ens/") && !uri.starts_with("ens/") {
-        return Uri::try_from(format!("wrap://ens/{}", uri)).unwrap();
+        Uri::try_from(format!("wrap://ens/{}", uri)).unwrap()
     } else if uri.starts_with("Qm") {
         return Uri::try_from(format!("wrap://ipfs/{}", uri)).unwrap();
     } else if uri.starts_with("ipfs://") {
         return Uri::try_from(format!(
             "wrap://ipfs/{}",
-            uri["ipfs://".len()..uri.len()].to_string()
+            &uri["ipfs://".len()..uri.len()]
         ))
         .unwrap();
-    } else if uri.starts_with(".") || uri.starts_with("/") {
+    } else if uri.starts_with('.') || uri.starts_with('/') {
         return Uri::try_from(format!("wrap://file/{}", uri)).unwrap();
-    } else if !uri.contains("/") {
+    } else if !uri.contains('/') {
         return Uri::try_from(format!("wrap://pwr/{}", uri)).unwrap();
     } else {
         return Uri::try_from(uri.clone()).unwrap();

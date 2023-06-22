@@ -37,16 +37,16 @@ impl CoreClient for CoreClientMock {
 
     fn invoke_raw(
         &self,
-        uri: &Uri,
-        method: &str,
-        args: Option<&[u8]>,
-        env: Option<&[u8]>,
-        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
+        _uri: &Uri,
+        _method: &str,
+        _args: Option<&[u8]>,
+        _env: Option<&[u8]>,
+        _resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
 
-    fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error> {
+    fn get_manifest(&self, _uri: &Uri) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
 }
@@ -60,9 +60,9 @@ impl PwrClient {
             .add(SystemClientConfig::default().into())
             .add(Web3ClientConfig::default().into());
 
-        let client = PwrClient(PolywrapClient::new(config.into()));
+        
 
-        client
+        PwrClient(PolywrapClient::new(config.into()))
     }
 }
 
@@ -92,12 +92,12 @@ impl CoreClient for PwrClient {
 
         match wrapper {
             Ok(wrapper) => {
-                let manifest = wrapper.get_file(&GetFileOptions {
+                
+
+                wrapper.get_file(&GetFileOptions {
                     path: String::from("wrap.info"),
                     encoding: None,
-                });
-
-                manifest
+                })
             }
             Err(e) => Err(e),
         }

@@ -16,5 +16,5 @@ pub fn create_wrap_from_script(
     let compiled_module = CompiledWasmModule::try_from_bytecode(&module).unwrap();
     let wrap = WasmWrapper::new(compiled_module, Arc::new(SimpleFileReader::new()));
 
-    return Ok(Arc::new(wrap));
+    Ok(Arc::new(wrap))
 }

@@ -103,7 +103,7 @@ pub fn get_client_with_wraps(wraps: Vec<(Uri, Arc<dyn Wrapper>)>) -> PolywrapCli
         interfaces: config.interfaces,
     };
 
-    let client = PolywrapClient::new(config.into());
+    
 
-    client
+    PolywrapClient::new(config)
 }

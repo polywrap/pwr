@@ -86,17 +86,17 @@ impl AppManager {
 
                 match exit_code {
                     Ok(exit_code) => {
-                        return exit_code;
+                        exit_code
                     }
                     Err(e) => {
                         logger.error(format!("{:?}", e)).unwrap();
-                        return 1;
+                        1
                     }
                 }
             }
             Err(e) => {
-                logger.error(format!("{}", e)).unwrap();
-                return 1;
+                logger.error(e).unwrap();
+                1
             }
         }
     }
@@ -167,10 +167,10 @@ fn invoke_with_access_control(
 ) -> Result<Vec<u8>, String> {
     match client.invoke_raw(uri, method, args, None, None) {
         Ok(data) => {
-            return Ok(data);
+            Ok(data)
         }
         Err(e) => {
-            return Err(format!("{}", e));
+            Err(format!("{}", e))
         }
     }
 }
