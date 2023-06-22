@@ -26,6 +26,7 @@ futures = "0.3"
 colored = "2.0.0"
 notify = "6.0.1"
 notify-debouncer-mini = "0.3.0"
+openssl = { version = "0.10.55", features = ["vendored"] }
 
 [patch.crates-io]
 polywrap_uri = { git = "https://github.com/polywrap/rust-client.git" }
