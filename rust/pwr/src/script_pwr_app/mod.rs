@@ -126,7 +126,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let engine_cid = matches
             .get_one::<String>("engine")
-            .and_then(|x| Some(x.as_str()))
+            .map(|x| x.as_str())
             .unwrap_or(match language {
                 ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
                 ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
@@ -134,7 +134,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let template_cid = matches
             .get_one::<String>("template")
-            .and_then(|x| Some(x.as_str()))
+            .map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         return execute_build_command(file, output, &engine_cid, &template_cid).await;
@@ -144,7 +144,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let engine_cid = matches
             .get_one::<String>("engine")
-            .and_then(|x| Some(x.as_str()))
+            .map(|x| x.as_str())
             .unwrap_or(match language {
                 ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
                 ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
@@ -152,16 +152,16 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let template_cid = matches
             .get_one::<String>("template")
-            .and_then(|x| Some(x.as_str()))
+            .map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
-        return execute_deploy_command(file, output, &engine_cid, &template_cid).await;
+        return execute_deploy_command(file, output, engine_cid, template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("repl") {
         let file = matches.get_one::<PathBuf>("file");
 
         let engine_cid = matches
             .get_one::<String>("engine")
-            .and_then(|x| Some(x.as_str()))
+            .map(|x| x.as_str())
             .unwrap_or(match language {
                 ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
                 ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
@@ -175,7 +175,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let is_release = matches.get_flag("release");
         let should_watch = matches.get_flag("watch");
 
-        return execute_repl_command(file, &engine_cid, &template_cid, is_release, should_watch)
+        return execute_repl_command(file, &engine_cid, template_cid, is_release, should_watch)
             .await;
     } else {
         println!("Command not found!");
@@ -205,7 +205,7 @@ async fn execute_eval_command(
         };
 
         let mut args = input
-            .split(" ")
+            .split(' ')
             .map(|s| s.to_string())
             .collect::<Vec<String>>();
         if let Some(method) = &method {
@@ -231,7 +231,7 @@ async fn execute_build_command(
 ) -> i32 {
     println!("Building the WRAP...");
 
-    let script = get_script_info(&file.to_string_lossy().into_owned()).unwrap();
+    let script = get_script_info(&file.to_string_lossy()).unwrap();
     let module = build_wasm_module_from_script(&script, template_cid);
 
     let default_output = PathBuf::from("./build");
@@ -297,7 +297,8 @@ async fn execute_deploy_command(
         &manifest.name
     );
     println!("WRAP deployed successfully!");
-    return 0;
+    
+    0
 }
 async fn read_file_and_eval(
     file: Option<&PathBuf>,
@@ -314,7 +315,7 @@ async fn read_file_and_eval(
     } else {
         "".to_string()
     };
-    if total_input.len() > 0 {
+    if !total_input.is_empty() {
         invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
     }
 
@@ -338,7 +339,7 @@ async fn execute_repl_command(
             watch(file, engine_cid, template_cid, client.clone()).await;
             return 0;
         } else {
-            write_err("File not specified".to_string());
+            write_err("File not specified");
 
             return 1;
         }
@@ -369,7 +370,7 @@ async fn execute_repl_command(
 
             match input.as_str() {
                 "" => {
-                    if total_input.len() > 0 {
+                    if !total_input.is_empty() {
                         invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
                     }
 
@@ -394,7 +395,7 @@ async fn execute_repl_command(
     }
 }
 
-async fn watch(path: &PathBuf, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) {
+async fn watch(path: &Path, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -420,7 +421,7 @@ async fn watch(path: &PathBuf, engine_cid: &str, template_cid: &str, client: Arc
                     } else {
                         "".to_string()
                     };
-                    if total_input.len() > 0 {
+                    if !total_input.is_empty() {
                         invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
                     }
                 }
@@ -560,8 +561,8 @@ async fn invoke_eval(
 
     let result = result.unwrap();
 
-    if let None = result.value {
-        if let None = result.error {
+    if result.value.is_none() {
+        if result.error.is_none() {
             write_warn("No value");
         } else {
             let error = result.error.unwrap();
@@ -578,7 +579,7 @@ async fn invoke_eval(
 
     write_ok(format!("{}", result));
 
-    return 0;
+    0
 }
 
 #[derive(Serialize, Deserialize)]

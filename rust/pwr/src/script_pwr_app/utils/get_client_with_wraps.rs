@@ -44,14 +44,14 @@ impl UriResolver for LocalResolver {
         _resolution_context: Arc<Mutex<UriResolutionContext>>,
     ) -> Result<UriPackageOrWrapper, polywrap_client::core::error::Error> {
         if uri.authority() == "script" {
-            let path = uri.path().clone();
+            let path = uri.path();
 
-            if Path::new(&path).extension().is_none() {
+            if Path::new(path).extension().is_none() {
                 return Ok(UriPackageOrWrapper::Uri(uri.clone()));
             }
 
-            if Path::new(&path).exists() {
-                let wrap = create_wrap_from_file(&path, DEFAULT_TEMPLATE_CID).map_err(|e| {
+            if Path::new(path).exists() {
+                let wrap = create_wrap_from_file(path, DEFAULT_TEMPLATE_CID).map_err(|e| {
                     polywrap_client::core::error::Error::FileReadError(format!(
                         "Error creating wrap from file: {}",
                         e
@@ -61,7 +61,7 @@ impl UriResolver for LocalResolver {
                 return Ok(UriPackageOrWrapper::Wrapper(uri.clone(), wrap));
             } else {
                 return Err(polywrap_client::core::error::Error::FileReadError(
-                    "File does not exist: ".to_string() + &path,
+                    "File does not exist: ".to_string() + path,
                 ));
             }
         }
