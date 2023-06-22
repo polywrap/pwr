@@ -13,16 +13,19 @@ struct AddedIpfsFile {
     #[serde(rename = "Size")]
     size: u32,
 }
-pub async fn deploy_uri_to_http(package_name_and_version: &str, uri: &Uri) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn deploy_uri_to_http(
+    package_name_and_version: &str,
+    uri: &Uri,
+) -> Result<String, Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
-    let resp = client.post("https://http.wrappers.dev/u/test/".to_string() + package_name_and_version)
-        .json(
-            &serde_json::json!({
-                "uri": uri.to_string(),
-            })
-        )
+    let resp = client
+        .post("https://http.wrappers.dev/u/test/".to_string() + package_name_and_version)
+        .json(&serde_json::json!({
+            "uri": uri.to_string(),
+        }))
         .header(WRAPPERS_REGISTRY_KEY_HEADER, WRAPPERS_TEST_ACCOUNT_API_KEY)
-        .send().await?;
+        .send()
+        .await?;
 
     if resp.status() != 200 {
         println!("{:?}", resp);

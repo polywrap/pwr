@@ -1,15 +1,19 @@
 mod app_manager;
-mod logger;
 mod client;
+mod logger;
 mod prompter;
 mod script_pwr_app;
 use std::{env, fmt::Display, fs};
 
-use polywrap_client::{core::uri::Uri, client::PolywrapClient, builder::{PolywrapClientConfig, PolywrapClientConfigBuilder}};
+use polywrap_client::{
+    builder::{PolywrapClientConfig, PolywrapClientConfigBuilder},
+    client::PolywrapClient,
+    core::uri::Uri,
+};
 
 use app_manager::*;
-use logger::*;
 use client::*;
+use logger::*;
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 use prompter::*;
 use script_pwr_app::*;
@@ -32,18 +36,26 @@ async fn main() {
 
     let all_access_controlled_uris: Vec<String> = vec![];
 
-    let exit_code = internal_main(&args, all_access_controlled_uris, manager, &client, &logger, &prompter).await;
+    let exit_code = internal_main(
+        &args,
+        all_access_controlled_uris,
+        manager,
+        &client,
+        &logger,
+        &prompter,
+    )
+    .await;
 
     std::process::exit(exit_code);
 }
 
 pub async fn internal_main(
-    args: &[String], 
-    all_access_controlled_uris: Vec<String>, 
-    manager: AppManager, 
-    client: &impl CoreClient, 
-    logger: &impl Logger, 
-    prompter: &impl Prompter
+    args: &[String],
+    all_access_controlled_uris: Vec<String>,
+    manager: AppManager,
+    client: &impl CoreClient,
+    logger: &impl Logger,
+    prompter: &impl Prompter,
 ) -> i32 {
     logger.debug(format!("Args: {:?}", args)).unwrap();
 
@@ -51,7 +63,9 @@ pub async fn internal_main(
 
     let uri = parse_uri(&uri);
 
-    logger.debug(format!("Parsed URI: {}", uri.to_string())).unwrap();
+    logger
+        .debug(format!("Parsed URI: {}", uri.to_string()))
+        .unwrap();
 
     match uri.to_string().as_str() {
         "wrap://pwr/js" => return run_script_pwr_app(args, ScriptLanguage::JavaScript).await,
@@ -59,7 +73,14 @@ pub async fn internal_main(
         _ => {}
     }
 
-    manager.run_app(&uri, args, client, prompter, logger, all_access_controlled_uris)
+    manager.run_app(
+        &uri,
+        args,
+        client,
+        prompter,
+        logger,
+        all_access_controlled_uris,
+    )
 }
 
 fn get_pwr_dir() -> Result<String, String> {
@@ -87,7 +108,11 @@ fn parse_uri(uri: &String) -> Uri {
     } else if uri.starts_with("Qm") {
         return Uri::try_from(format!("wrap://ipfs/{}", uri)).unwrap();
     } else if uri.starts_with("ipfs://") {
-        return Uri::try_from(format!("wrap://ipfs/{}", uri["ipfs://".len()..uri.len()].to_string())).unwrap();
+        return Uri::try_from(format!(
+            "wrap://ipfs/{}",
+            uri["ipfs://".len()..uri.len()].to_string()
+        ))
+        .unwrap();
     } else if uri.starts_with(".") || uri.starts_with("/") {
         return Uri::try_from(format!("wrap://file/{}", uri)).unwrap();
     } else if !uri.contains("/") {

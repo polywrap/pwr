@@ -1,13 +1,19 @@
-use std::{fs::{self, File}, io::{self, Write}, sync::{Arc}, path::{PathBuf, Path}, time::Duration};
+use std::{
+    fs::{self, File},
+    io::{self, Write},
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 mod utils;
-use clap::{arg, Command, value_parser};
+use clap::{arg, value_parser, Command};
 use colored::Colorize;
 use notify::RecursiveMode;
-use notify_debouncer_mini::{new_debouncer};
+use notify_debouncer_mini::new_debouncer;
 use polywrap_client::{client::PolywrapClient, core::uri::Uri};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use utils::*;
-use serde::{Deserialize, Serialize};
 use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
 const DEFAULT_TEMPLATE_CID: &str = "QmTzgDRWiSsux4463gz3h9kXfXkLaUq5gzqdJr7cSmG3Hx";
 const DEFAULT_JS_ENGINE_CID: &str = "QmQGWzyd6bsbErRgSdNXsDskvy6VTSaLBUYjZK5zDZVZwC";
@@ -17,43 +23,80 @@ pub enum ScriptLanguage {
     Python,
 }
 
-pub async fn run_script_pwr_app(
-    args: &[String], 
-    language: ScriptLanguage,
-) -> i32 {
-    let matches = Command::new("script") 
+pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i32 {
+    let matches = Command::new("script")
         .subcommand(
             Command::new("invoke")
                 .about("invokes a method from a script")
-                .arg(arg!(-f --file <FILE> "Path to script file").required(true).value_parser(value_parser!(PathBuf)))
+                .arg(
+                    arg!(-f --file <FILE> "Path to script file")
+                        .required(true)
+                        .value_parser(value_parser!(PathBuf)),
+                )
                 .arg(arg!(-m --method <METHOD> "Method to invoke").required(false))
-                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
-                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
-                .arg(arg!(-r --release "Release").required(false))
+                .arg(
+                    arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false),
+                )
+                .arg(
+                    arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
+                        .required(false),
+                )
+                .arg(arg!(-r --release "Release").required(false)),
         )
         .subcommand(
             Command::new("build")
                 .about("builds a into a wrap")
-                .arg(arg!(-f --file <FILE> "File to build").required(true).value_parser(value_parser!(PathBuf)))
-                .arg(arg!(-o --output <OUTPUT> "Directory for the build artifacts").required(false).value_parser(value_parser!(PathBuf)))
-                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
-                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+                .arg(
+                    arg!(-f --file <FILE> "File to build")
+                        .required(true)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+                .arg(
+                    arg!(-o --output <OUTPUT> "Directory for the build artifacts")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+                .arg(
+                    arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false),
+                )
+                .arg(
+                    arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
+                        .required(false),
+                ),
         )
         .subcommand(
             Command::new("deploy")
                 .about("deploys a wrap")
-                .arg(arg!(-f --file <FILE> "File to deploy").required(false).value_parser(value_parser!(PathBuf)))
-                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
-                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+                .arg(
+                    arg!(-f --file <FILE> "File to deploy")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+                .arg(
+                    arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false),
+                )
+                .arg(
+                    arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
+                        .required(false),
+                ),
         )
         .subcommand(
             Command::new("repl")
                 .about("Starts the repl")
-                .arg(arg!(-f --file <FILE> "File to input").required(false).value_parser(value_parser!(PathBuf)))
-                .arg(arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false))
-                .arg(arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use").required(false))
+                .arg(
+                    arg!(-f --file <FILE> "File to input")
+                        .required(false)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+                .arg(
+                    arg!(-e --engine <ENGINE> "IPFS CID of the engine wrap to use").required(false),
+                )
+                .arg(
+                    arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
+                        .required(false),
+                )
                 .arg(arg!(-r --release "Release").required(false))
-                .arg(arg!(-w --watch "Watch the file for changes").required(false))
+                .arg(arg!(-w --watch "Watch the file for changes").required(false)),
         )
         .get_matches_from(args);
 
@@ -61,16 +104,16 @@ pub async fn run_script_pwr_app(
         let file = matches.get_one::<PathBuf>("file");
         let method = matches.get_one::<String>("method");
 
-        let engine_cid = matches.get_one::<String>("engine")
+        let engine_cid = matches
+            .get_one::<String>("engine")
             .and_then(|x| Some(x.as_str()))
-            .unwrap_or(
-                match language {
-                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
-                }
-            );
+            .unwrap_or(match language {
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+            });
 
-        let template_cid = matches.get_one::<String>("template")
+        let template_cid = matches
+            .get_one::<String>("template")
             .and_then(|x| Some(x.as_str()))
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
@@ -81,34 +124,34 @@ pub async fn run_script_pwr_app(
         let file = matches.get_one::<PathBuf>("file").unwrap();
         let output = matches.get_one::<PathBuf>("output");
 
-        let engine_cid = matches.get_one::<String>("engine")
+        let engine_cid = matches
+            .get_one::<String>("engine")
             .and_then(|x| Some(x.as_str()))
-            .unwrap_or(
-                match language {
-                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
-                }
-            );
+            .unwrap_or(match language {
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+            });
 
-        let template_cid = matches.get_one::<String>("template")
+        let template_cid = matches
+            .get_one::<String>("template")
             .and_then(|x| Some(x.as_str()))
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         return execute_build_command(file, output, &engine_cid, &template_cid).await;
-    }  else if let Some(matches) = matches.subcommand_matches("deploy") {
+    } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
 
-        let engine_cid = matches.get_one::<String>("engine")
+        let engine_cid = matches
+            .get_one::<String>("engine")
             .and_then(|x| Some(x.as_str()))
-            .unwrap_or(
-                match language {
-                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
-                }
-            );
+            .unwrap_or(match language {
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+            });
 
-        let template_cid = matches.get_one::<String>("template")
+        let template_cid = matches
+            .get_one::<String>("template")
             .and_then(|x| Some(x.as_str()))
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
@@ -116,34 +159,40 @@ pub async fn run_script_pwr_app(
     } else if let Some(matches) = matches.subcommand_matches("repl") {
         let file = matches.get_one::<PathBuf>("file");
 
-        let engine_cid = matches.get_one::<String>("engine")
+        let engine_cid = matches
+            .get_one::<String>("engine")
             .and_then(|x| Some(x.as_str()))
-            .unwrap_or(
-                match language {
-                    ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                    ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
-                }
-            );
+            .unwrap_or(match language {
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+            });
 
-        let template_cid = matches.get_one::<String>("template")
+        let template_cid = matches
+            .get_one::<String>("template")
             .and_then(|x| Some(x.as_str()))
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
         let is_release = matches.get_flag("release");
         let should_watch = matches.get_flag("watch");
 
-        return execute_repl_command(file, &engine_cid, &template_cid, is_release, should_watch).await;
+        return execute_repl_command(file, &engine_cid, &template_cid, is_release, should_watch)
+            .await;
     } else {
         println!("Command not found!");
     }
 
     return 1;
-} 
+}
 
-async fn execute_eval_command(file: Option<&PathBuf>, method: Option<&String>, engine_cid: &str, template_cid: &str, is_release: bool) -> i32 {
+async fn execute_eval_command(
+    file: Option<&PathBuf>,
+    method: Option<&String>,
+    engine_cid: &str,
+    template_cid: &str,
+    is_release: bool,
+) -> i32 {
     println!("VM loading...");
-    let client = Arc::new(get_client_with_wraps(vec![
-    ]));
+    let client = Arc::new(get_client_with_wraps(vec![]));
     loop {
         println!("VM ready");
         let input = {
@@ -155,7 +204,10 @@ async fn execute_eval_command(file: Option<&PathBuf>, method: Option<&String>, e
             input.to_string()
         };
 
-        let mut args = input.split(" ").map(|s| s.to_string()).collect::<Vec<String>>();
+        let mut args = input
+            .split(" ")
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
         if let Some(method) = &method {
             args.insert(0, method.to_string());
         }
@@ -171,7 +223,12 @@ async fn execute_eval_command(file: Option<&PathBuf>, method: Option<&String>, e
     }
 }
 
-async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_cid: &str, template_cid: &str) -> i32 {
+async fn execute_build_command(
+    file: &PathBuf,
+    output: Option<&PathBuf>,
+    engine_cid: &str,
+    template_cid: &str,
+) -> i32 {
     println!("Building the WRAP...");
 
     let script = get_script_info(&file.to_string_lossy().into_owned()).unwrap();
@@ -199,7 +256,6 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_
     let mut file = File::create("./build/wrap.info").unwrap();
     file.write_all(&manifest).unwrap();
 
-
     let mut file = File::create("./build/wrap.wasm").unwrap();
     file.write_all(&module).unwrap();
 
@@ -207,14 +263,22 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, engine_
     return 0;
 }
 
-async fn execute_deploy_command(file: Option<&PathBuf>, output: Option<&PathBuf>, engine_cid: &str, template_cid: &str) -> i32 {
+async fn execute_deploy_command(
+    file: Option<&PathBuf>,
+    output: Option<&PathBuf>,
+    engine_cid: &str,
+    template_cid: &str,
+) -> i32 {
     if file.is_some() {
         execute_build_command(file.unwrap(), output, engine_cid, template_cid).await;
     }
 
     println!("Deploying the WRAP...");
 
-    let output = output.unwrap_or(&PathBuf::from("./build")).to_string_lossy().into_owned();
+    let output = output
+        .unwrap_or(&PathBuf::from("./build"))
+        .to_string_lossy()
+        .into_owned();
 
     let cid = deploy_package_to_ipfs(&output).await.unwrap();
     println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
@@ -222,12 +286,25 @@ async fn execute_deploy_command(file: Option<&PathBuf>, output: Option<&PathBuf>
     let manifest = fs::read(format!("{output}/wrap.info")).unwrap();
     let manifest = deserialize_wrap_manifest(&manifest, None).unwrap();
 
-    deploy_uri_to_http(&manifest.name, &Uri::try_from("wrap://ipfs/".to_string() + &cid).unwrap()).await.unwrap();
-    println!("WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}", &manifest.name);
+    deploy_uri_to_http(
+        &manifest.name,
+        &Uri::try_from("wrap://ipfs/".to_string() + &cid).unwrap(),
+    )
+    .await
+    .unwrap();
+    println!(
+        "WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}",
+        &manifest.name
+    );
     println!("WRAP deployed successfully!");
     return 0;
 }
-async fn read_file_and_eval(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, client: Arc<PolywrapClient>) -> String {
+async fn read_file_and_eval(
+    file: Option<&PathBuf>,
+    engine_cid: &str,
+    template_cid: &str,
+    client: Arc<PolywrapClient>,
+) -> String {
     let total_input = if let Some(file) = &file {
         if Path::exists(file) {
             fs::read_to_string(file).unwrap()
@@ -244,11 +321,16 @@ async fn read_file_and_eval(file: Option<&PathBuf>, engine_cid: &str, template_c
     total_input
 }
 
-async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template_cid: &str, is_release: bool, should_watch: bool) -> i32 {
+async fn execute_repl_command(
+    file: Option<&PathBuf>,
+    engine_cid: &str,
+    template_cid: &str,
+    is_release: bool,
+    should_watch: bool,
+) -> i32 {
     println!("REPL loading...");
-    let client = Arc::new(get_client_with_wraps(vec![
-    ]));
-    
+    let client = Arc::new(get_client_with_wraps(vec![]));
+
     if should_watch {
         if let Some(file) = file {
             println!("Watching file: {:?}", file);
@@ -298,7 +380,7 @@ async fn execute_repl_command(file: Option<&PathBuf>, engine_cid: &str, template
 
             let new_total_input = total_input.clone() + "\n" + &input;
             let result = invoke_eval(&new_total_input, vec![], engine_cid, client.clone()).await;
-            
+
             if result == 0 {
                 total_input = new_total_input;
                 if let Some(file) = &file {
@@ -342,21 +424,28 @@ async fn watch(path: &PathBuf, engine_cid: &str, template_cid: &str, client: Arc
                         invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
                     }
                 }
-            },
-            Err(errors) => errors.iter().for_each(|error| write_warn(format!("Watch error: {:?}", error))),
+            }
+            Err(errors) => errors
+                .iter()
+                .for_each(|error| write_warn(format!("Watch error: {:?}", error))),
         }
     }
 }
 
-async fn deploy_with_args(args: impl AsRef<Vec<String>>, template_cid: &str, engine_cid: &str, client: Arc<PolywrapClient>) -> i32 {
+async fn deploy_with_args(
+    args: impl AsRef<Vec<String>>,
+    template_cid: &str,
+    engine_cid: &str,
+    client: Arc<PolywrapClient>,
+) -> i32 {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
-   
+
     let user_wrap = create_wrap_from_file(&user_file, template_cid).unwrap();
 
     let args = {
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
-          args: args.as_ref().iter().skip(2).cloned().collect(),
+            args: args.as_ref().iter().skip(2).cloned().collect(),
         });
         let args = match serialization_result {
             Ok(args) => args,
@@ -369,7 +458,8 @@ async fn deploy_with_args(args: impl AsRef<Vec<String>>, template_cid: &str, eng
         args
     };
 
-    let result = user_wrap.invoke(method, Some(&args), None, client, None)
+    let result = user_wrap
+        .invoke(method, Some(&args), None, client, None)
         .map_err(|e| format!("Error invoking method: {}", e));
 
     if let Err(error) = result {
@@ -399,7 +489,11 @@ pub struct JsEngineEvalResult {
     pub error: Option<String>,
 }
 
-async fn eval_with_args(args: impl AsRef<Vec<String>>, client: Arc<PolywrapClient>, engine_cid: &str) -> i32 {
+async fn eval_with_args(
+    args: impl AsRef<Vec<String>>,
+    client: Arc<PolywrapClient>,
+    engine_cid: &str,
+) -> i32 {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
 
@@ -417,11 +511,12 @@ async fn eval_with_args(args: impl AsRef<Vec<String>>, client: Arc<PolywrapClien
             JsEngineGlobalVar {
                 name: "wrap_args".to_string(),
                 value: serde_json::to_string(&args).unwrap(),
-            }
+            },
         ],
         engine_cid,
-        client
-    ).await
+        client,
+    )
+    .await
 }
 
 fn write_ok(str: impl AsRef<str>) {
@@ -436,13 +531,25 @@ fn write_warn(str: impl AsRef<str>) {
     println!("{}", str.as_ref().yellow());
 }
 
-async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &str, client: Arc<PolywrapClient>) -> i32 {
-    let result = client.invoke::<JsEngineEvalResult>(&Uri::try_from(format!("ipfs/{}", engine_cid)).unwrap(), "evalWithGlobals", Some(
-       &rmp_serde::encode::to_vec_named(& ArgsEvalWithGlobals{
-            src: src.to_string(),
-            globals,
-       }).unwrap()
-    ), None, None);
+async fn invoke_eval(
+    src: &str,
+    globals: Vec<JsEngineGlobalVar>,
+    engine_cid: &str,
+    client: Arc<PolywrapClient>,
+) -> i32 {
+    let result = client.invoke::<JsEngineEvalResult>(
+        &Uri::try_from(format!("ipfs/{}", engine_cid)).unwrap(),
+        "evalWithGlobals",
+        Some(
+            &rmp_serde::encode::to_vec_named(&ArgsEvalWithGlobals {
+                src: src.to_string(),
+                globals,
+            })
+            .unwrap(),
+        ),
+        None,
+        None,
+    );
 
     let result = result.map_err(|e| format!("Error invoking method: {}", e));
 
@@ -474,8 +581,7 @@ async fn invoke_eval(src: &str, globals: Vec<JsEngineGlobalVar>, engine_cid: &st
     return 0;
 }
 
-
-#[derive(Serialize, Deserialize)] 
+#[derive(Serialize, Deserialize)]
 struct AppArgs {
     args: Vec<String>,
 }

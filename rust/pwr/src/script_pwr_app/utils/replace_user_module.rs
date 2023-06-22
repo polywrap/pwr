@@ -11,9 +11,9 @@ pub fn replace_user_module(module: &mut [u8], user_code: &str, engine_url: Strin
     }
 
     for i in 0..(module.len() - target.len() + 1) {
-        if &module[i..i+target.len()] == target.as_slice() {
+        if &module[i..i + target.len()] == target.as_slice() {
             // If a match is found, replace the window with injected_bytes.
-            module[i..i+target.len()].clone_from_slice(&injected_bytes);
+            module[i..i + target.len()].clone_from_slice(&injected_bytes);
             break;
         }
     }

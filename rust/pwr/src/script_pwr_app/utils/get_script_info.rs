@@ -14,13 +14,15 @@ pub fn get_script_info(script_path: &str) -> Result<ScriptInfo, String> {
         Some(ext) => match ext.to_str().unwrap() {
             "js" => ScriptLanguage::JavaScript,
             "py" => ScriptLanguage::Python,
-            ext => return Err(format!("File {} has an unsupported extension: {ext}", script_path)),
+            ext => {
+                return Err(format!(
+                    "File {} has an unsupported extension: {ext}",
+                    script_path
+                ))
+            }
         },
         None => return Err(format!("File {} has no extension", script_path)),
     };
 
-    Ok(ScriptInfo {
-      code,
-      language,
-    })
+    Ok(ScriptInfo { code, language })
 }

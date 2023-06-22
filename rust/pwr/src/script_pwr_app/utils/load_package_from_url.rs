@@ -16,7 +16,7 @@ pub fn load_package_from_url(path: &str) -> PackageContent {
     let module_bytes = module_response.bytes().unwrap();
 
     PackageContent {
-      manifest: manifest_bytes.to_vec(),
-      module: module_bytes.to_vec(),
+        manifest: manifest_bytes.to_vec(),
+        module: module_bytes.to_vec(),
     }
 }

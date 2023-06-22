@@ -1,8 +1,27 @@
-use std::{sync::{Arc, Mutex}, path::Path};
+use std::{
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
-use polywrap_client::{client::PolywrapClient, core::{uri::Uri, wrapper::Wrapper, resolution::{uri_resolver::UriResolver, uri_resolution_context::{UriResolutionContext, UriPackageOrWrapper}}, invoker::Invoker, client::ClientConfig}, resolvers::resolution_result_cache_resolver::ResolutionResultCacheResolverOptions};
+use polywrap_client::{
+    client::PolywrapClient,
+    core::{
+        client::ClientConfig,
+        invoker::Invoker,
+        resolution::{
+            uri_resolution_context::{UriPackageOrWrapper, UriResolutionContext},
+            uri_resolver::UriResolver,
+        },
+        uri::Uri,
+        wrapper::Wrapper,
+    },
+    resolvers::resolution_result_cache_resolver::ResolutionResultCacheResolverOptions,
+};
+use polywrap_client_builder::{
+    PolywrapBaseResolver, PolywrapBaseResolverOptions, PolywrapClientConfig,
+    PolywrapClientConfigBuilder,
+};
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
-use polywrap_client_builder::{PolywrapClientConfig, PolywrapBaseResolverOptions, PolywrapBaseResolver, PolywrapClientConfigBuilder};
 
 use crate::script_pwr_app::DEFAULT_TEMPLATE_CID;
 
@@ -56,12 +75,12 @@ pub fn get_client_with_wraps(wraps: Vec<(Uri, Arc<dyn Wrapper>)>) -> PolywrapCli
     config.add(SystemClientConfig::default().into());
     config.add(Web3ClientConfig::default().into());
     config.add_redirect(
-        Uri::try_from("wrap://ipfs/Qmbokxv3S2UFvkM569Gu4XCi4KvVCn138U7xBFCxfGQipo").unwrap(), 
-        Uri::try_from("wrap://mock/engine").unwrap()
+        Uri::try_from("wrap://ipfs/Qmbokxv3S2UFvkM569Gu4XCi4KvVCn138U7xBFCxfGQipo").unwrap(),
+        Uri::try_from("wrap://mock/engine").unwrap(),
     );
     config.add_interface_implementation(
-        Uri::try_from("wrap://ens/uri-resolver.core.polywrap.eth").unwrap(), 
-        Uri::try_from("wrap://http/http.wrappers.dev/u/test/polywrap-resolver").unwrap()
+        Uri::try_from("wrap://ens/uri-resolver.core.polywrap.eth").unwrap(),
+        Uri::try_from("wrap://http/http.wrappers.dev/u/test/polywrap-resolver").unwrap(),
     );
 
     for wrap in wraps {

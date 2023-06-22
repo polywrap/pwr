@@ -1,7 +1,13 @@
+use std::sync::{Arc, Mutex};
 
-use std::sync::{Mutex, Arc};
-
-use polywrap_client::{core::{resolution::uri_resolution_context::UriResolutionContext, error::Error, uri::Uri, wrap_loader::WrapLoader, wrapper::GetFileOptions, uri_resolver_handler::UriResolverHandler}, client::PolywrapClient, builder::{PolywrapClientConfig, PolywrapClientConfigBuilder}};
+use polywrap_client::{
+    builder::{PolywrapClientConfig, PolywrapClientConfigBuilder},
+    client::PolywrapClient,
+    core::{
+        error::Error, resolution::uri_resolution_context::UriResolutionContext, uri::Uri,
+        uri_resolver_handler::UriResolverHandler, wrap_loader::WrapLoader, wrapper::GetFileOptions,
+    },
+};
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 
 pub trait CoreClient {
@@ -28,7 +34,7 @@ impl CoreClient for CoreClientMock {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error> {
         Ok(uri.clone())
     }
-   
+
     fn invoke_raw(
         &self,
         uri: &Uri,
@@ -39,7 +45,7 @@ impl CoreClient for CoreClientMock {
     ) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
-    
+
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
@@ -66,10 +72,10 @@ impl CoreClient for PwrClient {
 
         match result {
             Ok(result) => Ok(result.uri()),
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
-   
+
     fn invoke_raw(
         &self,
         uri: &Uri,
@@ -80,22 +86,20 @@ impl CoreClient for PwrClient {
     ) -> Result<Vec<u8>, Error> {
         self.0.invoke(uri, method, args, env, resolution_context)
     }
-    
+
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error> {
         let wrapper = self.0.load_wrapper(uri, None);
 
         match wrapper {
             Ok(wrapper) => {
-                let manifest = wrapper.get_file(
-                    &GetFileOptions {
-                        path: String::from("wrap.info"),
-                        encoding: None
-                    }
-                );
+                let manifest = wrapper.get_file(&GetFileOptions {
+                    path: String::from("wrap.info"),
+                    encoding: None,
+                });
 
                 manifest
-            },
-            Err(e) => Err(e)
+            }
+            Err(e) => Err(e),
         }
     }
 }
