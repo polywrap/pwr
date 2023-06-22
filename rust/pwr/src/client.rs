@@ -25,11 +25,6 @@ pub trait CoreClient {
 
 pub struct CoreClientMock;
 
-impl CoreClientMock {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
 impl CoreClient for CoreClientMock {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error> {
         Ok(uri.clone())
