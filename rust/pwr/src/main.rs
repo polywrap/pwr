@@ -20,8 +20,6 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
 async fn main() {
-    println!("Version: {}", VERSION);
-
     let _pwr_dir = get_pwr_dir().map_err(print_and_exit).unwrap();
 
     let args: Vec<String> = env::args().collect();
@@ -68,6 +66,10 @@ pub async fn internal_main(
     match uri.to_string().as_str() {
         "wrap://pwr/js" => return run_script_pwr_app(args, ScriptLanguage::JavaScript).await,
         "wrap://pwr/py" => return run_script_pwr_app(args, ScriptLanguage::Python).await,
+        "wrap://pwr/version" => {
+            println!("Version: {}", VERSION);
+            return 0;
+        }
         _ => {}
     }
 
