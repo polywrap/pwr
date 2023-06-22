@@ -4,7 +4,7 @@ use polywrap_client::{client::PolywrapClient, core::{uri::Uri, wrapper::Wrapper,
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 use polywrap_client_builder::{PolywrapClientConfig, PolywrapBaseResolverOptions, PolywrapBaseResolver, PolywrapClientConfigBuilder};
 
-use crate::js_pwr_app::DEFAULT_TEMPLATE_CID;
+use crate::script_pwr_app::DEFAULT_TEMPLATE_CID;
 
 use super::create_wrap_from_file;
 

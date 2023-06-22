@@ -1,6 +1,6 @@
 use std::{fs, path::Path};
 
-use crate::js_pwr_app::ScriptLanguage;
+use crate::script_pwr_app::ScriptLanguage;
 
 pub struct ScriptInfo {
     pub code: String,

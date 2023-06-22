@@ -4,11 +4,11 @@ version = "0.1.2"
 edition = "2021"
 
 [dependencies]
-polywrap_client = "0.1.6-beta.5"
-polywrap_client_builder = "0.1.6-beta.5"
-polywrap_client_default_config = "0.1.6-beta.5"
-wrap_manifest_schemas = "0.1.6-beta.5"
-polywrap_msgpack = "0.1.6-beta.5"
+polywrap_client = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_client_builder = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client.git" }
+wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git" }
 polywrap_fs_plugin = { version  = "0.0.1-beta.4" }
 polywrap_http_plugin = { version  = "0.0.1-beta.4" }
 dirs = "5.0.0"
@@ -28,8 +28,10 @@ notify = "6.0.1"
 notify-debouncer-mini = "0.3.0"
 
 [patch.crates-io]
-polywrap_core = "0.1.6-beta.5"
-polywrap_client = "0.1.6-beta.5"
-polywrap_plugin = "0.1.6-beta.5"
-wrap_manifest_schemas = "0.1.6-beta.5"
-polywrap_msgpack = "0.1.6-beta.5"
+polywrap_uri = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_core = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_client = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_plugin = { git = "https://github.com/polywrap/rust-client.git" }
+wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_resolvers = { git = "https://github.com/polywrap/rust-client.git" }

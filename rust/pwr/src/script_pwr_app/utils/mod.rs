@@ -10,9 +10,6 @@ pub use load_wrap::load_wrap;
 mod load_package_from_url;
 pub use load_package_from_url::*;
 
-mod load_wrap_from_ipfs;
-pub use load_wrap_from_ipfs::load_wrap_from_ipfs;
-
 mod create_wrap_from_file;
 pub use create_wrap_from_file::create_wrap_from_file;
 

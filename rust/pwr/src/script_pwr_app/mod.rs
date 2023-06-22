@@ -9,11 +9,9 @@ use serde_json::json;
 use utils::*;
 use serde::{Deserialize, Serialize};
 use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
-// const DEFAULT_TEMPLATE_CID: &str = "QmSYr5FuZ49BbRqg8W1gmU5UtEaJmhxMn58SzvVmAgEkKm";
 const DEFAULT_TEMPLATE_CID: &str = "QmTzgDRWiSsux4463gz3h9kXfXkLaUq5gzqdJr7cSmG3Hx";
 const DEFAULT_JS_ENGINE_CID: &str = "QmQGWzyd6bsbErRgSdNXsDskvy6VTSaLBUYjZK5zDZVZwC";
 const DEFAULT_PY_ENGINE_CID: &str = "QmRhaCMunjt6DcgkSrwAxumWMHDK9UZATJgUrPaJJ2Zmb7";
-
 pub enum ScriptLanguage {
     JavaScript,
     Python,

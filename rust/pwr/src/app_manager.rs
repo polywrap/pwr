@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
 use polywrap_client::core::uri::Uri;
-use wrap_manifest_schemas::deserialize::{deserialize_wrap_manifest, DeserializeManifestOptions};
 
 use crate::client::CoreClient;
 use crate::prompter::Prompter;

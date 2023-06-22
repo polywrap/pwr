@@ -2,7 +2,7 @@ mod app_manager;
 mod logger;
 mod client;
 mod prompter;
-mod js_pwr_app;
+mod script_pwr_app;
 use std::{env, fmt::Display, fs};
 
 use polywrap_client::{core::uri::Uri, client::PolywrapClient, builder::{PolywrapClientConfig, PolywrapClientConfigBuilder}};
@@ -12,11 +12,12 @@ use logger::*;
 use client::*;
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 use prompter::*;
-use js_pwr_app::*;
+use script_pwr_app::*;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
+async fn main() {
     println!("Version: {}", VERSION);
 
     let _pwr_dir = get_pwr_dir().map_err(print_and_exit).unwrap();
@@ -60,7 +61,6 @@ pub async fn internal_main(
 
     manager.run_app(&uri, args, client, prompter, logger, all_access_controlled_uris)
 }
-
 
 fn get_pwr_dir() -> Result<String, String> {
     let app_dir = dirs::home_dir();
