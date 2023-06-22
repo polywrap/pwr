@@ -123,11 +123,6 @@ jobs:
               run: |
                   sudo apt-get update -y
                   sudo apt-get install -y gcc-aarch64-linux-gnu
-                  sudo apt install libssl-dev
-                  sudo apt install pkg-config
-                  OPENSSL_LIB_DIR="/usr/lib/x86_64-linux-gnu" 
-		  OPENSSL_INCLUDE_DIR="/usr/include/openssl" 
-		  sudo apk add curl pkgconfig openssl-dev bash
                   echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
 
             - name: Build binaries
