@@ -5,7 +5,6 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-mod utils;
 use clap::{arg, value_parser, Command};
 use colored::Colorize;
 use notify::RecursiveMode;
@@ -13,15 +12,9 @@ use notify_debouncer_mini::new_debouncer;
 use polywrap_client::{client::PolywrapClient, core::uri::Uri};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use utils::*;
 use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
-const DEFAULT_TEMPLATE_CID: &str = "QmTzgDRWiSsux4463gz3h9kXfXkLaUq5gzqdJr7cSmG3Hx";
-const DEFAULT_JS_ENGINE_CID: &str = "QmQGWzyd6bsbErRgSdNXsDskvy6VTSaLBUYjZK5zDZVZwC";
-const DEFAULT_PY_ENGINE_CID: &str = "QmRhaCMunjt6DcgkSrwAxumWMHDK9UZATJgUrPaJJ2Zmb7";
-pub enum ScriptLanguage {
-    JavaScript,
-    Python,
-}
+
+use crate::{utils::{create_wrap_from_file, get_client_with_wraps, deploy_uri_to_http, deploy_package_to_ipfs, build_wasm_module_from_script, get_script_info}, constants::{ScriptLanguage, DEFAULT_JS_ENGINE_CID, DEFAULT_PY_ENGINE_CID, DEFAULT_TEMPLATE_CID}};
 
 pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i32 {
     let matches = Command::new("script")
@@ -503,11 +496,11 @@ async fn eval_with_args(
         &fs::read_to_string(user_file).unwrap(),
         vec![
             JsEngineGlobalVar {
-                name: "wrap_method".to_string(),
+                name: "__method".to_string(),
                 value: serde_json::to_string(method).unwrap(),
             },
             JsEngineGlobalVar {
-                name: "wrap_args".to_string(),
+                name: "__args".to_string(),
                 value: serde_json::to_string(&args).unwrap(),
             },
         ],

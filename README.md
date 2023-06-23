@@ -10,9 +10,46 @@ type Module {
 ```
 
 ## Installation
-`npm i -g @nerfzael/pwr`
+Run the following command in the terminal:
+```bash
+curl -L https://raw.githubusercontent.com/polywrap/pwr/main/pwrup/install | bash
+```
+Which will install `pwrup`.
 
-## Examples: 
+Then, to install `pwr`, run:
+```bash
+pwrup
+```
+## Script WRAPS (JS and Python)
+{lang} = js | py
+
+### REPL
+`pwr {lang} repl`
+Runs a REPL where you can type scripts
+
+`pwr {lang} repl -f {name_of_file}`
+Runs the repl over a file
+It will read and execute the file first
+It will also store all CLI commands you type inside it
+Press enter in the CLI to rerun the whole file (useful if you want to code in the file instead of the CLI)
+
+`pwr {lang} repl -f {name_of_file} -w`
+It will read and execute the file first.
+Then it will execute the file every time you save it.
+It will not listen to CLI input if you use this option ("-w")
+
+### Build
+`pwr {lang} build -f {name_of_file}`
+Builds the target script file
+
+### Deploy
+`pwr {lang} deploy`
+Deploys the build directory
+
+`pwr {lang} deploy -f {name_of_file}`
+Builds and then deploys the script file
+
+## Examples usage: 
 Input: `pwr wrap://ens/wrap-echo.eth Hello world!`
 Output: `Hello world!`
 
@@ -34,15 +71,4 @@ Output: `Hello world!`
 Input: `pwr QmebzauKAXoYbywLAYdBvKyPhWsDoHfkUC4wffWvjighKT Hello world!`
 Output: `Hello world!`
 
-## Rust version
-### Installation 
-Run the following command in the terminal:
-```bash
-curl -L https://raw.githubusercontent.com/polywrap/pwr/main/pwrup/install | bash
-```
-Which will install `pwrup`.
 
-Then, to install `pwr`, run:
-```bash
-pwrup
-```

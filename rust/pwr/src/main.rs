@@ -3,6 +3,9 @@ mod client;
 mod logger;
 mod prompter;
 mod script_pwr_app;
+mod deploy_wrap;
+mod utils;
+mod constants;
 use std::{env, fmt::Display, fs};
 
 use polywrap_client::{
@@ -15,6 +18,9 @@ use logger::*;
 
 use prompter::*;
 use script_pwr_app::*;
+use deploy_wrap::*;
+use utils::*;
+use constants::*;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -66,10 +72,11 @@ pub async fn internal_main(
     match uri.to_string().as_str() {
         "wrap://pwr/js" => return run_script_pwr_app(args, ScriptLanguage::JavaScript).await,
         "wrap://pwr/py" => return run_script_pwr_app(args, ScriptLanguage::Python).await,
+        "wrap://pwr/deploy" => return deploy_wrap(args).await,
         "wrap://pwr/version" => {
             println!("Version: {}", VERSION);
             return 0;
-        }
+        },
         _ => {}
     }
 
