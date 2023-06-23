@@ -44,7 +44,7 @@ async fn execute_deploy_command() -> i32 {
 async fn deploy_with_args(
     args: impl AsRef<Vec<String>>,
     template_cid: &str,
-    _engine_cid: &str,
+    _engine_uri: &Uri,
     client: Arc<PolywrapClient>,
 ) -> i32 {
     let user_file = args.as_ref()[0].clone();

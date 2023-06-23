@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
 
-use crate::{utils::{create_wrap_from_file, get_client_with_wraps, deploy_uri_to_http, deploy_package_to_ipfs, build_wasm_module_from_script, get_script_info}, constants::{ScriptLanguage, DEFAULT_JS_ENGINE_CID, DEFAULT_PY_ENGINE_CID, DEFAULT_TEMPLATE_CID}};
+use crate::{utils::{create_wrap_from_file, get_client_with_wraps, deploy_uri_to_http, deploy_package_to_ipfs, build_wasm_module_from_script, get_script_info}, constants::{ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI, DEFAULT_TEMPLATE_CID}};
 
 pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i32 {
     let matches = Command::new("script")
@@ -97,11 +97,11 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let file = matches.get_one::<PathBuf>("file");
         let method = matches.get_one::<String>("method");
 
-        let engine_cid = matches
+        let engine_uri = matches
             .get_one::<String>("engine").map(|x| x.as_str())
             .unwrap_or(match language {
-                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_URI,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_URI,
             });
 
         let template_cid = matches
@@ -110,17 +110,17 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let is_release = matches.get_flag("release");
 
-        return execute_eval_command(file, method, engine_cid, template_cid, is_release).await;
+        return execute_eval_command(file, method, &Uri::try_from(engine_uri).unwrap(), template_cid, is_release).await;
     } else if let Some(matches) = matches.subcommand_matches("build") {
         let file = matches.get_one::<PathBuf>("file").unwrap();
         let output = matches.get_one::<PathBuf>("output");
 
-        let engine_cid = matches
+        let engine_uri = matches
             .get_one::<String>("engine")
             .map(|x| x.as_str())
             .unwrap_or(match language {
-                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_URI,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_URI,
             });
 
         let template_cid = matches
@@ -128,17 +128,17 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             .map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
-        return execute_build_command(file, output, engine_cid, template_cid).await;
+        return execute_build_command(file, output, &Uri::try_from(engine_uri).unwrap(), template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
 
-        let engine_cid = matches
+        let engine_uri = matches
             .get_one::<String>("engine")
             .map(|x| x.as_str())
             .unwrap_or(match language {
-                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_URI,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_URI,
             });
 
         let template_cid = matches
@@ -146,16 +146,16 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             .map(|x| x.as_str())
             .unwrap_or(DEFAULT_TEMPLATE_CID);
 
-        return execute_deploy_command(file, output, engine_cid, template_cid).await;
+        return execute_deploy_command(file, output, &Uri::try_from(engine_uri).unwrap(), template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("repl") {
         let file = matches.get_one::<PathBuf>("file");
 
-        let engine_cid = matches
+        let engine_uri = matches
             .get_one::<String>("engine")
             .map(|x| x.as_str())
             .unwrap_or(match language {
-                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_CID,
-                ScriptLanguage::Python => DEFAULT_PY_ENGINE_CID,
+                ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_URI,
+                ScriptLanguage::Python => DEFAULT_PY_ENGINE_URI,
             });
 
         let template_cid = matches
@@ -165,7 +165,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let is_release = matches.get_flag("release");
         let should_watch = matches.get_flag("watch");
 
-        return execute_repl_command(file, engine_cid, template_cid, is_release, should_watch)
+        return execute_repl_command(file, &Uri::try_from(engine_uri).unwrap(), template_cid, is_release, should_watch)
             .await;
     } else {
         println!("Command not found!");
@@ -177,7 +177,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 async fn execute_eval_command(
     file: Option<&PathBuf>,
     method: Option<&String>,
-    engine_cid: &str,
+    engine_uri: &Uri,
     template_cid: &str,
     is_release: bool,
 ) -> i32 {
@@ -206,9 +206,9 @@ async fn execute_eval_command(
         }
 
         if !is_release {
-            eval_with_args(&args, client.clone(), engine_cid).await;
+            eval_with_args(&args, client.clone(), engine_uri).await;
         } else {
-            deploy_with_args(&args, template_cid, engine_cid, client.clone()).await;
+            deploy_with_args(&args, template_cid, engine_uri, client.clone()).await;
         }
     }
 }
@@ -216,7 +216,7 @@ async fn execute_eval_command(
 async fn execute_build_command(
     file: &PathBuf,
     output: Option<&PathBuf>,
-    _engine_cid: &str,
+    _engine_uri: &Uri,
     template_cid: &str,
 ) -> i32 {
     println!("Building the WRAP...");
@@ -256,11 +256,11 @@ async fn execute_build_command(
 async fn execute_deploy_command(
     file: Option<&PathBuf>,
     output: Option<&PathBuf>,
-    engine_cid: &str,
+    engine_uri: &Uri,
     template_cid: &str,
 ) -> i32 {
     if file.is_some() {
-        execute_build_command(file.unwrap(), output, engine_cid, template_cid).await;
+        execute_build_command(file.unwrap(), output, engine_uri, template_cid).await;
     }
 
     println!("Deploying the WRAP...");
@@ -292,7 +292,7 @@ async fn execute_deploy_command(
 }
 async fn read_file_and_eval(
     file: Option<&PathBuf>,
-    engine_cid: &str,
+    engine_uri: &Uri,
     _template_cid: &str,
     client: Arc<PolywrapClient>,
 ) -> String {
@@ -306,7 +306,7 @@ async fn read_file_and_eval(
         "".to_string()
     };
     if !total_input.is_empty() {
-        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
     }
 
     total_input
@@ -314,7 +314,7 @@ async fn read_file_and_eval(
 
 async fn execute_repl_command(
     file: Option<&PathBuf>,
-    engine_cid: &str,
+    engine_uri: &Uri,
     template_cid: &str,
     is_release: bool,
     should_watch: bool,
@@ -325,8 +325,8 @@ async fn execute_repl_command(
     if should_watch {
         if let Some(file) = file {
             println!("Watching file: {:?}", file);
-            read_file_and_eval(Some(file), engine_cid, template_cid, client.clone()).await;
-            watch(file, engine_cid, template_cid, client.clone()).await;
+            read_file_and_eval(Some(file), engine_uri, template_cid, client.clone()).await;
+            watch(file, engine_uri, template_cid, client.clone()).await;
             return 0;
         } else {
             write_err("File not specified");
@@ -335,7 +335,7 @@ async fn execute_repl_command(
         }
     }
 
-    let mut total_input = read_file_and_eval(file, engine_cid, template_cid, client.clone()).await;
+    let mut total_input = read_file_and_eval(file, engine_uri, template_cid, client.clone()).await;
 
     loop {
         let input = {
@@ -361,7 +361,7 @@ async fn execute_repl_command(
             match input.as_str() {
                 "" => {
                     if !total_input.is_empty() {
-                        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
                     }
 
                     continue;
@@ -370,7 +370,7 @@ async fn execute_repl_command(
             };
 
             let new_total_input = total_input.clone() + "\n" + &input;
-            let result = invoke_eval(&new_total_input, vec![], engine_cid, client.clone()).await;
+            let result = invoke_eval(&new_total_input, vec![], engine_uri, client.clone()).await;
 
             if result == 0 {
                 total_input = new_total_input;
@@ -385,7 +385,7 @@ async fn execute_repl_command(
     }
 }
 
-async fn watch(path: &Path, engine_cid: &str, _template_cid: &str, client: Arc<PolywrapClient>) {
+async fn watch(path: &Path, engine_uri: &Uri, _template_cid: &str, client: Arc<PolywrapClient>) {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -412,7 +412,7 @@ async fn watch(path: &Path, engine_cid: &str, _template_cid: &str, client: Arc<P
                         "".to_string()
                     };
                     if !total_input.is_empty() {
-                        invoke_eval(&total_input, vec![], engine_cid, client.clone()).await;
+                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
                     }
                 }
             }
@@ -426,7 +426,7 @@ async fn watch(path: &Path, engine_cid: &str, _template_cid: &str, client: Arc<P
 async fn deploy_with_args(
     args: impl AsRef<Vec<String>>,
     template_cid: &str,
-    _engine_cid: &str,
+    _engine_uri: &Uri,
     client: Arc<PolywrapClient>,
 ) -> i32 {
     let user_file = args.as_ref()[0].clone();
@@ -483,7 +483,7 @@ pub struct JsEngineEvalResult {
 async fn eval_with_args(
     args: impl AsRef<Vec<String>>,
     client: Arc<PolywrapClient>,
-    engine_cid: &str,
+    engine_uri: &Uri,
 ) -> i32 {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
@@ -504,7 +504,7 @@ async fn eval_with_args(
                 value: serde_json::to_string(&args).unwrap(),
             },
         ],
-        engine_cid,
+        engine_uri,
         client,
     )
     .await
@@ -525,11 +525,11 @@ fn write_warn(str: impl AsRef<str>) {
 async fn invoke_eval(
     src: &str,
     globals: Vec<JsEngineGlobalVar>,
-    engine_cid: &str,
+    engine_uri: &Uri,
     client: Arc<PolywrapClient>,
 ) -> i32 {
     let result = client.invoke::<JsEngineEvalResult>(
-        &Uri::try_from(format!("ipfs/{}", engine_cid)).unwrap(),
+        engine_uri,
         "evalWithGlobals",
         Some(
             &rmp_serde::encode::to_vec_named(&ArgsEvalWithGlobals {

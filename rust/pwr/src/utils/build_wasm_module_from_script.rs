@@ -1,4 +1,4 @@
-use crate::constants::{ScriptLanguage, DEFAULT_JS_ENGINE_CID, DEFAULT_PY_ENGINE_CID};
+use crate::constants::{ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI};
 
 use super::{
     get_script_info::ScriptInfo, load_package_from_url, replace_user_module, PackageContent,
@@ -13,8 +13,8 @@ pub fn build_wasm_module_from_script(script: &ScriptInfo, template_cid: &str) ->
         &mut module,
         &script.code,
         match script.language {
-            ScriptLanguage::JavaScript => format!("ipfs/{DEFAULT_JS_ENGINE_CID}"),
-            ScriptLanguage::Python => format!("ipfs/{DEFAULT_PY_ENGINE_CID}"),
+            ScriptLanguage::JavaScript => DEFAULT_JS_ENGINE_URI.to_string(),
+            ScriptLanguage::Python => DEFAULT_PY_ENGINE_URI.to_string(),
         },
     );
 

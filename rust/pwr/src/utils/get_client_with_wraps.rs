@@ -13,7 +13,7 @@ use polywrap_client::{
             uri_resolver::UriResolver,
         },
         uri::Uri,
-        wrapper::Wrapper,
+        wrapper::Wrapper, macros::uri,
     },
     resolvers::resolution_result_cache_resolver::ResolutionResultCacheResolverOptions,
 };
@@ -75,12 +75,13 @@ pub fn get_client_with_wraps(wraps: Vec<(Uri, Arc<dyn Wrapper>)>) -> PolywrapCli
     config.add(SystemClientConfig::default().into());
     config.add(Web3ClientConfig::default().into());
     config.add_redirect(
-        Uri::try_from("wrap://ipfs/Qmbokxv3S2UFvkM569Gu4XCi4KvVCn138U7xBFCxfGQipo").unwrap(),
-        Uri::try_from("wrap://mock/engine").unwrap(),
+        uri!("ens/wraps.eth:http-uri-resolver-ext@1.0.1"),
+        // TODO: remove this once the latest version of the http-uri-resolver-ext is published
+        uri!("ipfs/QmansMm6hUBYs7D7EW1zA7BFBnDBGGgCM2jyVTWuDmMVNx"),
     );
     config.add_interface_implementation(
-        Uri::try_from("wrap://ens/uri-resolver.core.polywrap.eth").unwrap(),
-        Uri::try_from("wrap://http/http.wrappers.dev/u/test/polywrap-resolver").unwrap(),
+        uri!("wrap://ens/uri-resolver.core.polywrap.eth"),
+        uri!("wrap://http/http.wrappers.dev/u/test/polywrap-resolver"),
     );
 
     for wrap in wraps {
