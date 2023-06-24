@@ -41,48 +41,6 @@ async fn execute_deploy_command() -> i32 {
     0
 }
 
-async fn deploy_with_args(
-    args: impl AsRef<Vec<String>>,
-    template_cid: &str,
-    _engine_uri: &Uri,
-    client: Arc<PolywrapClient>,
-) -> i32 {
-    let user_file = args.as_ref()[0].clone();
-    let method = &args.as_ref()[1];
-
-    let user_wrap = create_wrap_from_file(&user_file, template_cid).unwrap();
-
-    let args = {
-        let serialization_result = polywrap_msgpack::serialize(&AppArgs {
-            args: args.as_ref().iter().skip(2).cloned().collect(),
-        });
-        
-
-        match serialization_result {
-            Ok(args) => args,
-            Err(serialize_error) => {
-                println!("{:?}", serialize_error);
-                return 1;
-            }
-        }
-    };
-
-    let result = user_wrap
-        .invoke(method, Some(&args), None, client, None)
-        .map_err(|e| format!("Error invoking method: {}", e));
-
-    if let Err(error) = result {
-        println!("{:?}", error);
-        return 0;
-    }
-
-    let result = msgpack_to_json_pretty(&result.unwrap());
-
-    println!("{}", result);
-
-    0
-}
-
 #[derive(Serialize, Deserialize)]
 struct AppArgs {
     args: Vec<String>,
