@@ -91,6 +91,15 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
                 .arg(arg!(-r --release "Release").required(false))
                 .arg(arg!(-w --watch "Watch the file for changes").required(false)),
         )
+        .subcommand(
+            Command::new("new")
+                .about("Creates a new script WRAP file")
+                .arg(
+                    arg!(-f --file <FILE> "File to input")
+                        .required(true)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+        )
         .get_matches_from(args);
 
     if let Some(matches) = matches.subcommand_matches("invoke") {
@@ -166,6 +175,11 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let should_watch = matches.get_flag("watch");
 
         return execute_repl_command(file, &Uri::try_from(engine_uri).unwrap(), template_cid, is_release, should_watch)
+            .await;
+    } else if let Some(matches) = matches.subcommand_matches("new") {
+        let file = matches.get_one::<PathBuf>("file").unwrap();
+
+        return execute_new_command(file, language)
             .await;
     } else {
         println!("Command not found!");
@@ -388,6 +402,34 @@ async fn execute_repl_command(
             panic!("Repl not yet supported in release mode");
         }
     }
+}
+
+async fn execute_new_command(
+    file: &PathBuf,
+    language: ScriptLanguage,
+) -> i32 {
+    if !Path::exists(file) {
+        println!("Creating file: {:?}", file);
+        File::create(file).unwrap();
+        println!("Created.");
+    } else {
+        write_err("File already exists");
+
+        return 1;
+    }
+
+    match language {
+        ScriptLanguage::JavaScript => {
+            let mut file = File::create(file).unwrap();
+            file.write_all(include_bytes!("./templates/javascript.js")).unwrap();
+        },
+        ScriptLanguage::Python => {
+            let mut file = File::create(file).unwrap();
+            file.write_all(include_bytes!("./templates/python.py")).unwrap();
+        },
+    }
+
+    return 0;
 }
 
 async fn watch(path: &Path, engine_uri: &Uri, template_cid: &str, client: Arc<PolywrapClient>) {
