@@ -9,7 +9,7 @@ use super::{build_wasm_module_from_script, get_script_info::ScriptInfo};
 
 pub fn create_wrap_from_script(
     script: &ScriptInfo,
-    template_cid: &str,
+    template_cid: Option<&str>,
 ) -> Result<Arc<dyn Wrapper>, String> {
     let module = build_wasm_module_from_script(script, template_cid);
 
