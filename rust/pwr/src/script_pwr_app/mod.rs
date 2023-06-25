@@ -91,6 +91,15 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
                 .arg(arg!(-r --release "Release").required(false))
                 .arg(arg!(-w --watch "Watch the file for changes").required(false)),
         )
+        .subcommand(
+            Command::new("new")
+                .about("Creates a new script WRAP file")
+                .arg(
+                    arg!(-f --file <FILE> "File to input")
+                        .required(true)
+                        .value_parser(value_parser!(PathBuf)),
+                )
+        )
         .get_matches_from(args);
 
     if let Some(matches) = matches.subcommand_matches("invoke") {
@@ -166,6 +175,11 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
         let should_watch = matches.get_flag("watch");
 
         return execute_repl_command(file, &Uri::try_from(engine_uri).unwrap(), template_cid, is_release, should_watch)
+            .await;
+    } else if let Some(matches) = matches.subcommand_matches("new") {
+        let file = matches.get_one::<PathBuf>("file").unwrap();
+
+        return execute_new_command(file, language)
             .await;
     } else {
         println!("Command not found!");
@@ -296,20 +310,18 @@ async fn read_file_and_eval(
     _template_cid: &str,
     client: Arc<PolywrapClient>,
 ) -> String {
-    let total_input = if let Some(file) = &file {
+    if let Some(file) = &file {
         if Path::exists(file) {
-            fs::read_to_string(file).unwrap()
-        } else {
-            "".to_string()
+            let total_input = fs::read_to_string(file).unwrap();
+
+            if !total_input.is_empty() {
+                println!("Evaluating file: {:?}...", file);
+                invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
+            }
         }
-    } else {
-        "".to_string()
-    };
-    if !total_input.is_empty() {
-        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
     }
 
-    total_input
+    "".to_string()
 }
 
 async fn execute_repl_command(
@@ -321,6 +333,17 @@ async fn execute_repl_command(
 ) -> i32 {
     println!("REPL loading...");
     let client = Arc::new(get_client_with_wraps(vec![]));
+
+    if let Some(file) = file {
+        if !Path::exists(file) {
+            println!("Creating file: {:?}", file);
+            File::create(file).unwrap();
+            println!("Created.");
+
+        } 
+    }
+
+    println!("REPL loaded.");
 
     if should_watch {
         if let Some(file) = file {
@@ -349,11 +372,7 @@ async fn execute_repl_command(
 
         if !is_release {
             total_input = if let Some(file) = &file {
-                if Path::exists(file) {
-                    fs::read_to_string(file).unwrap()
-                } else {
-                    total_input
-                }
+                fs::read_to_string(file).unwrap()
             } else {
                 total_input
             };
@@ -385,7 +404,35 @@ async fn execute_repl_command(
     }
 }
 
-async fn watch(path: &Path, engine_uri: &Uri, _template_cid: &str, client: Arc<PolywrapClient>) {
+async fn execute_new_command(
+    file: &PathBuf,
+    language: ScriptLanguage,
+) -> i32 {
+    if !Path::exists(file) {
+        println!("Creating file: {:?}", file);
+        File::create(file).unwrap();
+        println!("Created.");
+    } else {
+        write_err("File already exists");
+
+        return 1;
+    }
+
+    match language {
+        ScriptLanguage::JavaScript => {
+            let mut file = File::create(file).unwrap();
+            file.write_all(include_bytes!("./templates/javascript.js")).unwrap();
+        },
+        ScriptLanguage::Python => {
+            let mut file = File::create(file).unwrap();
+            file.write_all(include_bytes!("./templates/python.py")).unwrap();
+        },
+    }
+
+    return 0;
+}
+
+async fn watch(path: &Path, engine_uri: &Uri, template_cid: &str, client: Arc<PolywrapClient>) {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -402,18 +449,7 @@ async fn watch(path: &Path, engine_uri: &Uri, _template_cid: &str, client: Arc<P
         match result {
             Ok(events) => {
                 for _ in events {
-                    let total_input = if let Some(file) = &path.to_str() {
-                        if Path::exists(path) {
-                            fs::read_to_string(file).unwrap()
-                        } else {
-                            "".to_string()
-                        }
-                    } else {
-                        "".to_string()
-                    };
-                    if !total_input.is_empty() {
-                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
-                    }
+                    read_file_and_eval(Some(&path.to_owned()), engine_uri, template_cid, client.clone()).await;
                 }
             }
             Err(errors) => errors
@@ -450,7 +486,7 @@ async fn deploy_with_args(
     };
 
     let result = user_wrap
-        .invoke(method, Some(&args), None, client, None)
+        .invoke(method, Some(&args), None, client)
         .map_err(|e| format!("Error invoking method: {}", e));
 
     if let Err(error) = result {
