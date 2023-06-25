@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use wrap_manifest_schemas::{deserialize::deserialize_wrap_manifest, versions::WrapManifest};
 
-use crate::{utils::{create_wrap_from_file, get_client_with_wraps, deploy_uri_to_http, deploy_package_to_ipfs, build_wasm_module_from_script, get_script_info}, constants::{ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI, DEFAULT_TEMPLATE_CID}};
+use crate::{utils::{create_wrap_from_file, get_client_with_wraps, deploy_uri_to_http, deploy_package_to_ipfs, build_wasm_module_from_script, get_script_info}, constants::{ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI}};
 
 pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i32 {
     let matches = Command::new("script")
@@ -114,8 +114,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             });
 
         let template_cid = matches
-            .get_one::<String>("template").map(|x| x.as_str())
-            .unwrap_or(DEFAULT_TEMPLATE_CID);
+            .get_one::<String>("template").map(|x| x.as_str());
 
         let is_release = matches.get_flag("release");
 
@@ -134,8 +133,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let template_cid = matches
             .get_one::<String>("template")
-            .map(|x| x.as_str())
-            .unwrap_or(DEFAULT_TEMPLATE_CID);
+            .map(|x| x.as_str());
 
         return execute_build_command(file, output, &Uri::try_from(engine_uri).unwrap(), template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
@@ -152,8 +150,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
 
         let template_cid = matches
             .get_one::<String>("template")
-            .map(|x| x.as_str())
-            .unwrap_or(DEFAULT_TEMPLATE_CID);
+            .map(|x| x.as_str());
 
         return execute_deploy_command(file, output, &Uri::try_from(engine_uri).unwrap(), template_cid).await;
     } else if let Some(matches) = matches.subcommand_matches("repl") {
@@ -168,8 +165,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> i3
             });
 
         let template_cid = matches
-            .get_one::<String>("template").map(|x| x.as_str())
-            .unwrap_or(DEFAULT_TEMPLATE_CID);
+            .get_one::<String>("template").map(|x| x.as_str());
 
         let is_release = matches.get_flag("release");
         let should_watch = matches.get_flag("watch");
@@ -192,7 +188,7 @@ async fn execute_eval_command(
     file: Option<&PathBuf>,
     method: Option<&String>,
     engine_uri: &Uri,
-    template_cid: &str,
+    template_cid: Option<&str>,
     is_release: bool,
 ) -> i32 {
     println!("VM loading...");
@@ -231,7 +227,7 @@ async fn execute_build_command(
     file: &PathBuf,
     output: Option<&PathBuf>,
     _engine_uri: &Uri,
-    template_cid: &str,
+    template_cid: Option<&str>,
 ) -> i32 {
     println!("Building the WRAP...");
 
@@ -271,7 +267,7 @@ async fn execute_deploy_command(
     file: Option<&PathBuf>,
     output: Option<&PathBuf>,
     engine_uri: &Uri,
-    template_cid: &str,
+    template_cid: Option<&str>,
 ) -> i32 {
     if file.is_some() {
         execute_build_command(file.unwrap(), output, engine_uri, template_cid).await;
@@ -307,7 +303,7 @@ async fn execute_deploy_command(
 async fn read_file_and_eval(
     file: Option<&PathBuf>,
     engine_uri: &Uri,
-    _template_cid: &str,
+    _template_cid: Option<&str>,
     client: Arc<PolywrapClient>,
 ) -> String {
     if let Some(file) = &file {
@@ -327,7 +323,7 @@ async fn read_file_and_eval(
 async fn execute_repl_command(
     file: Option<&PathBuf>,
     engine_uri: &Uri,
-    template_cid: &str,
+    template_cid: Option<&str>,
     is_release: bool,
     should_watch: bool,
 ) -> i32 {
@@ -432,7 +428,7 @@ async fn execute_new_command(
     return 0;
 }
 
-async fn watch(path: &Path, engine_uri: &Uri, template_cid: &str, client: Arc<PolywrapClient>) {
+async fn watch(path: &Path, engine_uri: &Uri, template_cid: Option<&str>, client: Arc<PolywrapClient>) {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -461,7 +457,7 @@ async fn watch(path: &Path, engine_uri: &Uri, template_cid: &str, client: Arc<Po
 
 async fn deploy_with_args(
     args: impl AsRef<Vec<String>>,
-    template_cid: &str,
+    template_cid: Option<&str>,
     _engine_uri: &Uri,
     client: Arc<PolywrapClient>,
 ) -> i32 {
