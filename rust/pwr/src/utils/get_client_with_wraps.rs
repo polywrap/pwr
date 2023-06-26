@@ -23,8 +23,6 @@ use polywrap_client_builder::{
 };
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 
-use crate::constants::DEFAULT_TEMPLATE_CID;
-
 use super::create_wrap_from_file;
 
 #[derive(Debug)]
@@ -51,7 +49,7 @@ impl UriResolver for LocalResolver {
             }
 
             if Path::new(path).exists() {
-                let wrap = create_wrap_from_file(path, DEFAULT_TEMPLATE_CID).map_err(|e| {
+                let wrap = create_wrap_from_file(path, None).map_err(|e| {
                     polywrap_client::core::error::Error::FileReadError(format!(
                         "Error creating wrap from file: {}",
                         e

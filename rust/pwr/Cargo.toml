@@ -1,14 +1,14 @@
 [package]
 name = "pwr"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 
 [dependencies]
 polywrap_client = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_client_builder = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client.git" }
-wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_client_builder = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client.git"  }
+wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git"  }
 polywrap_fs_plugin = { version  = "0.0.1-beta.4" }
 polywrap_http_plugin = { version  = "0.0.1-beta.4" }
 dirs = "5.0.0"
@@ -29,10 +29,10 @@ notify-debouncer-mini = "0.3.0"
 openssl = { version = "0.10.55", features = ["vendored"] }
 
 [patch.crates-io]
-polywrap_uri = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_core = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_client = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_plugin = { git = "https://github.com/polywrap/rust-client.git" }
-wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git" }
-polywrap_resolvers = { git = "https://github.com/polywrap/rust-client.git" }
+polywrap_uri = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_core = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_client = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_plugin = { git = "https://github.com/polywrap/rust-client.git"  }
+wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_msgpack = { git = "https://github.com/polywrap/rust-client.git"  }
+polywrap_resolvers = { git = "https://github.com/polywrap/rust-client.git"  }

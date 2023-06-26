@@ -31,8 +31,6 @@ pub async fn deploy_uri_to_http(
         println!("{:?}", resp);
         return Err("Failed to upload to IPFS".into());
     }
-    let body = resp.text().await?;
-    println!("body: {}", body);
 
     Ok(package_name_and_version.to_string())
 }
