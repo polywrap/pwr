@@ -2032,7 +2032,7 @@ dependencies = [
 [[package]]
 name = "polywrap_client"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_client_builder",
  "polywrap_core",
@@ -2051,7 +2051,7 @@ dependencies = [
 [[package]]
 name = "polywrap_client_builder"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack",
@@ -2064,7 +2064,7 @@ dependencies = [
 [[package]]
 name = "polywrap_client_default_config"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "base64 0.13.1",
  "polywrap_client_builder",
@@ -2083,7 +2083,7 @@ dependencies = [
 [[package]]
 name = "polywrap_core"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "jsonschema",
  "polywrap_core_macros",
@@ -2099,7 +2099,7 @@ dependencies = [
 [[package]]
 name = "polywrap_core_macros"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_uri",
  "quote",
@@ -2142,7 +2142,7 @@ dependencies = [
 [[package]]
 name = "polywrap_msgpack"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "rmp-serde",
  "rmpv",
@@ -2155,7 +2155,7 @@ dependencies = [
 [[package]]
 name = "polywrap_plugin"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "Inflector",
  "bigdecimal",
@@ -2172,7 +2172,7 @@ dependencies = [
 [[package]]
 name = "polywrap_plugin_implementor"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_core",
  "proc-macro2",
@@ -2184,7 +2184,7 @@ dependencies = [
 [[package]]
 name = "polywrap_resolver_extensions"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack",
@@ -2199,7 +2199,7 @@ dependencies = [
 [[package]]
 name = "polywrap_resolvers"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack",
@@ -2246,7 +2246,7 @@ dependencies = [
 [[package]]
 name = "polywrap_uri"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "regex",
  "serde",
@@ -2255,7 +2255,7 @@ dependencies = [
 [[package]]
 name = "polywrap_wasm"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "base64 0.13.1",
  "bytes",
@@ -4096,7 +4096,7 @@ dependencies = [
 [[package]]
 name = "wrap_manifest_schemas"
 version = "0.1.6-beta.7"
-source = "git+https://github.com/polywrap/rust-client.git?branch=nerfzael-abort-fixes#d9c6a2976f1cce00c12ed3cd0122e5f153a8971a"
+source = "git+https://github.com/polywrap/rust-client.git#a732d10b59e42aecab2df341ec3ae2287e67c785"
 dependencies = [
  "handlebars",
  "jsonschema",
