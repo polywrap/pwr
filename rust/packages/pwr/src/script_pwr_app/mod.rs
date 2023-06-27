@@ -129,7 +129,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
         execute_eval_command(
             file,
             method,
-            &Uri::try_from(engine_uri).easy_err()?,
+            &Uri::try_from(engine_uri)?,
             template_cid,
             is_release,
         )
@@ -148,7 +148,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
 
         let template_cid = matches.get_one::<String>("template").map(|x| x.as_str());
 
-        execute_build_command(file, output, &Uri::try_from(engine_uri).easy_err()?).await
+        execute_build_command(file, output, &Uri::try_from(engine_uri)?).await
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
@@ -166,7 +166,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
         execute_deploy_command(
             file,
             output,
-            &Uri::try_from(engine_uri).easy_err()?,
+            &Uri::try_from(engine_uri)?,
             template_cid,
         )
         .await
@@ -188,7 +188,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
 
         execute_repl_command(
             file,
-            &Uri::try_from(engine_uri).easy_err()?,
+            &Uri::try_from(engine_uri)?,
             template_cid,
             is_release,
             should_watch,
@@ -246,14 +246,14 @@ async fn execute_eval_command(
 async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine_uri: &Uri) -> Result<i32, StringError> {
     println!("Building the WRAP...");
 
-    let script = get_script_info_from_file(&file.to_string_lossy()).easy_err()?;
-    let module = build_module_from_script(script, get_bytes_from_url).easy_err()?;
+    let script = get_script_info_from_file(&file.to_string_lossy())?;
+    let module = build_module_from_script(script, get_bytes_from_url)?;
 
     let default_output = PathBuf::from("./build");
     let output = output.unwrap_or(&default_output);
 
     if !Path::exists(output) {
-        fs::create_dir(output).easy_err()?;
+        fs::create_dir(output)?;
     }
 
     let wrap_name = Path::new(&file).file_stem().easy_err()?.to_str().easy_err()?;
@@ -266,13 +266,13 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine
             ..Default::default()
         },
     };
-    let manifest = rmp_serde::to_vec_named(&manifest).easy_err()?;
+    let manifest = rmp_serde::to_vec_named(&manifest)?;
 
-    let mut file = File::create("./build/wrap.info").easy_err()?;
-    file.write_all(&manifest).easy_err()?;
+    let mut file = File::create("./build/wrap.info")?;
+    file.write_all(&manifest)?;
 
-    let mut file = File::create("./build/wrap.wasm").easy_err()?;
-    file.write_all(&module).easy_err()?;
+    let mut file = File::create("./build/wrap.wasm")?;
+    file.write_all(&module)?;
 
     println!("WRAP built successfully!");
     Ok(0)
@@ -295,18 +295,18 @@ async fn execute_deploy_command(
         .to_string_lossy()
         .into_owned();
 
-    let cid = deploy_package_to_ipfs(&output).await.easy_err()?;
+    let cid = deploy_package_to_ipfs(&output).await?;
     println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
 
-    let manifest = fs::read(format!("{output}/wrap.info")).easy_err()?;
-    let manifest = deserialize_wrap_manifest(&manifest, None).easy_err()?;
+    let manifest = fs::read(format!("{output}/wrap.info"))?;
+    let manifest = deserialize_wrap_manifest(&manifest, None)?;
 
     deploy_uri_to_http(
         &manifest.name,
-        &Uri::try_from("wrap://ipfs/".to_string() + &cid).easy_err()?,
+        &Uri::try_from("wrap://ipfs/".to_string() + &cid)?,
     )
     .await
-    .easy_err()?;
+    ?;
     println!(
         "WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}",
         &manifest.name
@@ -320,7 +320,7 @@ async fn read_file_and_eval(
     engine_uri: &Uri,
     _template_cid: Option<&str>,
     client: Arc<PolywrapClient>,
-) -> String {
+) -> Result<String, StringError> {
     if let Some(file) = &file {
         if Path::exists(file) {
             let total_input = fs::read_to_string(file)?;
@@ -332,7 +332,7 @@ async fn read_file_and_eval(
         }
     }
 
-    "".to_string()
+    Ok("".to_string())
 }
 
 async fn execute_repl_command(
@@ -348,7 +348,7 @@ async fn execute_repl_command(
     if let Some(file) = file {
         if !Path::exists(file) {
             println!("Creating file: {:?}", file);
-            File::create(file).easy_err()?;
+            File::create(file)?;
             println!("Created.");
         }
     }
@@ -368,7 +368,7 @@ async fn execute_repl_command(
         }
     }
 
-    let mut total_input = read_file_and_eval(file, engine_uri, template_cid, client.clone()).await;
+    let mut total_input = read_file_and_eval(file, engine_uri, template_cid, client.clone()).await?;
 
     loop {
         let input = {
@@ -382,7 +382,7 @@ async fn execute_repl_command(
 
         if !is_release {
             total_input = if let Some(file) = &file {
-                fs::read_to_string(file).easy_err()?
+                fs::read_to_string(file)?
             } else {
                 total_input
             };
@@ -390,7 +390,7 @@ async fn execute_repl_command(
             match input.as_str() {
                 "" => {
                     if !total_input.is_empty() {
-                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
+                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await?;
                     }
 
                     continue;
@@ -399,13 +399,13 @@ async fn execute_repl_command(
             };
 
             let new_total_input = total_input.clone() + "\n" + &input;
-            let result = invoke_eval(&new_total_input, vec![], engine_uri, client.clone()).await;
+            let result = invoke_eval(&new_total_input, vec![], engine_uri, client.clone()).await?;
 
             if result == 0 {
                 total_input = new_total_input;
                 if let Some(file) = &file {
-                    let mut file = File::create(file).easy_err()?;
-                    file.write_all(total_input.as_bytes()).easy_err()?;
+                    let mut file = File::create(file)?;
+                    file.write_all(total_input.as_bytes())?;
                 }
             }
         } else {
@@ -417,7 +417,7 @@ async fn execute_repl_command(
 async fn execute_new_command(file: &PathBuf, language: ScriptLanguage) -> Result<i32, StringError> {
     if !Path::exists(file) {
         println!("Creating file: {:?}", file);
-        File::create(file).easy_err()?;
+        File::create(file)?;
         println!("Created.");
     } else {
         write_err("File already exists");
@@ -427,14 +427,14 @@ async fn execute_new_command(file: &PathBuf, language: ScriptLanguage) -> Result
 
     match language {
         ScriptLanguage::JavaScript => {
-            let mut file = File::create(file).easy_err()?;
+            let mut file = File::create(file)?;
             file.write_all(include_bytes!("./templates/javascript.js"))
-                .easy_err()?;
+                ?;
         }
         ScriptLanguage::Python => {
-            let mut file = File::create(file).easy_err()?;
+            let mut file = File::create(file)?;
             file.write_all(include_bytes!("./templates/python.py"))
-                .easy_err()?;
+                ?;
         }
     }
 
@@ -468,7 +468,7 @@ async fn watch(
                         template_cid,
                         client.clone(),
                     )
-                    .await;
+                    .await?;
                 }
             }
             Err(errors) => errors
@@ -476,17 +476,19 @@ async fn watch(
                 .for_each(|error| write_warn(format!("Watch error: {:?}", error))),
         }
     }
+
+    Ok(())
 }
 
 async fn deploy_with_args(
     args: impl AsRef<Vec<String>>,
     _engine_uri: &Uri,
     client: Arc<PolywrapClient>,
-) -> i32 {
+) -> Result<i32, StringError> {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
 
-    let user_wrap = create_wrap_from_file(&user_file).easy_err()?;
+    let user_wrap = create_wrap_from_file(&user_file)?;
 
     let args = {
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
@@ -497,7 +499,7 @@ async fn deploy_with_args(
             Ok(args) => args,
             Err(serialize_error) => {
                 println!("{:?}", serialize_error);
-                return 1;
+                return Ok(1);
             }
         }
     };
@@ -508,14 +510,14 @@ async fn deploy_with_args(
 
     if let Err(error) = result {
         println!("{:?}", error);
-        return 0;
+        return Ok(0);
     }
 
     let result = msgpack_to_json_pretty(&result.easy_err()?);
 
-    println!("{}", result);
+    println!("{}", result?);
 
-    0
+    Ok(0)
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ArgsEvalWithGlobals {
@@ -537,7 +539,7 @@ async fn eval_with_args(
     args: impl AsRef<Vec<String>>,
     client: Arc<PolywrapClient>,
     engine_uri: &Uri,
-) -> i32 {
+) -> Result<i32, StringError> {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
 
@@ -546,15 +548,15 @@ async fn eval_with_args(
     });
 
     invoke_eval(
-        &fs::read_to_string(user_file).easy_err()?,
+        &fs::read_to_string(user_file)?,
         vec![
             JsEngineGlobalVar {
                 name: "__wrap_method".to_string(),
-                value: serde_json::to_string(method).easy_err()?,
+                value: serde_json::to_string(method)?,
             },
             JsEngineGlobalVar {
                 name: "__wrap_args".to_string(),
-                value: serde_json::to_string(&args).easy_err()?,
+                value: serde_json::to_string(&args)?,
             },
         ],
         engine_uri,

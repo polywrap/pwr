@@ -136,13 +136,13 @@ impl AppManager {
 //     };
 
 //     let imported_module_types = if manifest.abi.imported_module_types != None {
-//         manifest.abi.imported_module_types.easy_err()?
+//         manifest.abi.imported_module_types?
 //     } else {
 //         [].to_vec()
 //     };
 
 //     // TODO: figure out how to read the manifest and get the imported uris
-//     // let imported_uris = imported_module_types.map(|imported_module_type| Uri::try_from(imported_module_type.uri).easy_err()?.to_string());
+//     // let imported_uris = imported_module_types.map(|imported_module_type| Uri::try_from(imported_module_type.uri)?.to_string());
 
 //     // let requested_uris = imported_uris.filter(|imported_uri| all_access_controlled_uris.contains(imported_uri));
 //     // let other_uris = imported_uris.filter(|imported_uri| !all_access_controlled_uris.contains(imported_uri));

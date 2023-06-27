@@ -56,13 +56,13 @@ async fn internal_main(
     logger: &impl Logger,
     prompter: &impl Prompter,
 ) -> Result<i32, StringError> {
-    logger.debug(format!("Args: {:?}", args)).easy_err()?;
+    logger.debug(format!("Args: {:?}", args))?;
 
     let uri = &args[0];
 
     let uri = parse_uri(uri)?;
 
-    logger.debug(format!("Parsed URI: {}", uri)).easy_err()?;
+    logger.debug(format!("Parsed URI: {}", uri))?;
 
     Ok(match uri.to_string().as_str() {
         "wrap://pwr/js" => run_script_pwr_app(args, ScriptLanguage::JavaScript).await?,
@@ -83,45 +83,45 @@ async fn internal_main(
     })
 }
 
-fn get_pwr_dir() -> Result<String, String> {
+fn get_pwr_dir() -> Result<String, StringError> {
     let app_dir = dirs::home_dir();
 
     if app_dir.is_none() {
-        return Err(String::from("Error: Could not find home directory"));
+        return Err(String::from("Error: Could not find home directory").into());
     }
 
     let app_dir = app_dir.easy_err()?.join(".pwr");
 
     // Check if the .pwr directory exists
     if !app_dir.exists() {
-        fs::create_dir(&app_dir).easy_err()?;
+        fs::create_dir(&app_dir)?;
     }
 
     let pwr_dir = app_dir.into_os_string().into_string()
-        .map_err(|e| e.to_string_lossy().to_string()).easy_err()?;
+        .map_err(|e| e.to_string_lossy().to_string())?;
 
     Ok(pwr_dir)
 }
 
-fn parse_uri(uri: &String) -> Result<Uri, String> {
+fn parse_uri(uri: &String) -> Result<Uri, StringError> {
     let uri = if uri.ends_with(".eth") && !uri.starts_with("wrap://ens/") && !uri.starts_with("ens/") {
-        Uri::try_from(format!("wrap://ens/{}", uri)).easy_err()?
+        Uri::try_from(format!("wrap://ens/{}", uri))?
     } else if uri.starts_with("Qm") {
-        Uri::try_from(format!("wrap://ipfs/{}", uri)).easy_err()?
+        Uri::try_from(format!("wrap://ipfs/{}", uri))?
     } else if uri.starts_with("ipfs://") {
-        Uri::try_from(format!("wrap://ipfs/{}", &uri["ipfs://".len()..uri.len()])).easy_err()?
+        Uri::try_from(format!("wrap://ipfs/{}", &uri["ipfs://".len()..uri.len()]))?
     } else if uri.starts_with('.') || uri.starts_with('/') {
-        Uri::try_from(format!("wrap://file/{}", uri)).easy_err()?
+        Uri::try_from(format!("wrap://file/{}", uri))?
     } else if !uri.contains('/') {
-        Uri::try_from(format!("wrap://pwr/{}", uri)).easy_err()?
+        Uri::try_from(format!("wrap://pwr/{}", uri))?
     } else {
-        Uri::try_from(uri.clone()).easy_err()?
+        Uri::try_from(uri.clone())?
     };
 
     Ok(uri)
 }
 
-fn print_and_exit<T: Display>(error: T) {
-    println!("{}", error);
+fn print_and_exit<T: ToString>(error: T) {
+    println!("{}", error.to_string());
     std::process::exit(1);
 }

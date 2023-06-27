@@ -21,18 +21,18 @@ async fn execute_deploy_command() -> Result<i32, StringError> {
 
     let output = "./build";
 
-    let cid = deploy_package_to_ipfs(output).await.easy_err()?;
+    let cid = deploy_package_to_ipfs(output).await?;
     println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
 
-    let manifest = fs::read(format!("{output}/wrap.info")).easy_err()?;
-    let manifest = deserialize_wrap_manifest(&manifest, None).easy_err()?;
+    let manifest = fs::read(format!("{output}/wrap.info"))?;
+    let manifest = deserialize_wrap_manifest(&manifest, None)?;
 
     deploy_uri_to_http(
         &manifest.name,
-        &Uri::try_from("wrap://ipfs/".to_string() + &cid).easy_err()?,
+        &Uri::try_from("wrap://ipfs/".to_string() + &cid)?,
     )
     .await
-    .easy_err()?;
+    ?;
     println!(
         "WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}",
         &manifest.name
@@ -48,6 +48,6 @@ struct AppArgs {
 }
 
 // fn msgpack_to_json_pretty(bytes: &[u8]) -> String {
-//     let value: rmpv::Value = rmp_serde::from_slice(bytes).easy_err()?;
-//     serde_json::to_string_pretty(&value).easy_err()?
+//     let value: rmpv::Value = rmp_serde::from_slice(bytes)?;
+//     serde_json::to_string_pretty(&value)?
 // }
