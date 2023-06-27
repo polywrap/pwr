@@ -1,10 +1,11 @@
 mod wrap;
-use script_wrap_utils_wasm::{ScripWrapModuleBuilder, ScriptInfo, ScriptLanguage};
+use script_wrap_utils_wasm::{ScriptInfo, ScriptLanguage, build_module_from_script};
 use serde::{Deserialize, Serialize};
 use wrap::{imported::*, module::serialization::ArgsDeploy, *};
 mod utils;
 use utils::*;
-use wrap_utils_wasm::{load_package_from_url, PackageContent};
+
+easy_error_string::use_easy_error_string!();
 
 impl ModuleTrait for Module {
     fn build_manifest(args: ArgsBuildManifest) -> Result<BuildResult, String> {
@@ -28,7 +29,7 @@ impl ModuleTrait for Module {
             language: lang,
         };
 
-        let module = build_module_from_script(script)?;
+        let module = build_module_from_script(script, get_bytes_from_url).map_err_str()?;
 
         Ok(BuildResult {
             data: Some(module.to_vec()),
@@ -50,7 +51,7 @@ impl ModuleTrait for Module {
 
         let manifest = build_wrap_manifest(&args.name);
 
-        let module = build_module_from_script(script)?;
+        let module = build_module_from_script(script, get_bytes_from_url).map_err_str()?;
 
         let result = deploy_package_to_ipfs(&manifest, &module)?;
 
@@ -71,17 +72,17 @@ struct WrapManifest01 {
     version: String,
 }
 
-fn build_module_from_script(script: ScriptInfo) -> Result<Box<[u8]>, String> {
-    let builder = ScripWrapModuleBuilder::new(script);
+// fn build_module_from_script(script: ScriptInfo) -> Result<Box<[u8]>, StringError> {
+//     let builder = ScripWrapModuleBuilder::new(script);
 
-    let PackageContent { module, .. } =
-        load_package_from_url::<()>(&builder.template_endpoint, |url| {
-            Ok(get_bytes_from_url(&url))
-        })
-        .unwrap();
+//     let PackageContent { module, .. } =
+//         load_package_from_url::<()>(&builder.template_endpoint, |url| {
+//             Ok(get_bytes_from_url(&url)?)
+//         })
+//         .unwrap();
 
-    Ok(builder.build(&module))
-}
+//     Ok(builder.build(&module)?)
+// }
 
 fn build_wrap_manifest(wrap_name: &str) -> Vec<u8> {
     // let manifest = WrapManifest01 {

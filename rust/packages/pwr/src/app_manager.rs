@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use polywrap_client::core::uri::Uri;
 
 use crate::{client::CoreClient, StringError};
-use crate::logger::*;
+use crate::{logger::*, MapToErrorString};
 use crate::prompter::Prompter;
 use serde::{Deserialize, Serialize};
 
@@ -64,7 +64,7 @@ impl AppManager {
         let args = match serialization_result {
             Ok(args) => args,
             Err(e) => {
-                logger.error(format!("{}", e))?;
+                logger.error(format!("{}", e)).map_err_str()?;
                 return Ok(1);
             }
         };
@@ -87,13 +87,13 @@ impl AppManager {
                 match exit_code {
                     Ok(exit_code) => Ok(exit_code),
                     Err(e) => {
-                        logger.error(format!("{:?}", e))?;
+                        logger.error(format!("{:?}", e)).map_err_str()?;
                         Ok(1)
                     }
                 }
             }
             Err(e) => {
-                logger.error(e)?;
+                logger.error(e).map_err_str()?;
                 Ok(1)
             }
         }

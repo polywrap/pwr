@@ -16,3 +16,4 @@ reqwest.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
 polywrap_client.workspace = true
+easy_error_string.workspace = true

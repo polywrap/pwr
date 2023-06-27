@@ -14,3 +14,4 @@ serde_json.workspace = true
 rmp-serde.workspace = true
 wrap_utils_wasm.workspace = true
 thiserror.workspace = true
+easy_error_string.workspace = true

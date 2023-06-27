@@ -1,6 +1,6 @@
-use crate::wrap::imported::{http_request::HttpRequest, ArgsGet, HttpModule, HttpResponseType};
+use crate::{wrap::imported::{http_request::HttpRequest, ArgsGet, HttpModule, HttpResponseType}, StringError, OkOrErrorString, MapToErrorString};
 
-pub fn get_bytes_from_url(url: &str) -> Box<[u8]> {
+pub fn get_bytes_from_url(url: &str) -> Result<Box<[u8]>, StringError> {
     let result = HttpModule::get(&ArgsGet {
         url: url.to_string(),
         request: Some(HttpRequest {
@@ -11,15 +11,11 @@ pub fn get_bytes_from_url(url: &str) -> Box<[u8]> {
             timeout: None,
             form_data: None,
         }),
-    });
+    }).map_err_str()?;
 
-    match result {
-        Ok(response) => match response {
-            Some(response) => base64::decode(response.body.unwrap())
-                .unwrap()
-                .into_boxed_slice(),
-            _ => panic!("Unexpected response type"),
-        },
-        Err(error) => panic!("Error: {}", error),
-    }
+    let result = result.ok_or_str("Unexpected response type")?;
+    let result = base64::decode(result.body.ok_or_str("Body is empty")?)?
+            .into_boxed_slice();
+   
+    Ok(result)
 }

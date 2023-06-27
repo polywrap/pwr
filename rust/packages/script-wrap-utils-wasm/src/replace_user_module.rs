@@ -1,9 +1,11 @@
+use crate::StringError;
+
 pub fn replace_user_module(
     module: &mut [u8],
     user_code: &str,
     engine_url: &str,
     padded_user_module_size: usize,
-) {
+) -> Result<(), StringError> {
     // 1 + 0 bytes until padded_user_module_size
     let mut target = vec![0u8; padded_user_module_size];
     target[0] = b'1';
@@ -28,7 +30,12 @@ pub fn replace_user_module(
         }
     }
 
-    if !has_replaced {
-        panic!("Could not find the target sequence in the module. Must be an error in the template wrap.");
+    match has_replaced {
+        true => Ok(()),
+        false => {
+            Err(StringError::new(
+                "Could not find the target sequence in the module. Must be an error in the template wrap.",
+            ))
+        }
     }
 }

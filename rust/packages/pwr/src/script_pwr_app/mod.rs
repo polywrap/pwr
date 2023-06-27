@@ -129,13 +129,13 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
         execute_eval_command(
             file,
             method,
-            &Uri::try_from(engine_uri)?,
+            &Uri::try_from(engine_uri).map_err_str()?,
             template_cid,
             is_release,
         )
         .await
     } else if let Some(matches) = matches.subcommand_matches("build") {
-        let file = matches.get_one::<PathBuf>("file").easy_err()?;
+        let file = matches.get_one::<PathBuf>("file").ok_or_str("File is required")?;
         let output = matches.get_one::<PathBuf>("output");
 
         let engine_uri = matches
@@ -148,7 +148,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
 
         let template_cid = matches.get_one::<String>("template").map(|x| x.as_str());
 
-        execute_build_command(file, output, &Uri::try_from(engine_uri)?).await
+        execute_build_command(file, output, &Uri::try_from(engine_uri).map_err_str()?).await
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
@@ -166,7 +166,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
         execute_deploy_command(
             file,
             output,
-            &Uri::try_from(engine_uri)?,
+            &Uri::try_from(engine_uri).map_err_str()?,
             template_cid,
         )
         .await
@@ -188,14 +188,14 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
 
         execute_repl_command(
             file,
-            &Uri::try_from(engine_uri)?,
+            &Uri::try_from(engine_uri).map_err_str()?,
             template_cid,
             is_release,
             should_watch,
         )
         .await
     } else if let Some(matches) = matches.subcommand_matches("new") {
-        let file = matches.get_one::<PathBuf>("file").easy_err()?;
+        let file = matches.get_one::<PathBuf>("file").ok_or_str("File is required")?;
 
         execute_new_command(file, language).await
     } else {
@@ -246,7 +246,7 @@ async fn execute_eval_command(
 async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine_uri: &Uri) -> Result<i32, StringError> {
     println!("Building the WRAP...");
 
-    let script = get_script_info_from_file(&file.to_string_lossy())?;
+    let script = get_script_info_from_file(&file.to_string_lossy()).map_err_str()?;
     let module = build_module_from_script(script, get_bytes_from_url)?;
 
     let default_output = PathBuf::from("./build");
@@ -256,7 +256,7 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine
         fs::create_dir(output)?;
     }
 
-    let wrap_name = Path::new(&file).file_stem().easy_err()?.to_str().easy_err()?;
+    let wrap_name = Path::new(&file).file_stem().ok_or_str("Error looking up the file")?.to_str().ok_or_str("Error looking up the file")?;
     println!("WRAP name: {}", wrap_name);
     let manifest = WrapManifest {
         name: wrap_name.to_string(),
@@ -285,7 +285,7 @@ async fn execute_deploy_command(
     template_cid: Option<&str>,
 ) -> Result<i32, StringError> {
     if file.is_some() {
-        execute_build_command(file.easy_err()?, output, engine_uri).await;
+        execute_build_command(file.ok_or_str("File is required")?, output, engine_uri).await;
     }
 
     println!("Deploying the WRAP...");
@@ -295,7 +295,7 @@ async fn execute_deploy_command(
         .to_string_lossy()
         .into_owned();
 
-    let cid = deploy_package_to_ipfs(&output).await?;
+    let cid = deploy_package_to_ipfs(&output).await.map_err_str()?;
     println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
 
     let manifest = fs::read(format!("{output}/wrap.info"))?;
@@ -303,7 +303,7 @@ async fn execute_deploy_command(
 
     deploy_uri_to_http(
         &manifest.name,
-        &Uri::try_from("wrap://ipfs/".to_string() + &cid)?,
+        &Uri::try_from("wrap://ipfs/".to_string() + &cid).map_err_str()?,
     )
     .await
     ?;
@@ -488,7 +488,7 @@ async fn deploy_with_args(
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
 
-    let user_wrap = create_wrap_from_file(&user_file)?;
+    let user_wrap = create_wrap_from_file(&user_file).map_err_str()?;
 
     let args = {
         let serialization_result = polywrap_msgpack::serialize(&AppArgs {
@@ -513,7 +513,7 @@ async fn deploy_with_args(
         return Ok(0);
     }
 
-    let result = msgpack_to_json_pretty(&result.easy_err()?);
+    let result = msgpack_to_json_pretty(&result.map_err_str()?);
 
     println!("{}", result?);
 
@@ -594,30 +594,21 @@ async fn invoke_eval(
         ),
         None,
         None,
-    );
-
-    let result = result.map_err(|e| format!("Error invoking method: {}", e));
-
-    if let Err(error) = result {
-        write_err(format!("Runtime error: {:?}", error));
-        return Ok(1);
-    }
-
-    let result = result?;
+    )?;
 
     if result.value.is_none() {
-        if result.error.is_none() {
-            write_warn("No value");
-        } else {
-            let error = result.error.easy_err()?;
+        if let Some(error) = result.error {
             write_err(format!("Eval error: {:?}", error));
             return Ok(1);
+        } else {
+            
+            write_warn("No value");
         }
 
         return Ok(1);
     }
 
-    let value = result.value.easy_err()?;
+    let value = result.value.ok_or_str("Expected invocation result to be defined")?;
     let value = serde_json::from_str::<serde_json::Value>(&value)?;
     let result = serde_json::to_string_pretty(&value)?;
 

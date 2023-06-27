@@ -4,9 +4,15 @@ macro_rules! use_easy_error_string {
         #[derive(Debug, PartialEq)]
         pub struct StringError(String);
 
-        impl ToString for StringError {
-            fn to_string(&self) -> String {
-                self.0.clone()
+        impl StringError {
+            pub fn new(message: impl Into<String>) -> Self {
+                Self(message.into())
+            }
+        }
+
+        impl std::fmt::Display for StringError {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                write!(f, "{}", self.to_string())
             }
         }
 
@@ -18,7 +24,7 @@ macro_rules! use_easy_error_string {
             }
         }
 
-        impl<T> From<T> for StringError where T: std::fmt::Display {
+        impl<T> From<T> for StringError where T: std::error::Error {
             fn from(s: T) -> Self {
                 StringError(s.to_string())
             }
@@ -35,7 +41,7 @@ macro_rules! use_easy_error_string {
           fn easy_err(self) -> std::result::Result<T, StringError>;
         }
 
-        impl<T, EI> MapToErrorString<T> for std::result::Result<T, EI> where EI: ToString {
+        impl<T, E> MapToErrorString<T> for std::result::Result<T, E> where E: std::fmt::Display {
             fn map_err_str(self) -> std::result::Result<T, StringError> {
                 match self {
                     Ok(value) => Ok(value),

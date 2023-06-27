@@ -1593,6 +1593,7 @@ name = "module"
 version = "0.1.0"
 dependencies = [
  "base64 0.21.2",
+ "easy_error_string",
  "polywrap-wasm-rs",
  "script_wrap_utils_wasm",
  "serde",
@@ -2896,6 +2897,7 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 name = "script_wrap_utils"
 version = "0.1.0"
 dependencies = [
+ "easy_error_string",
  "polywrap_client",
  "rmp-serde",
  "rmpv",
@@ -2910,6 +2912,7 @@ dependencies = [
 name = "script_wrap_utils_wasm"
 version = "0.1.0"
 dependencies = [
+ "easy_error_string",
  "rmp-serde",
  "rmpv",
  "serde",
@@ -4177,6 +4180,7 @@ dependencies = [
 name = "wrap_utils"
 version = "0.1.0"
 dependencies = [
+ "easy_error_string",
  "polywrap_client",
  "reqwest",
  "rmp-serde",

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use wrap_manifest_schemas::deserialize::deserialize_wrap_manifest;
 use wrap_utils::{deploy_package_to_ipfs, deploy_uri_to_http};
 
-use crate::StringError;
+use crate::{StringError, MapToErrorString};
 
 pub async fn deploy_wrap(args: &[String]) -> Result<i32, StringError> {
     Command::new("deploy")
@@ -21,7 +21,7 @@ async fn execute_deploy_command() -> Result<i32, StringError> {
 
     let output = "./build";
 
-    let cid = deploy_package_to_ipfs(output).await?;
+    let cid = deploy_package_to_ipfs(output).await.map_err_str()?;
     println!("WRAP deployed to IPFS: wrap://ipfs/{}", cid);
 
     let manifest = fs::read(format!("{output}/wrap.info"))?;
@@ -29,7 +29,7 @@ async fn execute_deploy_command() -> Result<i32, StringError> {
 
     deploy_uri_to_http(
         &manifest.name,
-        &Uri::try_from("wrap://ipfs/".to_string() + &cid)?,
+        &Uri::try_from("wrap://ipfs/".to_string() + &cid).map_err_str()?,
     )
     .await
     ?;

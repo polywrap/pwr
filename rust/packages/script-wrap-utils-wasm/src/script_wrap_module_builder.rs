@@ -1,7 +1,7 @@
 use crate::{
     constants::{DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI},
     get_template_endpoint, get_template_size, replace_user_module, template, ScriptInfo,
-    ScriptLanguage,
+    ScriptLanguage, StringError,
 };
 
 pub struct ScripWrapModuleBuilder {
@@ -34,7 +34,7 @@ impl ScripWrapModuleBuilder {
         }
     }
 
-    pub fn build(&self, template_module: &[u8]) -> Box<[u8]> {
+    pub fn build(&self, template_module: &[u8]) -> Result<Box<[u8]>, StringError> {
         let mut module = template_module.to_vec();
 
         replace_user_module(
@@ -42,8 +42,8 @@ impl ScripWrapModuleBuilder {
             &self.code,
             &self.engine_uri,
             self.template_size as usize,
-        );
+        )?;
 
-        module.into_boxed_slice()
+        Ok(module.into_boxed_slice())
     }
 }
