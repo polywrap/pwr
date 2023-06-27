@@ -1,0 +1,30 @@
+#import { Module, Response } into Http from "wrap://ens/wraps.eth:http@1.1.0"
+
+type Module {
+    buildManifest(name: String!, src: String!, language: Language!): BuildResult!
+    buildModule(src: String!, language: Language!): BuildResult!
+    deploy(name: String!, src: String!, language: Language!): DeployResult!
+    buildAndDeploy(name: String!, src: String!, language: Language!): BuildAndDeployResult!
+}
+
+type BuildResult {
+    data: Bytes
+    error: String
+}
+
+type DeployResult {
+    uri: String
+    error: String
+}
+
+type BuildAndDeployResult {
+    uri: String
+    manifest: Bytes
+    module: Bytes
+    error: String
+}
+
+enum Language {
+    JavaScript,
+    Python
+}
