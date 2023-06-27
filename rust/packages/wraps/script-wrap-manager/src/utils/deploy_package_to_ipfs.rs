@@ -43,7 +43,7 @@ pub fn deploy_package_to_ipfs(manifest: &[u8], module: &[u8]) -> Result<String, 
         .map_err_str()?
         .ok_or_str("Unexpected response type")?;
 
-    let body = result.body.unwrap();
+    let body = result.body.ok_or_str("Failed to upload to IPFS: body not defined")?;
     let body = body
         .split("\n")
         .filter(|x| x.len() > 0)

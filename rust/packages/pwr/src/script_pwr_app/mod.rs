@@ -409,7 +409,7 @@ async fn execute_repl_command(
                 }
             }
         } else {
-            panic!("Repl not yet supported in release mode");
+            return Err(StringError::new("Repl not yet supported in release mode"));
         }
     }
 }
