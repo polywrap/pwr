@@ -13,6 +13,7 @@ members = [
     "packages/wrap-utils",
     "packages/wrap-utils-wasm",
     "packages/wraps/script-wrap-manager",
+    "packages/easy-error-string",
 ]
 
 default-members = [
@@ -22,6 +23,7 @@ default-members = [
     "packages/wrap-utils",
     "packages/wrap-utils-wasm",
     "packages/wraps/script-wrap-manager",
+    "packages/easy-error-string",
 ]
 
 [workspace.dependencies]
@@ -29,6 +31,7 @@ script_wrap_utils = { path = "packages/script-wrap-utils" }
 script_wrap_utils_wasm = { path = "packages/script-wrap-utils-wasm" }
 wrap_utils = { path = "packages/wrap-utils" }
 wrap_utils_wasm = { path = "packages/wrap-utils-wasm" }
+easy_error_string = { version = "0.1.0", path = "packages/easy-error-string" }
 polywrap_client = { git = "https://github.com/polywrap/rust-client.git" }
 polywrap_client_builder = { git = "https://github.com/polywrap/rust-client.git"  }
 polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client.git"  }
@@ -46,6 +49,9 @@ base64 = "0.21.2"
 reqwest = { version = "0.11.18", features = ["multipart", "json"] }
 thiserror = "1.0.37"
 tokio = { version = "1", features = ["full"] }
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0.105", features=["full", "extra-traits", "visit"] }
 
 [patch.crates-io]
 polywrap_uri = { git = "https://github.com/polywrap/rust-client.git"  }

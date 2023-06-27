@@ -24,6 +24,7 @@ wrap_utils_wasm.workspace = true
 script_wrap_utils.workspace = true
 tokio.workspace = true
 script_wrap_utils_wasm.workspace = true
+easy_error_string.workspace = true
 
 dirs = "5.0.0"
 clap = { version = "4.3.4", features = ["cargo"] }
