@@ -549,11 +549,11 @@ async fn eval_with_args(
         &fs::read_to_string(user_file).unwrap(),
         vec![
             JsEngineGlobalVar {
-                name: "__method".to_string(),
+                name: "__wrap_method".to_string(),
                 value: serde_json::to_string(method).unwrap(),
             },
             JsEngineGlobalVar {
-                name: "__args".to_string(),
+                name: "__wrap_args".to_string(),
                 value: serde_json::to_string(&args).unwrap(),
             },
         ],
