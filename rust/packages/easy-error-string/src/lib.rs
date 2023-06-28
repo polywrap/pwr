@@ -12,7 +12,7 @@ macro_rules! use_easy_error_string {
 
         impl std::fmt::Display for StringError {
             fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-                write!(f, "{}", self.to_string())
+                write!(f, "{}", self.0.to_string())
             }
         }
 
