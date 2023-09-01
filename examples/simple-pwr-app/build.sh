@@ -44,7 +44,7 @@ cargo build --manifest-path Cargo.toml \
 export WASM_INTERFACE_TYPES=1
 
 # Run wasm-bindgen over the module, replacing all placeholder __wbindgen_... imports
-wasm-bindgen ../../../target/wasm32-unknown-unknown/release/script_wrap_manager.wasm --out-dir ./bin --out-name bg_module.wasm
+wasm-bindgen ../../target/wasm32-unknown-unknown/release/simple_pwr_app.wasm --out-dir ./bin --out-name bg_module.wasm
 
 # Run wasm-tools strip to remove the wasm-interface-types custom section
 wasm-tools strip ./bin/bg_module.wasm -d wasm-interface-types -o ./bin/strip_module.wasm

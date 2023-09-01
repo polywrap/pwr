@@ -1,7 +1,7 @@
 mod wrap;
+use wrap::*;
 use script_wrap_utils_wasm::{ScriptInfo, ScriptLanguage, build_module_from_script};
 use serde::{Deserialize, Serialize};
-use wrap::{imported::*, module::serialization::ArgsDeploy, *};
 mod utils;
 use utils::*;
 
@@ -57,6 +57,32 @@ impl ModuleTrait for Module {
 
         Ok(DeployResult {
             uri: Some(format!("wrap://ipfs/{}", result)),
+            error: None,
+        })
+    }
+
+    fn build_and_deploy(args: ArgsBuildAndDeploy) -> Result<BuildAndDeployResult, String> {
+        let lang = match args.language {
+            Language::JavaScript => ScriptLanguage::JavaScript,
+            Language::Python => ScriptLanguage::Python,
+            _ => return Err(String::from("Invalid language")),
+        };
+
+        let script = ScriptInfo {
+            code: args.src,
+            language: lang,
+        };
+
+        let manifest = build_wrap_manifest(&args.name);
+
+        let module = build_module_from_script(script, get_bytes_from_url).map_err_str()?;
+
+        let result = deploy_package_to_ipfs(&manifest, &module)?;
+
+        Ok(BuildAndDeployResult {
+            manifest: Some(manifest),
+            uri: Some(format!("wrap://ipfs/{}", result)),
+            module: Some(module.to_vec()),
             error: None,
         })
     }
