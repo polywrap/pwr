@@ -1,2 +1,6 @@
-node_modules/
+build
+bin
+node_modules
+wrap
+.polywrap
 target
