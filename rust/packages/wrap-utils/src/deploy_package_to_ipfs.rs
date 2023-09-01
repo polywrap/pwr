@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
 
-use crate::{StringError, OkOrErrorString};
+use crate::{StringError, OkOrErrorString, MapToErrorString};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct AddedIpfsFile {
@@ -17,7 +17,7 @@ struct AddedIpfsFile {
 pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, StringError> {
     let path = Path::new(path);
 
-    let mut dir = fs::read_dir(path).await?;
+    let mut dir = fs::read_dir(path).await.easy_err()?;
     let mut form = multipart::Form::new();
     while let Some(entry) = dir.next_entry().await? {
         let file_path = entry.path();
