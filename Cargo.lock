@@ -3396,6 +3396,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "polywrap_http_server_plugin"
+version = "0.1.0"
+dependencies = [
+ "base64 0.21.2",
+ "polywrap_client",
+ "polywrap_core",
+ "polywrap_msgpack_serde",
+ "polywrap_plugin",
+ "serde",
+ "thiserror",
+ "wrap_manifest_schemas",
+]
+
+[[package]]
 name = "polywrap_logger_plugin"
 version = "0.1.9-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

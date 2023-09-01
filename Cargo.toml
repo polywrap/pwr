@@ -14,6 +14,7 @@ members = [
     "packages/wrap-utils-wasm",
     "packages/easy-error-string",
     "packages/wraps/script-wrap-manager",
+    "packages/plugins/http-server",
     "examples/simple-pwr-app",
 ]
 
@@ -24,6 +25,7 @@ default-members = [
     "packages/wrap-utils",
     "packages/wrap-utils-wasm",
     "packages/easy-error-string",
+    "packages/plugins/http-server",
     "packages/wraps/script-wrap-manager",
     "examples/simple-pwr-app",
 ]
