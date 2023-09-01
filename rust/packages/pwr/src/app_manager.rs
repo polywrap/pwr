@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use polywrap_client::core::uri::Uri;
 
-use crate::client::CoreClient;
-use crate::logger::*;
+use crate::{client::CoreClient, StringError};
+use crate::{logger::*, MapToErrorString};
 use crate::prompter::Prompter;
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +26,7 @@ impl AppManager {
         _prompter: &impl Prompter,
         logger: &impl Logger,
         _all_access_controlled_uris: Vec<String>,
-    ) -> i32 {
+    ) -> Result<i32, StringError> {
         let access_controlled_uris: Vec<String> = vec![];
         let mut _visited_uris: HashSet<String> = HashSet::new();
 
@@ -64,8 +64,8 @@ impl AppManager {
         let args = match serialization_result {
             Ok(args) => args,
             Err(e) => {
-                logger.error(format!("{}", e)).unwrap();
-                return 1;
+                logger.error(format!("{}", e)).map_err_str()?;
+                return Ok(1);
             }
         };
 
@@ -85,16 +85,16 @@ impl AppManager {
                 let exit_code = polywrap_msgpack::decode::<i32>(&data);
 
                 match exit_code {
-                    Ok(exit_code) => exit_code,
+                    Ok(exit_code) => Ok(exit_code),
                     Err(e) => {
-                        logger.error(format!("{:?}", e)).unwrap();
-                        1
+                        logger.error(format!("{:?}", e)).map_err_str()?;
+                        Ok(1)
                     }
                 }
             }
             Err(e) => {
-                logger.error(e).unwrap();
-                1
+                logger.error(e).map_err_str()?;
+                Ok(1)
             }
         }
     }
@@ -136,13 +136,13 @@ impl AppManager {
 //     };
 
 //     let imported_module_types = if manifest.abi.imported_module_types != None {
-//         manifest.abi.imported_module_types.unwrap()
+//         manifest.abi.imported_module_types?
 //     } else {
 //         [].to_vec()
 //     };
 
 //     // TODO: figure out how to read the manifest and get the imported uris
-//     // let imported_uris = imported_module_types.map(|imported_module_type| Uri::try_from(imported_module_type.uri).unwrap().to_string());
+//     // let imported_uris = imported_module_types.map(|imported_module_type| Uri::try_from(imported_module_type.uri)?.to_string());
 
 //     // let requested_uris = imported_uris.filter(|imported_uri| all_access_controlled_uris.contains(imported_uri));
 //     // let other_uris = imported_uris.filter(|imported_uri| !all_access_controlled_uris.contains(imported_uri));

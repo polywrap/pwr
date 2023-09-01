@@ -15,3 +15,4 @@ rmp-serde.workspace = true
 polywrap_client.workspace = true
 script_wrap_utils_wasm.workspace = true
 wrap_utils.workspace = true
+easy_error_string.workspace = true

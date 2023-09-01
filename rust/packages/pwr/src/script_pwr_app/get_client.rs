@@ -52,7 +52,7 @@ impl UriResolver for LocalResolver {
                 let wrap = create_wrap_from_file(path).map_err(|e| {
                     polywrap_client::core::error::Error::FileReadError(format!(
                         "Error creating wrap from file: {}",
-                        e
+                        e.to_string()
                     ))
                 })?;
 

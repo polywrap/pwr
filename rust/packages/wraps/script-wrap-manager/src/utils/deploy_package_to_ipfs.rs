@@ -1,5 +1,5 @@
 use crate::{
-    wrap::imported::HttpFormDataEntry, ArgsPost, HttpModule, HttpRequest, HttpResponseType,
+    wrap::imported::HttpFormDataEntry, ArgsPost, HttpModule, HttpRequest, HttpResponseType, StringError, OkOrErrorString, MapToErrorString,
 };
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +13,7 @@ struct AddedIpfsFile {
     size: u32,
 }
 
-pub fn deploy_package_to_ipfs(manifest: &[u8], module: &[u8]) -> Result<String, String> {
+pub fn deploy_package_to_ipfs(manifest: &[u8], module: &[u8]) -> Result<String, StringError> {
     let mut form_data: Vec<HttpFormDataEntry> = Vec::new();
     form_data.push(HttpFormDataEntry {
         name: "files".to_string(),
@@ -39,16 +39,20 @@ pub fn deploy_package_to_ipfs(manifest: &[u8], module: &[u8]) -> Result<String, 
             form_data: Some(form_data),
         }),
     };
-    let result = HttpModule::post(&args)?.ok_or("Unexpected response type")?;
+    let result = HttpModule::post(&args)
+        .map_err_str()?
+        .ok_or_str("Unexpected response type")?;
 
-    let body = result.body.unwrap();
+    let body = result.body.ok_or_str("Failed to upload to IPFS: body not defined")?;
     let body = body
         .split("\n")
         .filter(|x| x.len() > 0)
-        .map(|x| serde_json::from_str::<AddedIpfsFile>(x).unwrap())
-        .find(|x| x.name.len() == 0)
-        .unwrap()
-        .hash;
+        .map(|x| serde_json::from_str::<AddedIpfsFile>(x))
+        .find_map(|x| if let Ok(x) = x { 
+                if x.name.is_empty() { Some(x) } else { None }
+            } else { None }
+        )
+        .ok_or_str("Failed to upload to IPFS: hash not found")?;
 
-    Ok(body)
+    Ok(body.hash)
 }

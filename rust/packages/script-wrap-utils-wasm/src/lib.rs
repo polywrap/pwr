@@ -10,6 +10,7 @@ pub use script_wrap_module_builder::*;
 
 mod build_module_from_script;
 pub use build_module_from_script::build_module_from_script;
+pub use build_module_from_script::BuildModuleFromScriptError;
 
 mod get_language_from_path;
 pub use get_language_from_path::get_language_from_path;
@@ -19,3 +20,6 @@ pub use constants::*;
 
 pub mod types;
 pub use types::*;
+
+easy_error_string::use_easy_error_string!();
+

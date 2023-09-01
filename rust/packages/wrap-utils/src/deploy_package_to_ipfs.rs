@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
 
+use crate::{StringError, OkOrErrorString, MapToErrorString};
+
 #[derive(Debug, Serialize, Deserialize)]
 struct AddedIpfsFile {
     #[serde(rename = "Name")]
@@ -12,10 +14,10 @@ struct AddedIpfsFile {
     #[serde(rename = "Size")]
     size: u32,
 }
-pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, StringError> {
     let path = Path::new(path);
 
-    let mut dir = fs::read_dir(path).await?;
+    let mut dir = fs::read_dir(path).await.easy_err()?;
     let mut form = multipart::Form::new();
     while let Some(entry) = dir.next_entry().await? {
         let file_path = entry.path();
@@ -47,17 +49,19 @@ pub async fn deploy_package_to_ipfs(path: &str) -> Result<String, Box<dyn std::e
 
     if resp.status() != 200 {
         println!("{:?}", resp);
-        return Err("Failed to upload to IPFS".into());
+        return Err(StringError::new("Failed to upload to IPFS"));
     }
     let body = resp.text().await?;
     let body = body.split('\n').collect::<Vec<&str>>();
     // find the item that starts with "added"
-    let cid = body
+    let body = body
         .iter()
-        .map(|x| serde_json::from_str::<AddedIpfsFile>(x).unwrap())
-        .find(|x| x.name.is_empty())
-        .unwrap()
-        .hash;
+        .map(|x| serde_json::from_str::<AddedIpfsFile>(x))
+        .find_map(|x| if let Ok(x) = x { 
+                if x.name.is_empty() { Some(x) } else { None }
+            } else { None }
+        )
+        .ok_or_str("Failed to upload to IPFS: hash not found")?;
 
-    Ok(cid)
+    Ok(body.hash)
 }
