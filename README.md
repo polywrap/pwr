@@ -1,8 +1,8 @@
-# Polywrap Wrapper Runner (PWR)
+# Polywrap Wrap Runner (PWR)
 
 ## Description
-Polywrap Wrapper Runner (PWR) is a CLI application for running Polywrap wrappers.
-It uses the PolywrapClient to execute any wrapper that implements the PwrApp interface wrap://ens/pwr-app.eth
+Polywrap Wrap Runner (PWR) is a CLI application for running Polywrap wraps.
+It uses the PolywrapClient to execute any wrap that implements the PwrApp interface wrap://ens/pwr-app.eth
 ```graphql
 type Module {
   main(args: [String!]!): UInt8!
