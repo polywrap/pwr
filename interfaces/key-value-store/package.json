@@ -5,8 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "npx polywrap build && copyfiles ./README.md ./build/",
-    "deploy": "npx polywrap deploy",
-    "test": "yarn test:env:up && yarn deploy && yarn test:env:down"
+    "deploy": "pwr deploy"
   },
   "devDependencies": {
     "copyfiles": "2.4.1",
