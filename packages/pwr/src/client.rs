@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, collections::HashMap};
 
 use polywrap_client::{
     builder::{PolywrapClientConfig, PolywrapClientConfigBuilder},
@@ -8,7 +8,10 @@ use polywrap_client::{
         uri_resolver_handler::UriResolverHandler, wrap_loader::WrapLoader, wrapper::GetFileOptions,
     }, plugin::Invoker,
 };
-use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
+use polywrap_plugin::package::PluginPackage;
+use polywrap_http_server_plugin::HttpServerPlugin;
+use polywrap_key_value_store_plugin::KeyValueStorePlugin;
+use polywrap_client_default_config::SystemClientConfig;
 
 pub trait CoreClient {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error>;
@@ -46,16 +49,17 @@ impl CoreClient for CoreClientMock {
     }
 }
 
-pub struct PwrClient(pub PolywrapClient);
+pub struct PwrClient(pub Arc<PolywrapClient>);
 
 impl PwrClient {
     pub fn new() -> Self {
         let mut config = PolywrapClientConfig::default();
         config
             .add(SystemClientConfig::default().into())
-            .add(Web3ClientConfig::default().into());
+            .add_package("wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
+            .add_package("wrap://ipfs/QmQrq7XuV7v5yANxYk8k42DjH3Vn2QS8DjR9ZXPNn8wdtz".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
 
-        PwrClient(PolywrapClient::new(config.into()))
+        PwrClient(Arc::new(PolywrapClient::new(config.into())))
     }
 }
 

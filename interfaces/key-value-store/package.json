@@ -1,0 +1,15 @@
+{
+  "name": "key-value-store-interface",
+  "description": "An interface for a key value store that can be used to store and retrieve data.",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "npx polywrap build && copyfiles ./README.md ./build/",
+    "deploy": "npx polywrap deploy",
+    "test": "yarn test:env:up && yarn deploy && yarn test:env:down"
+  },
+  "devDependencies": {
+    "copyfiles": "2.4.1",
+    "polywrap": "0.8.0"
+  }
+}

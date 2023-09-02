@@ -13,6 +13,8 @@ polywrap_client_default_config.workspace = true
 wrap_manifest_schemas.workspace = true
 polywrap_fs_plugin.workspace = true
 polywrap_http_plugin.workspace = true
+polywrap_http_server_plugin.workspace = true
+polywrap_key_value_store_plugin.workspace = true
 rmpv.workspace = true
 serde.workspace = true
 serde_bytes.workspace = true
@@ -25,6 +27,7 @@ tokio.workspace = true
 script_wrap_utils_wasm.workspace = true
 easy_error_string.workspace = true
 polywrap_msgpack_serde.workspace = true
+polywrap_plugin.workspace = true
 
 dirs = "5.0.0"
 clap = { version = "4.3.4", features = ["cargo"] }
