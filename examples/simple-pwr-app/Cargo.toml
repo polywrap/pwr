@@ -1,0 +1,21 @@
+[package]
+name = "simple-pwr-app"
+version = "0.1.0"
+description = "An example of a simple PWR application."
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+polywrap_msgpack_serde.workspace = true
+polywrap-wasm-rs.workspace = true
+serde = { version = "1.0", features = ["derive"] }
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 's'
+lto = true
+panic = 'abort'

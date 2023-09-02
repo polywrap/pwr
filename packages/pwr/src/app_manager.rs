@@ -1,15 +1,17 @@
 use std::collections::HashSet;
 
 use polywrap_client::core::uri::Uri;
+use polywrap_msgpack_serde::{from_slice, to_vec};
+use rmp_serde::{decode, encode, to_vec_named};
 
 use crate::{client::CoreClient, StringError};
 use crate::{logger::*, MapToErrorString};
 use crate::prompter::Prompter;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct AppArgs {
-    args: Vec<String>,
+    pub args: Vec<String>,
 }
 
 pub struct AppManager;
@@ -58,7 +60,7 @@ impl AppManager {
         //     }
         // }
 
-        let serialization_result = polywrap_msgpack::serialize(&AppArgs {
+        let serialization_result = to_vec(&AppArgs {
             args: args.to_vec(),
         });
         let args = match serialization_result {
@@ -68,8 +70,6 @@ impl AppManager {
                 return Ok(1);
             }
         };
-
-        println!("args: {:?}", args);
 
         let result = invoke_with_access_control(
             uri,
@@ -82,7 +82,7 @@ impl AppManager {
 
         match result {
             Ok(data) => {
-                let exit_code = polywrap_msgpack::decode::<i32>(&data);
+                let exit_code = decode::from_slice::<i32>(&data);
 
                 match exit_code {
                     Ok(exit_code) => Ok(exit_code),

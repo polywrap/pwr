@@ -6,7 +6,7 @@ use polywrap_client::{
     core::{
         error::Error, resolution::uri_resolution_context::UriResolutionContext, uri::Uri,
         uri_resolver_handler::UriResolverHandler, wrap_loader::WrapLoader, wrapper::GetFileOptions,
-    },
+    }, plugin::Invoker,
 };
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 
@@ -77,7 +77,7 @@ impl CoreClient for PwrClient {
         env: Option<&[u8]>,
         resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error> {
-        self.0.invoke(uri, method, args, env, resolution_context)
+        self.0.invoke_raw(uri, method, args, env, resolution_context)
     }
 
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error> {

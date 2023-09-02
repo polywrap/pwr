@@ -6,7 +6,7 @@ mod prompter;
 mod script_pwr_app;
 use std::{env, fs, error::Error, fmt::Display};
 
-use polywrap_client::core::uri::{Uri, UriParseError};
+use polywrap_client::core::uri::Uri;
 
 use app_manager::*;
 use client::*;
@@ -74,7 +74,7 @@ async fn internal_main(
         }
         _ => manager.run_app(
             &uri,
-            args,
+            &args[1..],
             client,
             prompter,
             logger,

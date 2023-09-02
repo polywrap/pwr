@@ -1,2 +1,2 @@
 # Script WRAP builder
-WRAP for building script WRAPS
+WRAP for building and deploying script WRAPS

@@ -6,6 +6,7 @@ use colored::Colorize;
 use notify::RecursiveMode;
 use notify_debouncer_mini::new_debouncer;
 use polywrap_client::{client::PolywrapClient, core::uri::Uri};
+use rmp_serde::encode;
 use script_wrap_utils::{create_wrap_from_file, get_script_info_from_file};
 use script_wrap_utils_wasm::{
     build_module_from_script, ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI,
@@ -491,7 +492,7 @@ async fn deploy_with_args(
     let user_wrap = create_wrap_from_file(&user_file).map_err_str()?;
 
     let args = {
-        let serialization_result = polywrap_msgpack::serialize(&AppArgs {
+        let serialization_result = encode::to_vec_named(&AppArgs {
             args: args.as_ref().iter().skip(2).cloned().collect(),
         });
 

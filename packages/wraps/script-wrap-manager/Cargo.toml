@@ -15,6 +15,8 @@ base64.workspace = true
 script_wrap_utils_wasm.workspace = true
 wrap_utils_wasm.workspace = true
 easy_error_string.workspace = true
+serde_bytes.workspace = true
+polywrap_msgpack_serde.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
