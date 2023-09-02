@@ -142,15 +142,15 @@ jobs:
                   VERSION_NAME: ${{ (env.IS_NIGHTLY && 'nightly') || needs.prepare.outputs.tag_name }}
               run: |
                   if [ "$PLATFORM_NAME" == "linux" ]; then
-                    tar -czvf "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release/pwr pwr
+                    tar -czvf "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release pwr
                     echo "::set-output name=file_name::pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz"
                   elif [ "$PLATFORM_NAME" == "darwin" ]; then
                     # We need to use gtar here otherwise the archive is corrupt.
                     # See: https://github.com/actions/virtual-environments/issues/2619
-                    gtar -czvf "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release/pwr pwr
+                    gtar -czvf "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz" -C ./target/${TARGET}/release pwr
                     echo "::set-output name=file_name::pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.tar.gz"
                   else
-                    cd ./target/${TARGET}/release/pwr
+                    cd ./target/${TARGET}/release
                     7z a -tzip "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" pwr.exe
                     mv "pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip" ../../../
                     echo "::set-output name=file_name::pwr_${VERSION_NAME}_${PLATFORM_NAME}_${ARCH}.zip"
