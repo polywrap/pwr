@@ -1,0 +1,7 @@
+format: 0.4.0
+project:
+  type: plugin/rust
+  name: key-value-store
+source:
+  module: ./Cargo.toml
+  schema: ./polywrap.graphql

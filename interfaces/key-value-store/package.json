@@ -1,6 +1,6 @@
 {
-  "name": "http-server-interface",
-  "description": "HTTP Server Interface",
+  "name": "key-value-store-interface",
+  "description": "An interface for a key value store that can be used to store and retrieve data.",
   "private": true,
   "version": "0.1.0",
   "scripts": {

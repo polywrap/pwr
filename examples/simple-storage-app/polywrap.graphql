@@ -1,0 +1,5 @@
+#import { Module, KeyValuePair } into KeyValueStore from "wrap://ipfs/QmQrq7XuV7v5yANxYk8k42DjH3Vn2QS8DjR9ZXPNn8wdtz"
+
+type Module {
+  main(args: [String!]!): Int32!
+}

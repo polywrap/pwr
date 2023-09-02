@@ -1,0 +1,11 @@
+{
+  "name": "@polywrap/key-value-store-rs",
+  "description": "Polywrap Key Value Store Plugin in Rust",
+  "version": "0.1.0",
+  "scripts": {
+    "codegen": "npx polywrap codegen"
+  },
+  "devDependencies": {
+    "polywrap": "0.11.2"
+  }
+}

@@ -14,6 +14,7 @@ wrap_manifest_schemas.workspace = true
 polywrap_fs_plugin.workspace = true
 polywrap_http_plugin.workspace = true
 polywrap_http_server_plugin.workspace = true
+polywrap_key_value_store_plugin.workspace = true
 rmpv.workspace = true
 serde.workspace = true
 serde_bytes.workspace = true
