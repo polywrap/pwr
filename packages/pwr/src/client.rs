@@ -56,8 +56,8 @@ impl PwrClient {
         let mut config = PolywrapClientConfig::default();
         config
             .add(SystemClientConfig::default().into())
-            .add_package("wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
-            .add_package("wrap://ipfs/QmQrq7XuV7v5yANxYk8k42DjH3Vn2QS8DjR9ZXPNn8wdtz".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
+            .add_package("wrap://http/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
+            .add_package("wrap://http/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
 
         PwrClient(Arc::new(PolywrapClient::new(config.into())))
     }
