@@ -40,7 +40,7 @@ pub struct Response {
     pub headers: Option<Vec<KeyValuePair>>,
     pub data: Option<ByteBuf>,
     #[serde(rename = "statusCode")]
-    pub status_code: u32,
+    pub status_code: u16,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Route {

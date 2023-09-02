@@ -8,6 +8,8 @@ use polywrap_client::{
         uri_resolver_handler::UriResolverHandler, wrap_loader::WrapLoader, wrapper::GetFileOptions,
     }, plugin::Invoker,
 };
+use polywrap_plugin::package::PluginPackage;
+use polywrap_http_server_plugin::HttpServerPlugin;
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 
 pub trait CoreClient {
@@ -46,16 +48,16 @@ impl CoreClient for CoreClientMock {
     }
 }
 
-pub struct PwrClient(pub PolywrapClient);
+pub struct PwrClient(pub Arc<PolywrapClient>);
 
 impl PwrClient {
     pub fn new() -> Self {
         let mut config = PolywrapClientConfig::default();
         config
             .add(SystemClientConfig::default().into())
-            .add(Web3ClientConfig::default().into());
+            .add_package("wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})));
 
-        PwrClient(PolywrapClient::new(config.into()))
+        PwrClient(Arc::new(PolywrapClient::new(config.into())))
     }
 }
 
@@ -77,6 +79,7 @@ impl CoreClient for PwrClient {
         env: Option<&[u8]>,
         resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
     ) -> Result<Vec<u8>, Error> {
+        println!("invoke_raw: {}", uri);
         self.0.invoke_raw(uri, method, args, env, resolution_context)
     }
 

@@ -36,9 +36,9 @@ pub fn get_manifest() -> WrapManifest {
               "kind": 4,
               "name": "port",
               "required": true,
-              "type": "UInt32"
+              "type": "UInt16"
             },
-            "type": "UInt32"
+            "type": "UInt16"
           },
           {
             "kind": 34,
@@ -245,9 +245,9 @@ pub fn get_manifest() -> WrapManifest {
             "kind": 4,
             "name": "statusCode",
             "required": true,
-            "type": "UInt32"
+            "type": "UInt16"
           },
-          "type": "UInt32"
+          "type": "UInt16"
         }
       ],
       "type": "Response"

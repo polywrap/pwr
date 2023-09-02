@@ -16,6 +16,7 @@ members = [
     "packages/wraps/script-wrap-manager",
     "packages/plugins/http-server",
     "examples/simple-pwr-app",
+    "examples/http-server-app",
 ]
 
 default-members = [
@@ -28,6 +29,7 @@ default-members = [
     "packages/plugins/http-server",
     "packages/wraps/script-wrap-manager",
     "examples/simple-pwr-app",
+    "examples/http-server-app",
 ]
 
 [workspace.dependencies]
@@ -36,6 +38,7 @@ script_wrap_utils_wasm = { path = "packages/script-wrap-utils-wasm" }
 wrap_utils = { path = "packages/wrap-utils" }
 wrap_utils_wasm = { path = "packages/wrap-utils-wasm" }
 easy_error_string = { version = "0.1.0", path = "packages/easy-error-string" }
+polywrap_http_server_plugin = { path = "packages/plugins/http-server" }
 polywrap_uri = { version = "0.1.9-beta.2" }
 polywrap_core = { version = "0.1.9-beta.2" }
 polywrap_client = { version = "0.1.9-beta.2" }

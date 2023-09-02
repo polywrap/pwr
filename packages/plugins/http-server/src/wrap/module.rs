@@ -18,7 +18,7 @@ use super::types::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ArgsStart {
-    pub port: u32,
+    pub port: u16,
     #[serde(rename = "requestTimeout")]
     pub request_timeout: u32,
     pub routes: Vec<Route>,
