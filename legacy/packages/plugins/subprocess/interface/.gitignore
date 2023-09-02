@@ -1,6 +1,4 @@
 build
-bin
 node_modules
 wrap
 .polywrap
-target

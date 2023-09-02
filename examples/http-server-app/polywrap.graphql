@@ -1,0 +1,7 @@
+#import { Module, Response, KeyValuePair, Request } into HttpServer from "wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp"
+
+type Module {
+  main(args: [String!]!): Int32!
+  onStart: Boolean!
+  routeHome(request: HttpServer_Request!): HttpServer_Response!
+}

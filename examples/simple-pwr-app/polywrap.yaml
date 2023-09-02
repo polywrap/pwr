@@ -1,0 +1,9 @@
+format: 0.4.0
+project:
+  name: simple-pwr-app
+  type: wasm/rust
+source:
+  module: ./Cargo.toml
+  schema: ./polywrap.graphql
+extensions:
+  docs: ./polywrap.docs.yaml

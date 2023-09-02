@@ -1,0 +1,14 @@
+type Module {
+  set(key: String!, value: Bytes!): Boolean!
+  get(key: String!): Bytes
+  remove(key: String!): Boolean!
+  has(key: String!): Boolean!
+  keys: [String!]!
+  values: [Bytes!]!
+  entries: [KeyValuePair!]!
+}
+
+type KeyValuePair {
+  key: String!
+  value: Bytes!
+}

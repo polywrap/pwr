@@ -1,0 +1,11 @@
+{
+  "name": "@polywrap/http-server-rs",
+  "description": "Polywrap HTTP Server Plugin in Rust",
+  "version": "0.1.0",
+  "scripts": {
+    "codegen": "npx polywrap codegen"
+  },
+  "devDependencies": {
+    "polywrap": "0.11.2"
+  }
+}
