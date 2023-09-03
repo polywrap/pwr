@@ -1,5 +1,4 @@
 format: 0.1.0
 name: http-server
 language: interface
-deploy: ./polywrap.deploy.yaml
 schema: ./schema.graphql

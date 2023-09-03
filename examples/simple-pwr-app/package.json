@@ -4,8 +4,7 @@
     "codegen": "npx polywrap codegen",
     "compile": "./build.sh",
     "build": "yarn codegen && yarn compile",
-    "deploy": "npx polywrap deploy",
-    "test": "jest --passWithNoTests --runInBand --verbose"
+    "deploy": "pwr deploy"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",
