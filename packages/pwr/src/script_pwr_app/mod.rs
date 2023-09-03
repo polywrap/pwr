@@ -237,9 +237,9 @@ async fn execute_eval_command(
         }
 
         if !is_release {
-            eval_with_args(&args, client.clone(), engine_uri).await;
+            eval_with_args(&args, client.clone(), engine_uri).await.unwrap();
         } else {
-            deploy_with_args(&args, engine_uri, client.clone()).await;
+            deploy_with_args(&args, engine_uri, client.clone()).await.unwrap();
         }
     }
 }
@@ -595,7 +595,15 @@ async fn invoke_eval(
         ),
         None,
         None,
-    )?;
+    );
+
+    let result = match result {
+        Ok(result) => result,
+        Err(error) => {
+            write_err(format!("Eval error: {:?}", error));
+            return Ok(1);
+        }
+    };
 
     if result.value.is_none() {
         if let Some(error) = result.error {
