@@ -16,7 +16,7 @@ pub struct HttpServerStartResult {
 }
 
 impl HttpServerStartResult {
-    pub const URI: &'static str = "wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp";
+    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/http-server";
 
     pub fn new() -> HttpServerStartResult {
         HttpServerStartResult {

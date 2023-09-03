@@ -33,12 +33,17 @@ pub struct WrapperCallback {
 pub struct Request {
     pub params: Vec<KeyValuePair>,
     pub query: Vec<KeyValuePair>,
-    pub body: Option<JSONString>,
+    pub body: Option<ByteBuf>,
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct KeyValuePair {
+    pub key: String,
+    pub value: String,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Response {
     pub headers: Option<Vec<KeyValuePair>>,
-    pub data: Option<ByteBuf>,
+    pub body: Option<ByteBuf>,
     #[serde(rename = "statusCode")]
     pub status_code: u16,
 }
@@ -52,11 +57,6 @@ pub struct Route {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct StartResult {
     pub ok: bool,
-}
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct KeyValuePair {
-    pub key: String,
-    pub value: String,
 }
 // Objects END //
 

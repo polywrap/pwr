@@ -10,12 +10,12 @@ type WrapperCallback {
 type Request {
   params: [KeyValuePair!]!
   query: [KeyValuePair!]!
-  body: JSON
+  body: Bytes
 }
 
 type Response {
   headers: [KeyValuePair!]
-  data: Bytes
+  body: Bytes
   statusCode: UInt16!
 }
 

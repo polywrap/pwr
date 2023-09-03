@@ -9,25 +9,24 @@ use polywrap_wasm_rs::{
     Map,
     JSON
 };
-use serde_bytes::ByteBuf;
 use crate::HttpServerKeyValuePair;
+use serde_bytes::ByteBuf;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct HttpServerResponse {
     pub headers: Option<Vec<HttpServerKeyValuePair>>,
-    #[serde(with = "serde_bytes")]
-    pub data: Option<ByteBuf>,
+    pub body: Option<ByteBuf>,
     #[serde(rename = "statusCode")]
     pub status_code: u16,
 }
 
 impl HttpServerResponse {
-    pub const URI: &'static str = "wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp";
+    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/http-server";
 
     pub fn new() -> HttpServerResponse {
         HttpServerResponse {
             headers: None,
-            data: None,
+            body: None,
             status_code: 0,
         }
     }

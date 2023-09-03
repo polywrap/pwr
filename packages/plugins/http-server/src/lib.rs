@@ -3,10 +3,10 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use axum::{Router, async_trait};
-use axum::extract::FromRequest;
+use axum::extract::{FromRequest, Path, Query, State, RawBody};
 use axum::http::{StatusCode, Request};
 use axum::routing::{get, post, options, patch, delete, put};
-use hyper::Body;
+use hyper::{Body, body};
 use serde::{Deserialize, Serialize};
 use wrap::{*, module::*};
 use polywrap_plugin::*;
@@ -38,9 +38,12 @@ impl Module for HttpServerPlugin {
             let method = route.handler.method.clone();
             let route2 = route.clone();
             let func = move |
-                PathParams(req): PathParams<Dependencies>,
+                query:  Query<HashMap<String, String>>,
+                path:  Path<HashMap<String, String>>,
+                deps: State<Dependencies>,
+                body: RawBody,
             | {
-                handle_request(uri.clone(), method.clone(), req)
+                handle_request(uri.clone(), method.clone(), query, path, deps, body)
             };
 
             app = match route2.http_method {
@@ -90,13 +93,25 @@ impl Module for HttpServerPlugin {
 
         let addr = std::net::SocketAddr::from(([127, 0, 0, 1], args.port));
        
+        let server = axum::Server::bind(&addr)
+            .serve(app.into_make_service());
+
+        if let Some(handler) = args.on_start {
+            let _ = deps.invoker.invoke_raw(
+                &handler.uri.parse().unwrap(),
+                &handler.method,
+                None,
+                None,
+                None
+            ).unwrap();
+        }
+        
         task::block_in_place(|| {
             tokio::runtime::Handle::current().block_on(
-                axum::Server::bind(&addr)
-                    .serve(app.into_make_service())
+                server
             )
         }).unwrap();
-        
+
         Ok(StartResult { ok: true })
     }
 }
@@ -104,32 +119,38 @@ impl Module for HttpServerPlugin {
 async fn handle_request(
     uri: Uri,
     method: String,
-    req: (HashMap<String, String>, Dependencies),
+    Query(query_params): Query<HashMap<String, String>>,
+    Path(path_params): Path<HashMap<String, String>>,
+    deps: State<Dependencies>,
+    RawBody(body): RawBody,
 ) -> Result<Response<Body>, StatusCode> {
-    let (params, deps) = req;
-    let params: Vec<crate::types::KeyValuePair> =  params.into_iter().map(|(k, v)| {
-        crate::types::KeyValuePair {
-            key: k,
-            value: v,
-        }
-    }).collect();
-
+    println!("Query Params {:?}", query_params);
+    println!("Path Params {:?}", path_params);
             
+    let body: Option<Vec<u8>> = 
+        body::to_bytes(body).await.map(|x| x.to_vec()).ok();
+        
     let result = deps.invoker.invoke_raw(
         &uri,
         &method,
         Some(&to_vec(&RequestArgs {
             request: crate::types::Request {
-                params,
-                query: vec![],
-                body: None,
+                params: path_params.into_iter().map(|(k, v)| KeyValuePair {
+                    key: k,
+                    value: v,
+                }).collect(),
+                query: query_params.into_iter().map(|(k, v)| KeyValuePair {
+                    key: k,
+                    value: v,
+                }).collect(),
+                body: body.map(|x| ByteBuf::from(x))
             }
         }).unwrap()),
         None,
         None
     ).unwrap();
 
-    let crate::types::Response { data, status_code, headers } =  from_slice(&result).unwrap();
+    let crate::types::Response { body: response_body, status_code, headers } =  from_slice(&result).unwrap();
     
     let mut builder = Response::builder()
         .status(StatusCode::from_u16(status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR));
@@ -138,17 +159,16 @@ async fn handle_request(
         builder = builder.header(header.key, header.value);
     }
 
-    let bytes: Vec<u8> = data.unwrap_or(ByteBuf::from(vec![])).into_vec();
+    let bytes: Vec<u8> = response_body.unwrap_or(ByteBuf::from(vec![])).into_vec();
 
     let response: Response<Body> = builder.body(Body::from(bytes)).unwrap();
     Ok(response)
 }
 
-
-struct PathParams<S>((HashMap<String, String>, S));
+struct PathParams<B, S>((B, HashMap<String, String>, S));
 
 #[async_trait]
-impl<S, B> FromRequest<S, B> for PathParams<S>
+impl<S, B> FromRequest<S, B> for PathParams<B, S>
 where
     for<'a> B: Send + 'a,
     S: Clone + Send + Sync,
@@ -160,10 +180,13 @@ where
         if let Some(route_params) = req.extensions().get::<axum::extract::RawPathParams>().clone() {
             for (name, value) in route_params.iter() {
                 map.insert(name.to_string(), value.to_string());
+                println!("{}: {}", name, value);
             }
         }
 
-        Ok(PathParams::<S>((map, state.clone())))
+        let body = req.into_body();
+
+        Ok(PathParams::<B, S>((body, map, state.clone())))
     }
 }
 

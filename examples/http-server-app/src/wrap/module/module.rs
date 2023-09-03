@@ -12,6 +12,9 @@ use crate::{
     ArgsMain,
     ArgsOnStart,
     ArgsRouteHome,
+    ArgsRouteWithParam,
+    ArgsRouteWithQuery,
+    ArgsRoutePost,
 };
 use crate::HttpServerRequest;
 use crate::HttpServerResponse;
@@ -24,4 +27,10 @@ pub trait ModuleTrait {
   fn on_start(args: ArgsOnStart) -> Result<bool, String>;
 
   fn route_home(args: ArgsRouteHome) -> Result<HttpServerResponse, String>;
+
+  fn route_with_param(args: ArgsRouteWithParam) -> Result<HttpServerResponse, String>;
+
+  fn route_with_query(args: ArgsRouteWithQuery) -> Result<HttpServerResponse, String>;
+
+  fn route_post(args: ArgsRoutePost) -> Result<HttpServerResponse, String>;
 }
