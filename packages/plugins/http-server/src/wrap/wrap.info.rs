@@ -195,12 +195,42 @@ pub fn get_manifest() -> WrapManifest {
           "scalar": {
             "kind": 4,
             "name": "body",
-            "type": "JSON"
+            "type": "Bytes"
           },
-          "type": "JSON"
+          "type": "Bytes"
         }
       ],
       "type": "Request"
+    },
+    {
+      "kind": 1,
+      "properties": [
+        {
+          "kind": 34,
+          "name": "key",
+          "required": true,
+          "scalar": {
+            "kind": 4,
+            "name": "key",
+            "required": true,
+            "type": "String"
+          },
+          "type": "String"
+        },
+        {
+          "kind": 34,
+          "name": "value",
+          "required": true,
+          "scalar": {
+            "kind": 4,
+            "name": "value",
+            "required": true,
+            "type": "String"
+          },
+          "type": "String"
+        }
+      ],
+      "type": "KeyValuePair"
     },
     {
       "kind": 1,
@@ -229,10 +259,10 @@ pub fn get_manifest() -> WrapManifest {
         },
         {
           "kind": 34,
-          "name": "data",
+          "name": "body",
           "scalar": {
             "kind": 4,
-            "name": "data",
+            "name": "body",
             "type": "Bytes"
           },
           "type": "Bytes"
@@ -311,36 +341,6 @@ pub fn get_manifest() -> WrapManifest {
         }
       ],
       "type": "StartResult"
-    },
-    {
-      "kind": 1,
-      "properties": [
-        {
-          "kind": 34,
-          "name": "key",
-          "required": true,
-          "scalar": {
-            "kind": 4,
-            "name": "key",
-            "required": true,
-            "type": "String"
-          },
-          "type": "String"
-        },
-        {
-          "kind": 34,
-          "name": "value",
-          "required": true,
-          "scalar": {
-            "kind": 4,
-            "name": "value",
-            "required": true,
-            "type": "String"
-          },
-          "type": "String"
-        }
-      ],
-      "type": "KeyValuePair"
     }
   ],
   "version": "0.1"

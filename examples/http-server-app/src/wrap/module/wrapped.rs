@@ -84,3 +84,81 @@ pub fn route_home_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
         }
     }
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ArgsRouteWithParam {
+    pub request: HttpServerRequest,
+}
+
+pub fn route_with_param_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
+    match from_slice::<ArgsRouteWithParam>(args) {
+        Ok(args) => {
+            let result = Module::route_with_param(ArgsRouteWithParam {
+                request: args.request,
+            });
+            match result {
+                Ok(res) => {
+                    to_vec(&res).unwrap()
+                }
+                Err(e) => {
+                    panic!("{}", e.to_string())
+                }
+            }
+        }
+        Err(e) => {
+            panic!("{}", e.to_string())
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ArgsRouteWithQuery {
+    pub request: HttpServerRequest,
+}
+
+pub fn route_with_query_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
+    match from_slice::<ArgsRouteWithQuery>(args) {
+        Ok(args) => {
+            let result = Module::route_with_query(ArgsRouteWithQuery {
+                request: args.request,
+            });
+            match result {
+                Ok(res) => {
+                    to_vec(&res).unwrap()
+                }
+                Err(e) => {
+                    panic!("{}", e.to_string())
+                }
+            }
+        }
+        Err(e) => {
+            panic!("{}", e.to_string())
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ArgsRoutePost {
+    pub request: HttpServerRequest,
+}
+
+pub fn route_post_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
+    match from_slice::<ArgsRoutePost>(args) {
+        Ok(args) => {
+            let result = Module::route_post(ArgsRoutePost {
+                request: args.request,
+            });
+            match result {
+                Ok(res) => {
+                    to_vec(&res).unwrap()
+                }
+                Err(e) => {
+                    panic!("{}", e.to_string())
+                }
+            }
+        }
+        Err(e) => {
+            panic!("{}", e.to_string())
+        }
+    }
+}

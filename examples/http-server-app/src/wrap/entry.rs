@@ -1,7 +1,10 @@
 use crate::{
     main_wrapped,
     on_start_wrapped,
-    route_home_wrapped
+    route_home_wrapped,
+    route_with_param_wrapped,
+    route_with_query_wrapped,
+    route_post_wrapped
 };
 use polywrap_wasm_rs::{
     abort,
@@ -26,6 +29,15 @@ pub extern "C" fn _wrap_invoke(method_size: u32, args_size: u32, env_size: u32) 
         }
         "routeHome" => {
             result = route_home_wrapped(args.args.as_slice(), env_size);
+        }
+        "routeWithParam" => {
+            result = route_with_param_wrapped(args.args.as_slice(), env_size);
+        }
+        "routeWithQuery" => {
+            result = route_with_query_wrapped(args.args.as_slice(), env_size);
+        }
+        "routePost" => {
+            result = route_post_wrapped(args.args.as_slice(), env_size);
         }
         _ => {
             invoke::wrap_invoke_error(format!("Could not find invoke function {}", args.method));

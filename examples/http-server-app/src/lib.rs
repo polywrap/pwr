@@ -31,6 +31,30 @@ impl ModuleTrait for Module {
                         method: "routeHome".to_string()
                     }
                 },
+                HttpServerRoute {
+                    path: "/with-param/:param".to_string(),
+                    http_method: HttpServerHttpMethod::GET,
+                    handler: HttpServerWrapperCallback {
+                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        method: "routeWithParam".to_string()
+                    }
+                },
+                HttpServerRoute {
+                    path: "/with-query".to_string(),
+                    http_method: HttpServerHttpMethod::GET,
+                    handler: HttpServerWrapperCallback {
+                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        method: "routeWithQuery".to_string()
+                    }
+                },
+                HttpServerRoute {
+                    path: "/post".to_string(),
+                    http_method: HttpServerHttpMethod::POST,
+                    handler: HttpServerWrapperCallback {
+                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        method: "routePost".to_string()
+                    }
+                },
             ], 
             on_start: Some(
                 HttpServerWrapperCallback {
@@ -52,13 +76,55 @@ impl ModuleTrait for Module {
     fn route_home(_: ArgsRouteHome) -> Result<HttpServerResponse, String> {
         log("Home route");
 
+        let resp = format!("Hello world!");
         Ok(HttpServerResponse {
             status_code: 200,
             headers: Some(vec![HttpServerKeyValuePair {
                 key: "Content-Type".to_string(),
                 value: "text/html".to_string(),
             }]),
-            data: Some(ByteBuf::from("Hello world!".as_bytes().to_vec())),
+            body: Some(ByteBuf::from(resp.as_bytes().to_vec())),
+        })    
+    }
+    
+    fn route_with_param(args: ArgsRouteWithParam) -> Result<HttpServerResponse, String> {
+        log("Route with param");
+
+        let resp = format!("{:?}", args);
+        Ok(HttpServerResponse {
+            status_code: 200,
+            headers: Some(vec![HttpServerKeyValuePair {
+                key: "Content-Type".to_string(),
+                value: "text/html".to_string(),
+            }]),
+            body: Some(ByteBuf::from(resp.as_bytes().to_vec())),
+        })    
+    }
+
+    fn route_with_query(args: ArgsRouteWithQuery) -> Result<HttpServerResponse, String> {
+        log("Route with query");
+
+        let resp = format!("{:?}", args);
+        Ok(HttpServerResponse {
+            status_code: 200,
+            headers: Some(vec![HttpServerKeyValuePair {
+                key: "Content-Type".to_string(),
+                value: "text/html".to_string(),
+            }]),
+            body: Some(ByteBuf::from(resp.as_bytes().to_vec())),
+        })    
+    }
+
+    fn route_post(args: ArgsRoutePost) -> Result<HttpServerResponse, String> {
+        log(format!("Route post, body {:?}", args));
+
+        Ok(HttpServerResponse {
+            status_code: 200,
+            headers: Some(vec![HttpServerKeyValuePair {
+                key: "Content-Type".to_string(),
+                value: "text/html".to_string(),
+            }]),
+            body: args.request.body.map(|x| ByteBuf::from(x.to_vec())),
         })    
     }
 }
@@ -70,7 +136,7 @@ fn to_json_response<T: Serialize>(data: T) -> HttpServerResponse {
             key: "Content-Type".to_string(),
             value: "application/json".to_string(),
         }]),
-        data: Some(
+        body: Some(
             ByteBuf::from(json!(data)
                 .to_string()
                 .as_bytes()
@@ -86,7 +152,7 @@ fn to_error_response(message: String) -> HttpServerResponse {
             key: "Content-Type".to_string(),
             value: "text/html".to_string(),
         }]),
-        data: Some(ByteBuf::from(message.as_bytes().to_vec())),
+        body: Some(ByteBuf::from(message.as_bytes().to_vec())),
     }
 }
 
