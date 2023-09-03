@@ -10,16 +10,17 @@ use polywrap_wasm_rs::{
     JSON
 };
 use crate::HttpServerKeyValuePair;
+use serde_bytes::ByteBuf;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct HttpServerRequest {
     pub params: Vec<HttpServerKeyValuePair>,
     pub query: Vec<HttpServerKeyValuePair>,
-    pub body: Option<JSONString>,
+    pub body: Option<ByteBuf>,
 }
 
 impl HttpServerRequest {
-    pub const URI: &'static str = "wrap://ipfs/QmZVdVcpDovikMED8zDM42PtDGhewuJ18hNy6kqP2Ukqwp";
+    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/http-server";
 
     pub fn new() -> HttpServerRequest {
         HttpServerRequest {

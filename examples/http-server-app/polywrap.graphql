@@ -4,4 +4,7 @@ type Module {
   main(args: [String!]!): Int32!
   onStart: Boolean!
   routeHome(request: HttpServer_Request!): HttpServer_Response!
+  routeWithParam(request: HttpServer_Request!): HttpServer_Response!
+  routeWithQuery(request: HttpServer_Request!): HttpServer_Response!
+  routePost(request: HttpServer_Request!): HttpServer_Response!
 }
