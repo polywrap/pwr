@@ -75,8 +75,8 @@ pub fn get_client() -> PolywrapClient {
     let mut config = PolywrapClientConfig::default();
     config.add(SystemClientConfig::default().into())
         .add(Web3ClientConfig::default().into())
-        .add_package("wrap://http/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
-        .add_package("wrap://http/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
+        .add_package("wrap://https/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
+        .add_package("wrap://https/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
     // config.add_redirect(
     //     uri!("ens/wraps.eth:http-uri-resolver-ext@1.0.1"),
     //     // TODO: remove this once the latest version of the http-uri-resolver-ext is published
@@ -85,7 +85,7 @@ pub fn get_client() -> PolywrapClient {
     // TODO: re-enable this when the resolver is re-written in rust (for performance)
     //   config.add_interface_implementation(
     //       uri!("wrap://ens/uri-resolver.core.polywrap.eth"),
-    //       uri!("wrap://http/http.wrappers.dev/u/test/polywrap-resolver"),
+    //       uri!("wrap://https/http.wrappers.dev/u/test/polywrap-resolver"),
     //   );
 
     config.add_resolver(Arc::new(LocalResolver::new()));

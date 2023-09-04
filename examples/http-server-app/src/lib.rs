@@ -28,7 +28,7 @@ impl ModuleTrait for Module {
                     path: "/".to_string(),
                     http_method: HttpServerHttpMethod::GET,
                     handler: HttpServerWrapperCallback {
-                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routeHome".to_string()
                     }
                 },
@@ -36,7 +36,7 @@ impl ModuleTrait for Module {
                     path: "/with-param/:param".to_string(),
                     http_method: HttpServerHttpMethod::GET,
                     handler: HttpServerWrapperCallback {
-                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routeWithParam".to_string()
                     }
                 },
@@ -44,7 +44,7 @@ impl ModuleTrait for Module {
                     path: "/with-query".to_string(),
                     http_method: HttpServerHttpMethod::GET,
                     handler: HttpServerWrapperCallback {
-                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routeWithQuery".to_string()
                     }
                 },
@@ -52,7 +52,7 @@ impl ModuleTrait for Module {
                     path: "/post".to_string(),
                     http_method: HttpServerHttpMethod::POST,
                     handler: HttpServerWrapperCallback {
-                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routePost".to_string()
                     }
                 },
@@ -60,14 +60,14 @@ impl ModuleTrait for Module {
                     path: "/upload".to_string(),
                     http_method: HttpServerHttpMethod::POST,
                     handler: HttpServerWrapperCallback {
-                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routeUpload".to_string()
                     }
                 },
             ], 
             on_start: Some(
                 HttpServerWrapperCallback {
-                    uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                    uri: "https/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                     method: "onStart".to_string()
                 }
             ),
