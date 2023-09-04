@@ -57,8 +57,8 @@ impl PwrClient {
         config
             .add(SystemClientConfig::default().into())
             .add(Web3ClientConfig::default().into())
-            .add_package("wrap://http/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
-            .add_package("wrap://http/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
+            .add_package("wrap://https/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
+            .add_package("wrap://https/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
 
         PwrClient(Arc::new(PolywrapClient::new(config.into())))
     }
