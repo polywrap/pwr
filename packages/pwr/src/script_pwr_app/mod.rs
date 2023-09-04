@@ -328,7 +328,8 @@ async fn read_file_and_eval(
 
             if !total_input.is_empty() {
                 println!("Evaluating file: {:?}...", file);
-                invoke_eval(&total_input, vec![], engine_uri, client.clone()).await;
+                let repl_boilerplate = include_str!("./templates/repl.js");
+                invoke_eval(&(repl_boilerplate.to_string() + &total_input), vec![], engine_uri, client.clone()).await?;
             }
         }
     }
@@ -359,8 +360,8 @@ async fn execute_repl_command(
     if should_watch {
         if let Some(file) = file {
             println!("Watching file: {:?}", file);
-            read_file_and_eval(Some(file), engine_uri, template_cid, client.clone()).await;
-            watch(file, engine_uri, template_cid, client.clone()).await;
+            read_file_and_eval(Some(file), engine_uri, template_cid, client.clone()).await?;
+            watch(file, engine_uri, template_cid, client.clone()).await?;
             return Ok(0);
         } else {
             write_err("File not specified");
