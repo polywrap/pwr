@@ -1,5 +1,4 @@
 pub mod wrap;
-use std::{borrow::Cow, io::{self, Read}, collections::HashMap};
 
 use polywrap_wasm_rs::{wrap_debug_log, JSON::json};
 use serde::Serialize;
@@ -139,68 +138,32 @@ impl ModuleTrait for Module {
     }
 
     fn route_upload(args: ArgsRouteUpload) -> Result<HttpServerResponse, String> {
-        log(format!("Route upload, body {:?}", args));
+        log(format!("Route upload"));
         
-        Err("Not implemented".to_string())
+        let files = MultipartModule::get_files(&ArgsGetFiles {
+            headers: args.request.headers.iter().map(|x| MultipartKeyValuePair {
+                key: x.key.clone(),
+                value: x.value.clone()
+            }).collect::<Vec<MultipartKeyValuePair>>(),
+            body: args.request.body.unwrap()
+        }).unwrap();
 
-        // let resp = format!("Received {} files", files.len());
+        log(format!("Found the following files: {}", files.iter().map(|x| x.name.clone()).collect::<Vec<String>>().join(", ")));
 
-        // Ok(HttpServerResponse {
-        //     status_code: 200,
-        //     headers: Some(vec![
-        //         HttpServerKeyValuePair {
-        //             key: "Content-Type".to_string(),
-        //             value: "text/html".to_string(),
-        //         },
-        //         HttpServerKeyValuePair {
-        //             key: "Content-Disposition".to_string(),
-        //             value: "attachment; filename=\"MyFile.txt\"".to_string(),
-        //         }
-        //     ]),
-        //     body: Some(ByteBuf::from(resp.as_bytes().to_vec())),
-        // })    
-    }
-}
-
-fn get_boundary_from_content_type(content_type: &str) -> Option<String> {
-    let mut boundary = None;
-    let parts: Vec<&str> = content_type.split(';').collect();
-
-    for part in parts {
-        let part = part.trim();
-        if part.starts_with("boundary=") {
-            boundary = Some(part[9..].to_string());
-            break;
-        }
-    }
-
-    boundary
-}
-
-fn to_json_response<T: Serialize>(data: T) -> HttpServerResponse {
-    HttpServerResponse {
-        status_code: 200,
-        headers: Some(vec![HttpServerKeyValuePair {
-            key: "Content-Type".to_string(),
-            value: "application/json".to_string(),
-        }]),
-        body: Some(
-            ByteBuf::from(json!(data)
-                .to_string()
-                .as_bytes()
-                .to_vec())
-        ),
-    }    
-}
-
-fn to_error_response(message: String) -> HttpServerResponse {
-    HttpServerResponse {
-        status_code: 500,
-        headers: Some(vec![HttpServerKeyValuePair {
-            key: "Content-Type".to_string(),
-            value: "text/html".to_string(),
-        }]),
-        body: Some(ByteBuf::from(message.as_bytes().to_vec())),
+        Ok(HttpServerResponse {
+            status_code: 200,
+            headers: Some(vec![
+                HttpServerKeyValuePair {
+                    key: "Content-Type".to_string(),
+                    value: "text/html".to_string(),
+                },
+                HttpServerKeyValuePair {
+                    key: "Content-Disposition".to_string(),
+                    value: format!("attachment; filename=\"{}\"", files[0].name),
+                }
+            ]),
+            body: Some(files[0].content.clone()),
+        })    
     }
 }
 

@@ -7,6 +7,8 @@ pub use imported::http_server_start_result::HttpServerStartResult;
 pub use imported::http_server_response::HttpServerResponse;
 pub use imported::http_server_key_value_pair::HttpServerKeyValuePair;
 pub use imported::http_server_request::HttpServerRequest;
+pub use imported::multipart_file_info::MultipartFileInfo;
+pub use imported::multipart_key_value_pair::MultipartKeyValuePair;
 pub use imported::http_server_http_method::{
     get_http_server_http_method_key,
     get_http_server_http_method_value,
@@ -14,6 +16,7 @@ pub use imported::http_server_http_method::{
     HttpServerHttpMethod
 };
 pub use imported::http_server_module::HttpServerModule;
+pub use imported::multipart_module::MultipartModule;
 pub mod module;
 pub use module::{
     Module,
