@@ -39,13 +39,13 @@ default-members = [
 ]
 
 [workspace.dependencies]
-script_wrap_utils = { path = "packages/script-wrap-utils" }
-script_wrap_utils_wasm = { path = "packages/script-wrap-utils-wasm" }
-wrap_utils = { path = "packages/wrap-utils" }
-wrap_utils_wasm = { path = "packages/wrap-utils-wasm" }
+script_wrap_utils = { version = "0.1.0", path = "packages/script-wrap-utils" }
+script_wrap_utils_wasm = { version = "0.1.0", path = "packages/script-wrap-utils-wasm" }
+wrap_utils = { version = "0.1.0", path = "packages/wrap-utils" }
+wrap_utils_wasm = { version = "0.1.0", path = "packages/wrap-utils-wasm" }
 easy_error_string = { version = "0.1.0", path = "packages/easy-error-string" }
-polywrap_http_server_plugin = { path = "packages/plugins/http-server" }
-polywrap_key_value_store_plugin = { path = "packages/plugins/key-value-store" }
+polywrap_http_server_plugin = { version = "0.1.0", path = "packages/plugins/http-server" }
+polywrap_key_value_store_plugin = { version = "0.1.0", path = "packages/plugins/key-value-store" }
 polywrap_uri = "0.1.9-beta.2"
 polywrap_core = "0.1.9-beta.2"
 polywrap_client = "0.1.9-beta.2"
