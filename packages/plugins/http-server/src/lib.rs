@@ -6,6 +6,7 @@ use axum::{Router, async_trait};
 use axum::extract::{FromRequest, Path, Query, State, RawBody};
 use axum::http::{StatusCode, Request};
 use axum::routing::{get, post, options, patch, delete, put};
+use http::HeaderMap;
 use hyper::{Body, body};
 use serde::{Deserialize, Serialize};
 use wrap::{*, module::*};
@@ -38,12 +39,13 @@ impl Module for HttpServerPlugin {
             let method = route.handler.method.clone();
             let route2 = route.clone();
             let func = move |
+                headers: HeaderMap,
                 query:  Query<HashMap<String, String>>,
                 path:  Path<HashMap<String, String>>,
                 deps: State<Dependencies>,
                 body: RawBody,
             | {
-                handle_request(uri.clone(), method.clone(), query, path, deps, body)
+                handle_request(uri.clone(), method.clone(), headers, query, path, deps, body)
             };
 
             app = match route2.http_method {
@@ -119,6 +121,7 @@ impl Module for HttpServerPlugin {
 async fn handle_request(
     uri: Uri,
     method: String,
+    headers: HeaderMap,
     Query(query_params): Query<HashMap<String, String>>,
     Path(path_params): Path<HashMap<String, String>>,
     deps: State<Dependencies>,
@@ -135,6 +138,10 @@ async fn handle_request(
         &method,
         Some(&to_vec(&RequestArgs {
             request: crate::types::Request {
+                headers: headers.into_iter().map(|(k, v)| KeyValuePair {
+                    key: k.map(|x| x.to_string()).unwrap_or("".to_string()),
+                    value: v.to_str().unwrap().to_string(),
+                }).collect(),
                 params: path_params.into_iter().map(|(k, v)| KeyValuePair {
                     key: k,
                     value: v,

@@ -7,4 +7,5 @@ type Module {
   routeWithParam(request: HttpServer_Request!): HttpServer_Response!
   routeWithQuery(request: HttpServer_Request!): HttpServer_Response!
   routePost(request: HttpServer_Request!): HttpServer_Response!
+  routeUpload(request: HttpServer_Request!): HttpServer_Response!
 }

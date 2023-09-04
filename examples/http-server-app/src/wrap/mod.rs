@@ -29,7 +29,9 @@ pub use module::{
     route_with_query_wrapped,
     ArgsRouteWithQuery,
     route_post_wrapped,
-    ArgsRoutePost
+    ArgsRoutePost,
+    route_upload_wrapped,
+    ArgsRouteUpload
 };
 
 // Override print!(...) & println!(...) macros

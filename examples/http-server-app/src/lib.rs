@@ -1,4 +1,6 @@
 pub mod wrap;
+use std::{borrow::Cow, io::{self, Read}, collections::HashMap};
+
 use polywrap_wasm_rs::{wrap_debug_log, JSON::json};
 use serde::Serialize;
 use serde_bytes::ByteBuf;
@@ -53,6 +55,14 @@ impl ModuleTrait for Module {
                     handler: HttpServerWrapperCallback {
                         uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routePost".to_string()
+                    }
+                },
+                HttpServerRoute {
+                    path: "/upload".to_string(),
+                    http_method: HttpServerHttpMethod::POST,
+                    handler: HttpServerWrapperCallback {
+                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        method: "routeUpload".to_string()
                     }
                 },
             ], 
@@ -127,6 +137,44 @@ impl ModuleTrait for Module {
             body: args.request.body.map(|x| ByteBuf::from(x.to_vec())),
         })    
     }
+
+    fn route_upload(args: ArgsRouteUpload) -> Result<HttpServerResponse, String> {
+        log(format!("Route upload, body {:?}", args));
+        
+        Err("Not implemented".to_string())
+
+        // let resp = format!("Received {} files", files.len());
+
+        // Ok(HttpServerResponse {
+        //     status_code: 200,
+        //     headers: Some(vec![
+        //         HttpServerKeyValuePair {
+        //             key: "Content-Type".to_string(),
+        //             value: "text/html".to_string(),
+        //         },
+        //         HttpServerKeyValuePair {
+        //             key: "Content-Disposition".to_string(),
+        //             value: "attachment; filename=\"MyFile.txt\"".to_string(),
+        //         }
+        //     ]),
+        //     body: Some(ByteBuf::from(resp.as_bytes().to_vec())),
+        // })    
+    }
+}
+
+fn get_boundary_from_content_type(content_type: &str) -> Option<String> {
+    let mut boundary = None;
+    let parts: Vec<&str> = content_type.split(';').collect();
+
+    for part in parts {
+        let part = part.trim();
+        if part.starts_with("boundary=") {
+            boundary = Some(part[9..].to_string());
+            break;
+        }
+    }
+
+    boundary
 }
 
 fn to_json_response<T: Serialize>(data: T) -> HttpServerResponse {
