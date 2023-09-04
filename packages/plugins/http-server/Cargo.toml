@@ -14,7 +14,7 @@ wrap_manifest_schemas.workspace = true
 polywrap_plugin.workspace = true
 serde.workspace = true
 thiserror.workspace = true
-
+tower-http.workspace = true
 base64.workspace = true
 axum = "0.6.20"
 tokio.workspace = true
