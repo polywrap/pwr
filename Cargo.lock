@@ -3541,6 +3541,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "polywrap_pwr"
+version = "0.2.4"
+dependencies = [
+ "clap",
+ "colored",
+ "dirs",
+ "easy_error_string",
+ "futures",
+ "notify",
+ "notify-debouncer-mini",
+ "openssl",
+ "polywrap_client",
+ "polywrap_client_builder",
+ "polywrap_client_default_config",
+ "polywrap_fs_plugin",
+ "polywrap_http_plugin",
+ "polywrap_http_server_plugin",
+ "polywrap_key_value_store_plugin",
+ "polywrap_msgpack_serde",
+ "polywrap_plugin",
+ "rmp-serde",
+ "rmpv",
+ "script_wrap_utils",
+ "script_wrap_utils_wasm",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "tokio",
+ "tokio-tar",
+ "tokio-util 0.6.10",
+ "wrap_manifest_schemas",
+ "wrap_utils",
+ "wrap_utils_wasm",
+]
+
+[[package]]
 name = "polywrap_resolver_extensions"
 version = "0.1.9-beta.1"
 source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
@@ -3734,42 +3770,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "pwr"
-version = "0.2.4"
-dependencies = [
- "clap",
- "colored",
- "dirs",
- "easy_error_string",
- "futures",
- "notify",
- "notify-debouncer-mini",
- "openssl",
- "polywrap_client",
- "polywrap_client_builder",
- "polywrap_client_default_config",
- "polywrap_fs_plugin",
- "polywrap_http_plugin",
- "polywrap_http_server_plugin",
- "polywrap_key_value_store_plugin",
- "polywrap_msgpack_serde",
- "polywrap_plugin",
- "rmp-serde",
- "rmpv",
- "script_wrap_utils",
- "script_wrap_utils_wasm",
- "serde",
- "serde_bytes",
- "serde_json",
- "tokio",
- "tokio-tar",
- "tokio-util 0.6.10",
- "wrap_manifest_schemas",
- "wrap_utils",
- "wrap_utils_wasm",
 ]
 
 [[package]]

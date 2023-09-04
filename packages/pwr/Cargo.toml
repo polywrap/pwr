@@ -1,5 +1,5 @@
 [package]
-name = "pwr"
+name = "polywrap_pwr"
 version = "0.2.4"
 
 edition.workspace = true
