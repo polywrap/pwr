@@ -72,11 +72,11 @@ pub fn get_client() -> PolywrapClient {
     let mut config = PolywrapClientConfig::default();
     config.add(SystemClientConfig::default().into());
     config.add(Web3ClientConfig::default().into());
-    config.add_redirect(
-        uri!("ens/wraps.eth:http-uri-resolver-ext@1.0.1"),
-        // TODO: remove this once the latest version of the http-uri-resolver-ext is published
-        uri!("ipfs/QmansMm6hUBYs7D7EW1zA7BFBnDBGGgCM2jyVTWuDmMVNx"),
-    );
+    // config.add_redirect(
+    //     uri!("ens/wraps.eth:http-uri-resolver-ext@1.0.1"),
+    //     // TODO: remove this once the latest version of the http-uri-resolver-ext is published
+    //     uri!("ipfs/QmansMm6hUBYs7D7EW1zA7BFBnDBGGgCM2jyVTWuDmMVNx"),
+    // );
     // TODO: re-enable this when the resolver is re-written in rust (for performance)
     //   config.add_interface_implementation(
     //       uri!("wrap://ens/uri-resolver.core.polywrap.eth"),
