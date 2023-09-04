@@ -3335,8 +3335,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "765d37e7cf5375fae90c6ea7eb5c84d60af0779681d76dd94c811b8ac11e603e"
 dependencies = [
  "polywrap_client_builder",
  "polywrap_core",
@@ -3353,8 +3354,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client_builder"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "021e01ece8dfaa3c0d6ffcf5bf2dc730c4c9bc88671d17a78dc725a05772a950"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3366,8 +3368,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client_default_config"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "940d09e5e454986e8779130fb4a82982f7f07f3326cfaca9aa7985df9970a9fb"
 dependencies = [
  "base64 0.13.1",
  "polywrap_client_builder",
@@ -3387,8 +3390,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_core"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a1c89d25a4a399b47617f409c95901e19b9bfa47fe9cbf112bcebce577d18dc"
 dependencies = [
  "jsonschema",
  "polywrap_core_macros",
@@ -3403,8 +3407,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_core_macros"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41468666e339e851aff8ef6fb4367d99a50a1f4bf15869bb2c56d7b0ed3a3fad"
 dependencies = [
  "polywrap_uri",
  "quote",
@@ -3413,8 +3418,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_ethereum_wallet_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e51cb1aafe445d1338e143925dcf28fa3f2671673d9a2c23c285610b9cf4789"
 dependencies = [
  "ethers",
  "lazy_static",
@@ -3426,8 +3432,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_fs_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a08e1fa3a59947a3d05bee8dc2f90f39c7d356238d9382d47386d3d0552c20d4"
 dependencies = [
  "lazy_static",
  "polywrap_plugin",
@@ -3438,8 +3445,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_http_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39fb10ebe67a738a41ebf748a1e3bcc5802757df6abaa4e1cfed727a9957f6b2"
 dependencies = [
  "base64 0.13.1",
  "multipart 0.18.0",
@@ -3483,8 +3491,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_logger_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "751fa2020ea3cc833062b582bb4f2550123c292286732ee825658685a33e3895"
 dependencies = [
  "base64 0.13.1",
  "env_logger",
@@ -3512,8 +3521,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "411575bf00c1852f8a16923ee217841353885306b4f4b2aecce1527dd08193f8"
 dependencies = [
  "Inflector",
  "bigdecimal",
@@ -3530,8 +3540,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_plugin_implementor"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b22d255007aabbded925d122563bb798b3bd96a1b783b920bfc912a06bec806"
 dependencies = [
  "polywrap_core",
  "proc-macro2",
@@ -3578,8 +3589,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_resolver_extensions"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1955426adeb2962fbb977b5884277c0d325537fd8e2ad057090f00bbc2ef5634"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3593,8 +3605,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_resolvers"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fef39d0ed681906efb2f6d245cce32e2acdac81e5ae22662ce688e9a98112b16"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3640,8 +3653,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_uri"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93c645eb982a4bc055ddb2bd1ef8c60c3eccdbd0847008b3f0b4b3f9cd114f8b"
 dependencies = [
  "regex",
  "serde",
@@ -3649,8 +3663,9 @@ dependencies = [
 
 [[package]]
 name = "polywrap_wasm"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ada5f7dde37863883eeb55b25e9b7974891b2cf1fb160595034a899c642a318"
 dependencies = [
  "base64 0.13.1",
  "bytes",
@@ -6074,8 +6089,9 @@ dependencies = [
 
 [[package]]
 name = "wrap_manifest_schemas"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "506ef8ad5d4334e590503d92a55c22cdb0bee3e20bd1bb9c6074d88811d8ef8c"
 dependencies = [
  "handlebars",
  "jsonschema",
