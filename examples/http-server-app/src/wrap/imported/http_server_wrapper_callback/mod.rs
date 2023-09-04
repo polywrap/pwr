@@ -17,7 +17,7 @@ pub struct HttpServerWrapperCallback {
 }
 
 impl HttpServerWrapperCallback {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/http-server";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/http-server";
 
     pub fn new() -> HttpServerWrapperCallback {
         HttpServerWrapperCallback {

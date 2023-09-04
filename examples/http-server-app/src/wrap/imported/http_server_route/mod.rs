@@ -21,7 +21,7 @@ pub struct HttpServerRoute {
 }
 
 impl HttpServerRoute {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/http-server";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/http-server";
 
     pub fn new() -> HttpServerRoute {
         HttpServerRoute {

@@ -52,7 +52,7 @@ pub struct ArgsEntries {
 pub struct KeyValueStoreModule {}
 
 impl KeyValueStoreModule {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/key-value-store";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/key-value-store";
 
     pub fn new() -> KeyValueStoreModule {
         KeyValueStoreModule {}

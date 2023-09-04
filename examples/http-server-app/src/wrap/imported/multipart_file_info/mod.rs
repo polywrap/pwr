@@ -18,7 +18,7 @@ pub struct MultipartFileInfo {
 }
 
 impl MultipartFileInfo {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/multipart";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/multipart";
 
     pub fn new() -> MultipartFileInfo {
         MultipartFileInfo {

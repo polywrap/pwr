@@ -18,7 +18,7 @@ pub struct KeyValueStoreKeyValuePair {
 }
 
 impl KeyValueStoreKeyValuePair {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/key-value-store";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/key-value-store";
 
     pub fn new() -> KeyValueStoreKeyValuePair {
         KeyValueStoreKeyValuePair {

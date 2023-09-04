@@ -26,7 +26,7 @@ pub struct ArgsGetFiles {
 pub struct MultipartModule {}
 
 impl MultipartModule {
-    pub const URI: &'static str = "wrap://http/http.wrappers.dev/u/test/multipart";
+    pub const URI: &'static str = "wrap://https/http.wrappers.dev/u/test/multipart";
 
     pub fn new() -> MultipartModule {
         MultipartModule {}

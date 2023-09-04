@@ -309,7 +309,7 @@ async fn execute_deploy_command(
     .await
     ?;
     println!(
-        "WRAP deployed to wrappers.dev registry: wrap://http/http.wrappers.dev/u/test/{}",
+        "WRAP deployed to wrappers.dev registry: wrap://https/http.wrappers.dev/u/test/{}",
         &manifest.name
     );
     println!("WRAP deployed successfully!");
