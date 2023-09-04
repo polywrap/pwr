@@ -1,4 +1,5 @@
 pub mod wrap;
+
 use polywrap_wasm_rs::{wrap_debug_log, JSON::json};
 use serde::Serialize;
 use serde_bytes::ByteBuf;
@@ -53,6 +54,14 @@ impl ModuleTrait for Module {
                     handler: HttpServerWrapperCallback {
                         uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
                         method: "routePost".to_string()
+                    }
+                },
+                HttpServerRoute {
+                    path: "/upload".to_string(),
+                    http_method: HttpServerHttpMethod::POST,
+                    handler: HttpServerWrapperCallback {
+                        uri: "http/http.wrappers.dev/u/test/http-server-pwr-app".to_string(),
+                        method: "routeUpload".to_string()
                     }
                 },
             ], 
@@ -127,32 +136,34 @@ impl ModuleTrait for Module {
             body: args.request.body.map(|x| ByteBuf::from(x.to_vec())),
         })    
     }
-}
 
-fn to_json_response<T: Serialize>(data: T) -> HttpServerResponse {
-    HttpServerResponse {
-        status_code: 200,
-        headers: Some(vec![HttpServerKeyValuePair {
-            key: "Content-Type".to_string(),
-            value: "application/json".to_string(),
-        }]),
-        body: Some(
-            ByteBuf::from(json!(data)
-                .to_string()
-                .as_bytes()
-                .to_vec())
-        ),
-    }    
-}
+    fn route_upload(args: ArgsRouteUpload) -> Result<HttpServerResponse, String> {
+        log(format!("Route upload"));
+        
+        let files = MultipartModule::get_files(&ArgsGetFiles {
+            headers: args.request.headers.iter().map(|x| MultipartKeyValuePair {
+                key: x.key.clone(),
+                value: x.value.clone()
+            }).collect::<Vec<MultipartKeyValuePair>>(),
+            body: args.request.body.unwrap()
+        }).unwrap();
 
-fn to_error_response(message: String) -> HttpServerResponse {
-    HttpServerResponse {
-        status_code: 500,
-        headers: Some(vec![HttpServerKeyValuePair {
-            key: "Content-Type".to_string(),
-            value: "text/html".to_string(),
-        }]),
-        body: Some(ByteBuf::from(message.as_bytes().to_vec())),
+        log(format!("Found the following files: {}", files.iter().map(|x| x.name.clone()).collect::<Vec<String>>().join(", ")));
+
+        Ok(HttpServerResponse {
+            status_code: 200,
+            headers: Some(vec![
+                HttpServerKeyValuePair {
+                    key: "Content-Type".to_string(),
+                    value: "text/html".to_string(),
+                },
+                HttpServerKeyValuePair {
+                    key: "Content-Disposition".to_string(),
+                    value: format!("attachment; filename=\"{}\"", files[0].name),
+                }
+            ]),
+            body: Some(files[0].content.clone()),
+        })    
     }
 }
 

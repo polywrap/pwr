@@ -8,6 +8,7 @@ type WrapperCallback {
 }
 
 type Request {
+  headers: [KeyValuePair!]!
   params: [KeyValuePair!]!
   query: [KeyValuePair!]!
   body: Bytes

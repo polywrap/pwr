@@ -14,6 +14,7 @@ use serde_bytes::ByteBuf;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct HttpServerRequest {
+    pub headers: Vec<HttpServerKeyValuePair>,
     pub params: Vec<HttpServerKeyValuePair>,
     pub query: Vec<HttpServerKeyValuePair>,
     pub body: Option<ByteBuf>,
@@ -24,6 +25,7 @@ impl HttpServerRequest {
 
     pub fn new() -> HttpServerRequest {
         HttpServerRequest {
+            headers: vec![],
             params: vec![],
             query: vec![],
             body: None,

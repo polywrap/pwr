@@ -145,6 +145,30 @@ pub fn get_manifest() -> WrapManifest {
           "array": {
             "item": {
               "kind": 8192,
+              "name": "headers",
+              "required": true,
+              "type": "KeyValuePair"
+            },
+            "kind": 18,
+            "name": "headers",
+            "object": {
+              "kind": 8192,
+              "name": "headers",
+              "required": true,
+              "type": "KeyValuePair"
+            },
+            "required": true,
+            "type": "[KeyValuePair]"
+          },
+          "kind": 34,
+          "name": "headers",
+          "required": true,
+          "type": "[KeyValuePair]"
+        },
+        {
+          "array": {
+            "item": {
+              "kind": 8192,
               "name": "params",
               "required": true,
               "type": "KeyValuePair"

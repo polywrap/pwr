@@ -162,3 +162,29 @@ pub fn route_post_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
         }
     }
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ArgsRouteUpload {
+    pub request: HttpServerRequest,
+}
+
+pub fn route_upload_wrapped(args: &[u8], env_size: u32) -> Vec<u8> {
+    match from_slice::<ArgsRouteUpload>(args) {
+        Ok(args) => {
+            let result = Module::route_upload(ArgsRouteUpload {
+                request: args.request,
+            });
+            match result {
+                Ok(res) => {
+                    to_vec(&res).unwrap()
+                }
+                Err(e) => {
+                    panic!("{}", e.to_string())
+                }
+            }
+        }
+        Err(e) => {
+            panic!("{}", e.to_string())
+        }
+    }
+}

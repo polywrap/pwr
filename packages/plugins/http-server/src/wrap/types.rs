@@ -31,6 +31,7 @@ pub struct WrapperCallback {
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Request {
+    pub headers: Vec<KeyValuePair>,
     pub params: Vec<KeyValuePair>,
     pub query: Vec<KeyValuePair>,
     pub body: Option<ByteBuf>,

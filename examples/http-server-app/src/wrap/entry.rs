@@ -4,7 +4,8 @@ use crate::{
     route_home_wrapped,
     route_with_param_wrapped,
     route_with_query_wrapped,
-    route_post_wrapped
+    route_post_wrapped,
+    route_upload_wrapped
 };
 use polywrap_wasm_rs::{
     abort,
@@ -38,6 +39,9 @@ pub extern "C" fn _wrap_invoke(method_size: u32, args_size: u32, env_size: u32) 
         }
         "routePost" => {
             result = route_post_wrapped(args.args.as_slice(), env_size);
+        }
+        "routeUpload" => {
+            result = route_upload_wrapped(args.args.as_slice(), env_size);
         }
         _ => {
             invoke::wrap_invoke_error(format!("Could not find invoke function {}", args.method));

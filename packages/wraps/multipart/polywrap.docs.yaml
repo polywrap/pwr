@@ -1,0 +1,5 @@
+format: 0.1.0
+description: Wrap that provides support for POST multipart/form-data requests
+website: https://polywrap.io
+repository: https://github.com/polywrap/pwr
+readme: ./README.md

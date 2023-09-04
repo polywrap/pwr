@@ -1,0 +1,13 @@
+type Module {
+    getFiles(headers: [KeyValuePair!]!, body: Bytes!): [FileInfo!]!
+}
+
+type FileInfo {
+    name: String!
+    content: Bytes!
+}
+
+type KeyValuePair {
+    key: String!
+    value: String!
+}

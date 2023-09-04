@@ -1,4 +1,5 @@
 #import { Module, Response, KeyValuePair, Request } into HttpServer from "wrap://http/http.wrappers.dev/u/test/http-server"
+#import * into Multipart from "wrap://http/http.wrappers.dev/u/test/multipart"
 
 type Module {
   main(args: [String!]!): Int32!
@@ -7,4 +8,5 @@ type Module {
   routeWithParam(request: HttpServer_Request!): HttpServer_Response!
   routeWithQuery(request: HttpServer_Request!): HttpServer_Response!
   routePost(request: HttpServer_Request!): HttpServer_Response!
+  routeUpload(request: HttpServer_Request!): HttpServer_Response!
 }
