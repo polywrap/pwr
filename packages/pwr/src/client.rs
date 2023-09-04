@@ -11,7 +11,7 @@ use polywrap_client::{
 use polywrap_plugin::package::PluginPackage;
 use polywrap_http_server_plugin::HttpServerPlugin;
 use polywrap_key_value_store_plugin::KeyValueStorePlugin;
-use polywrap_client_default_config::SystemClientConfig;
+use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 
 pub trait CoreClient {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error>;
@@ -56,6 +56,7 @@ impl PwrClient {
         let mut config = PolywrapClientConfig::default();
         config
             .add(SystemClientConfig::default().into())
+            .add(Web3ClientConfig::default().into())
             .add_package("wrap://http/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
             .add_package("wrap://http/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
 

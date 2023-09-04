@@ -15,6 +15,7 @@ use crate::{
     ArgsRouteWithParam,
     ArgsRouteWithQuery,
     ArgsRoutePost,
+    ArgsRouteUpload,
 };
 use crate::HttpServerRequest;
 use crate::HttpServerResponse;
@@ -33,4 +34,6 @@ pub trait ModuleTrait {
   fn route_with_query(args: ArgsRouteWithQuery) -> Result<HttpServerResponse, String>;
 
   fn route_post(args: ArgsRoutePost) -> Result<HttpServerResponse, String>;
+
+  fn route_upload(args: ArgsRouteUpload) -> Result<HttpServerResponse, String>;
 }
