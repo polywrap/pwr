@@ -1,6 +1,6 @@
 use std::{
     path::Path,
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex}, collections::HashMap,
 };
 
 use polywrap_client::{
@@ -22,6 +22,9 @@ use polywrap_client_builder::{
     PolywrapClientConfigBuilder,
 };
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
+use polywrap_http_server_plugin::HttpServerPlugin;
+use polywrap_key_value_store_plugin::KeyValueStorePlugin;
+use polywrap_plugin::PluginPackage;
 
 use super::create_wrap_from_file;
 
@@ -70,8 +73,10 @@ impl UriResolver for LocalResolver {
 
 pub fn get_client() -> PolywrapClient {
     let mut config = PolywrapClientConfig::default();
-    config.add(SystemClientConfig::default().into());
-    config.add(Web3ClientConfig::default().into());
+    config.add(SystemClientConfig::default().into())
+        .add(Web3ClientConfig::default().into())
+        .add_package("wrap://http/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
+        .add_package("wrap://http/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
     // config.add_redirect(
     //     uri!("ens/wraps.eth:http-uri-resolver-ext@1.0.1"),
     //     // TODO: remove this once the latest version of the http-uri-resolver-ext is published
