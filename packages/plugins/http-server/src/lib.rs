@@ -165,31 +165,6 @@ async fn handle_request(
     Ok(response)
 }
 
-struct PathParams<B, S>((B, HashMap<String, String>, S));
-
-#[async_trait]
-impl<S, B> FromRequest<S, B> for PathParams<B, S>
-where
-    for<'a> B: Send + 'a,
-    S: Clone + Send + Sync,
-{
-    type Rejection = std::convert::Infallible;
-
-    async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
-        let mut map = HashMap::new();
-        if let Some(route_params) = req.extensions().get::<axum::extract::RawPathParams>().clone() {
-            for (name, value) in route_params.iter() {
-                map.insert(name.to_string(), value.to_string());
-                println!("{}: {}", name, value);
-            }
-        }
-
-        let body = req.into_body();
-
-        Ok(PathParams::<B, S>((body, map, state.clone())))
-    }
-}
-
 #[derive(Clone, Serialize, Deserialize)]
 struct RequestArgs {
     request: crate::types::Request,
@@ -199,13 +174,6 @@ struct RequestArgs {
 struct Dependencies {
     invoker: Arc<dyn Invoker>,
 }
-
-pub async fn home() -> Result<String, StatusCode> {
-    let page = format!("Version: ");
-
-    Ok(page)
-}
-
 
 #[derive(thiserror::Error, Debug)]
 pub enum HttpPluginError {
