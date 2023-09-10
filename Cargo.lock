@@ -28,6 +28,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
 
 [[package]]
+name = "advanced-server-app"
+version = "0.1.0"
+dependencies = [
+ "polywrap-wasm-rs",
+ "polywrap_msgpack_serde",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
 name = "aes"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2005,6 +2015,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "http-range-header"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "add0ab9360ddbd88cfeb3bd9574a1d85cfdfa14db10b3e21d3700dbc4328758f"
+
+[[package]]
 name = "http-server-app"
 version = "0.1.0"
 dependencies = [
@@ -3464,6 +3480,7 @@ dependencies = [
  "serde",
  "thiserror",
  "tokio",
+ "tower-http",
  "wrap_manifest_schemas",
 ]
 
@@ -3738,7 +3755,7 @@ dependencies = [
 
 [[package]]
 name = "pwr"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "clap",
  "colored",
@@ -5218,6 +5235,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "tower-http"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61c5bb1d698276a2443e5ecfabc1008bf15a36c12e6a7176e7bf089ea9131140"
+dependencies = [
+ "bitflags 2.4.0",
+ "bytes",
+ "futures-core",
+ "futures-util",
+ "http",
+ "http-body",
+ "http-range-header",
+ "pin-project-lite",
+ "tower-layer",
+ "tower-service",
+]
+
+[[package]]
 name = "tower-layer"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6070,6 +6105,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "80d0f4e272c85def139476380b12f9ac60926689dd2e01d4923222f40580869d"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "wrap_link_deployer"
+version = "0.1.0"
+dependencies = [
+ "polywrap-wasm-rs",
+ "polywrap_msgpack_serde",
+ "serde",
+ "serde_bytes",
 ]
 
 [[package]]

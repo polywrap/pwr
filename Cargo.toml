@@ -20,6 +20,8 @@ members = [
     "examples/simple-pwr-app",
     "examples/http-server-app",
     "examples/simple-storage-app",
+    "examples/wrap-link-deployer",
+    "examples/advanced-server-app"
 ]
 
 default-members = [
@@ -36,6 +38,8 @@ default-members = [
     "examples/simple-pwr-app",
     "examples/http-server-app",
     "examples/simple-storage-app",
+    "examples/wrap-link-deployer",
+    "examples/advanced-server-app"
 ]
 
 [workspace.dependencies]
@@ -46,6 +50,7 @@ wrap_utils_wasm = { path = "packages/wrap-utils-wasm" }
 easy_error_string = { version = "0.1.0", path = "packages/easy-error-string" }
 polywrap_http_server_plugin = { path = "packages/plugins/http-server" }
 polywrap_key_value_store_plugin = { path = "packages/plugins/key-value-store" }
+polywrap_msgpack_serde = "0.0.2-beta.7"
 polywrap_uri = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
 polywrap_core = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
 polywrap_client = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
@@ -58,7 +63,7 @@ polywrap_wasm = { git = "https://github.com/polywrap/rust-client", branch = "ner
 polywrap_fs_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
 polywrap_http_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
 polywrap-wasm-rs = { version = "0.11.2" }
-polywrap_msgpack_serde = "0.0.2-beta.7"
+tower-http = { version = "0.4.3", features = ["cors"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11"
 serde_json = "1.0"
