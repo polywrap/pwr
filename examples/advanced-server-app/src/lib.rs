@@ -63,7 +63,7 @@ impl ModuleTrait for Module {
             value: ByteBuf::from(vec![counter + 1])
         }).unwrap();
 
-        let resp = format!("Hey there namesty: {}", counter);
+        let resp = format!("Counter: {}", counter);
         Ok(HttpServerResponse {
             status_code: 200,
             headers: Some(vec![HttpServerKeyValuePair {
