@@ -250,12 +250,16 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine
     let script = get_script_info_from_file(&file.to_string_lossy()).map_err_str()?;
     let module = build_module_from_script(script, get_bytes_from_url)?;
 
-    let default_output = PathBuf::from("./build");
-    let output = output.unwrap_or(&default_output);
-
-    if !Path::exists(output) {
-        fs::create_dir(output)?;
+    let output = output
+        .map(|x| x.to_owned())
+        .unwrap_or(PathBuf::from("./build"));
+        
+    if !Path::exists(&output) {
+        fs::create_dir(&output)?;
     }
+
+    let output = output
+        .to_string_lossy();
 
     let wrap_name = Path::new(&file).file_stem().ok_or_str("Error looking up the file")?.to_str().ok_or_str("Error looking up the file")?;
     println!("WRAP name: {}", wrap_name);
@@ -269,10 +273,10 @@ async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine
     };
     let manifest = rmp_serde::to_vec_named(&manifest)?;
 
-    let mut file = File::create("./build/wrap.info")?;
+    let mut file = File::create(format!("{output}/wrap.info"))?;
     file.write_all(&manifest)?;
 
-    let mut file = File::create("./build/wrap.wasm")?;
+    let mut file = File::create(format!("{output}/wrap.wasm"))?;
     file.write_all(&module)?;
 
     println!("WRAP built successfully!");
@@ -283,10 +287,10 @@ async fn execute_deploy_command(
     file: Option<&PathBuf>,
     output: Option<&PathBuf>,
     engine_uri: &Uri,
-    template_cid: Option<&str>,
+    _template_cid: Option<&str>,
 ) -> Result<i32, StringError> {
     if file.is_some() {
-        execute_build_command(file.ok_or_str("File is required")?, output, engine_uri).await;
+        execute_build_command(file.ok_or_str("File is required")?, output, engine_uri).await?;
     }
 
     println!("Deploying the WRAP...");
