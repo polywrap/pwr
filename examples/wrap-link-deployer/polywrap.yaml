@@ -1,0 +1,9 @@
+format: 0.4.0
+project:
+  name: wrap-link-deployer
+  type: wasm/rust
+source:
+  module: ./Cargo.toml
+  schema: ./polywrap.graphql
+extensions:
+  docs: ./polywrap.docs.yaml
