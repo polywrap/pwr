@@ -4,7 +4,9 @@ mod deploy_wrap;
 mod logger;
 mod prompter;
 mod script_pwr_app;
-use std::{env, fs, error::Error, fmt::Display};
+mod link_wrap;
+
+use std::{fs, env};
 
 use polywrap_client::core::uri::Uri;
 
@@ -16,6 +18,7 @@ use deploy_wrap::*;
 use prompter::*;
 use script_pwr_app::*;
 use script_wrap_utils_wasm::ScriptLanguage;
+use link_wrap::*;
 
 easy_error_string::use_easy_error_string!();
 
@@ -68,6 +71,7 @@ async fn internal_main(
         "wrap://pwr/js" => run_script_pwr_app(args, ScriptLanguage::JavaScript).await?,
         "wrap://pwr/py" => run_script_pwr_app(args, ScriptLanguage::Python).await?,
         "wrap://pwr/deploy" => deploy_wrap(args).await?,
+        "wrap://pwr/link" => link_wrap(args).await?,
         "wrap://pwr/version" => {
             println!("Version: {}", VERSION);
             0

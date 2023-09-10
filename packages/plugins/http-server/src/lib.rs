@@ -2,9 +2,9 @@ mod wrap;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use axum::{Router, async_trait};
-use axum::extract::{FromRequest, Path, Query, State, RawBody};
-use axum::http::{StatusCode, Request};
+use axum::Router;
+use axum::extract::{Path, Query, State, RawBody};
+use axum::http::StatusCode;
 use axum::routing::{get, post, options, patch, delete, put};
 use http::HeaderMap;
 use hyper::{Body, body};
@@ -16,6 +16,8 @@ use crate::wrap_info::get_manifest;
 use crate::types::*;
 use axum::response::Response;
 use tokio::task;
+use tower_http::cors::CorsLayer;
+
 #[derive(Debug)]
 pub struct HttpServerPlugin;
 
@@ -92,6 +94,8 @@ impl Module for HttpServerPlugin {
                 }
             };
         }
+
+        app = app.layer(CorsLayer::permissive());
 
         let addr = std::net::SocketAddr::from(([127, 0, 0, 1], args.port));
        
