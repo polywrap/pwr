@@ -39,7 +39,7 @@ pub struct KeyValuePair {
 // Imported objects START //
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ContextResolutionContext {
+pub struct InvocationContextResolutionContext {
     #[serde(rename = "originUri")]
     pub origin_uri: String,
     #[serde(rename = "finalUri")]
@@ -59,26 +59,26 @@ pub struct ContextResolutionContext {
 
 // URI: "https/http.wrappers.dev/u/test/invocation-context" //
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ContextModuleArgsGetOwnContext {
+pub struct InvocationContextModuleArgsGetOwnContext {
 }
 
 // URI: "https/http.wrappers.dev/u/test/invocation-context" //
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ContextModuleArgsGetCallerContext {
+pub struct InvocationContextModuleArgsGetCallerContext {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ContextModule {}
+pub struct InvocationContextModule {}
 
-impl ContextModule {
+impl InvocationContextModule {
     pub const URI: &'static str = "https/http.wrappers.dev/u/test/invocation-context";
 
-    pub fn new() -> ContextModule {
-        ContextModule {}
+    pub fn new() -> InvocationContextModule {
+        InvocationContextModule {}
     }
 
-    pub fn get_own_context(args: &ContextModuleArgsGetOwnContext, invoker: Arc<dyn Invoker>) -> Result<ContextResolutionContext, PluginError> {
-        let uri = ContextModule::URI;
+    pub fn get_own_context(args: &InvocationContextModuleArgsGetOwnContext, invoker: Arc<dyn Invoker>) -> Result<InvocationContextResolutionContext, PluginError> {
+        let uri = InvocationContextModule::URI;
     
         let serialized_args = to_vec(args).unwrap();
         let opt_args = Some(serialized_args.as_slice());
@@ -87,19 +87,17 @@ impl ContextModule {
             &uri,
             "getOwnContext",
             opt_args,
-            None
+            None,
         )
-        .map_err(|e| PluginError::InvocationError { 
-            exception: e.to_string(),
-         })?;
+        .map_err(|e| PluginError::InvocationError { exception: e.to_string() })?;
 
         Ok(from_slice(result.as_slice())?)
     }
 
-    pub fn get_caller_context(args: &ContextModuleArgsGetCallerContext, invoker: Arc<dyn Invoker>) -> Result<Option<ContextResolutionContext>, PluginError> {
-        let uri = ContextModule::URI;
-        
-        let serialized_args = to_vec(&args).unwrap();
+    pub fn get_caller_context(args: &InvocationContextModuleArgsGetCallerContext, invoker: Arc<dyn Invoker>) -> Result<Option<InvocationContextResolutionContext>, PluginError> {
+        let uri = InvocationContextModule::URI;
+       
+        let serialized_args = to_vec(args).unwrap();
         let opt_args = Some(serialized_args.as_slice());
         let uri = Uri::try_from(uri).unwrap();
         let result = invoker.invoke_raw(
@@ -108,9 +106,7 @@ impl ContextModule {
             opt_args,
             None,
         )
-        .map_err(|e| PluginError::InvocationError { 
-            exception: e.to_string(),
-         })?;
+        .map_err(|e| PluginError::InvocationError { exception: e.to_string() })?;
 
         Ok(Some(from_slice(result.as_slice())?))
     }

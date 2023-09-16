@@ -7,6 +7,7 @@ mod script_pwr_app;
 mod link_wrap;
 mod constants;
 mod utils;
+mod migrate;
 
 use std::{fs, env};
 
@@ -21,6 +22,7 @@ use prompter::*;
 use script_pwr_app::*;
 use script_wrap_utils_wasm::ScriptLanguage;
 use link_wrap::*;
+use migrate::*;
 
 easy_error_string::use_easy_error_string!();
 
@@ -70,6 +72,7 @@ async fn internal_main(
     logger.debug(format!("Parsed URI: {}", uri)).map_err_str()?;
 
     Ok(match uri.to_string().as_str() {
+        "wrap://pwr/migrate" => migrate(args).await?,
         "wrap://pwr/js" => run_script_pwr_app(args, ScriptLanguage::JavaScript).await?,
         "wrap://pwr/py" => run_script_pwr_app(args, ScriptLanguage::Python).await?,
         "wrap://pwr/deploy" => deploy_wrap(args).await?,

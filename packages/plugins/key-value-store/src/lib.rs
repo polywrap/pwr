@@ -57,7 +57,6 @@ impl Module for KeyValueStorePlugin {
         let uri = get_caller_uri(invoker)?;
         let key = format!("{}: {}", uri, args.key);
 
-
         let has = self.store.contains_key(&key);
         Ok(has)
     }
@@ -109,7 +108,7 @@ impl Module for KeyValueStorePlugin {
 }
 
 fn get_caller_uri(invoker: Arc<dyn Invoker>) -> Result<String, PluginError> {
-    let context = ContextModule::get_caller_context(&ContextModuleArgsGetCallerContext {}, invoker)?;
+    let context = InvocationContextModule::get_caller_context(&InvocationContextModuleArgsGetCallerContext {}, invoker)?;
 
     let origin_uri = context.ok_or(PluginError::InvocationError { exception: "Key value store can not be called directly".to_string() })?
         .origin_uri;
