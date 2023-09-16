@@ -108,7 +108,6 @@ impl Module for HttpServerPlugin {
                 &handler.method,
                 None,
                 None,
-                None
             ).unwrap();
         }
         
@@ -158,7 +157,6 @@ async fn handle_request(
             }
         }).unwrap()),
         None,
-        None
     ).unwrap();
 
     let crate::types::Response { body: response_body, status_code, headers } =  from_slice(&result).unwrap();

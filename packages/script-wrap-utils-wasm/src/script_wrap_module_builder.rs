@@ -23,7 +23,7 @@ impl ScripWrapModuleBuilder {
         let user_module_size = engine_uri.as_bytes().len() + script.code.as_bytes().len() + 2;
 
         let template_size = get_template_size(user_module_size)
-            .expect("User module should be smaller than template module");
+            .expect(&format!("User module size is too big to be wrapped ({}).", user_module_size));
         let template_endpoint = get_template_endpoint(&template_size);
 
         Self {

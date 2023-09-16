@@ -5,6 +5,8 @@ mod logger;
 mod prompter;
 mod script_pwr_app;
 mod link_wrap;
+mod constants;
+mod utils;
 
 use std::{fs, env};
 

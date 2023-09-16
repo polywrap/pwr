@@ -3351,8 +3351,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_client_builder",
  "polywrap_core",
@@ -3369,8 +3369,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client_builder"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3382,8 +3382,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_client_default_config"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "base64 0.13.1",
  "polywrap_client_builder",
@@ -3403,8 +3403,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_core"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "jsonschema",
  "polywrap_core_macros",
@@ -3419,8 +3419,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_core_macros"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_uri",
  "quote",
@@ -3429,8 +3429,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_ethereum_wallet_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "ethers",
  "lazy_static",
@@ -3442,8 +3442,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_fs_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "lazy_static",
  "polywrap_plugin",
@@ -3454,8 +3454,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_http_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "base64 0.13.1",
  "multipart 0.18.0",
@@ -3500,8 +3500,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_logger_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "base64 0.13.1",
  "env_logger",
@@ -3529,8 +3529,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_plugin"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "Inflector",
  "bigdecimal",
@@ -3547,8 +3547,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_plugin_implementor"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_core",
  "proc-macro2",
@@ -3559,8 +3559,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_resolver_extensions"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3574,8 +3574,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_resolvers"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "polywrap_core",
  "polywrap_msgpack_serde",
@@ -3621,8 +3621,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_uri"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "regex",
  "serde",
@@ -3630,8 +3630,8 @@ dependencies = [
 
 [[package]]
 name = "polywrap_wasm"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "base64 0.13.1",
  "bytes",
@@ -3755,7 +3755,7 @@ dependencies = [
 
 [[package]]
 name = "pwr"
-version = "0.2.5"
+version = "0.4.0"
 dependencies = [
  "clap",
  "colored",
@@ -6119,8 +6119,8 @@ dependencies = [
 
 [[package]]
 name = "wrap_manifest_schemas"
-version = "0.1.9-beta.1"
-source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-plugin-option-deser-issue#d02de380387ee8c645137d0f22a91474123c19bf"
+version = "0.1.9-beta.2"
+source = "git+https://github.com/polywrap/rust-client?branch=nerfzael-invoker-context#05de8ac0d8bf5a1dcd90208a1c8f3e42acf97ea5"
 dependencies = [
  "handlebars",
  "jsonschema",
