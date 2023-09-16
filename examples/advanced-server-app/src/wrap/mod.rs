@@ -10,6 +10,7 @@ pub use imported::http_server_request::HttpServerRequest;
 pub use imported::multipart_file_info::MultipartFileInfo;
 pub use imported::multipart_key_value_pair::MultipartKeyValuePair;
 pub use imported::key_value_store_key_value_pair::KeyValueStoreKeyValuePair;
+pub use imported::invocation_context_resolution_context::InvocationContextResolutionContext;
 pub use imported::http_server_http_method::{
     get_http_server_http_method_key,
     get_http_server_http_method_value,
@@ -19,6 +20,7 @@ pub use imported::http_server_http_method::{
 pub use imported::http_server_module::HttpServerModule;
 pub use imported::multipart_module::MultipartModule;
 pub use imported::key_value_store_module::KeyValueStoreModule;
+pub use imported::invocation_context_module::InvocationContextModule;
 pub mod module;
 pub use module::{
     Module,

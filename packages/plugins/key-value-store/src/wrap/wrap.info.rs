@@ -9,7 +9,96 @@ pub fn get_manifest() -> WrapManifest {
     type_: "plugin".to_string(),
     version: "0.1".to_string(),
     abi: from_value::<WrapManifestAbi>(json!({
+  "importedModuleTypes": [
+    {
+      "isInterface": false,
+      "kind": 256,
+      "methods": [
+        {
+          "kind": 64,
+          "name": "getOwnContext",
+          "required": true,
+          "return": {
+            "kind": 34,
+            "name": "getOwnContext",
+            "object": {
+              "kind": 8192,
+              "name": "getOwnContext",
+              "required": true,
+              "type": "Context_ResolutionContext"
+            },
+            "required": true,
+            "type": "Context_ResolutionContext"
+          },
+          "type": "Method"
+        },
+        {
+          "kind": 64,
+          "name": "getCallerContext",
+          "required": true,
+          "return": {
+            "kind": 34,
+            "name": "getCallerContext",
+            "object": {
+              "kind": 8192,
+              "name": "getCallerContext",
+              "type": "Context_ResolutionContext"
+            },
+            "type": "Context_ResolutionContext"
+          },
+          "type": "Method"
+        }
+      ],
+      "namespace": "Context",
+      "nativeType": "Module",
+      "type": "Context_Module",
+      "uri": "https/http.wrappers.dev/u/test/invocation-context"
+    }
+  ],
+  "importedObjectTypes": [
+    {
+      "kind": 1025,
+      "namespace": "Context",
+      "nativeType": "ResolutionContext",
+      "properties": [
+        {
+          "kind": 34,
+          "name": "originUri",
+          "required": true,
+          "scalar": {
+            "kind": 4,
+            "name": "originUri",
+            "required": true,
+            "type": "String"
+          },
+          "type": "String"
+        },
+        {
+          "kind": 34,
+          "name": "finalUri",
+          "required": true,
+          "scalar": {
+            "kind": 4,
+            "name": "finalUri",
+            "required": true,
+            "type": "String"
+          },
+          "type": "String"
+        }
+      ],
+      "type": "Context_ResolutionContext",
+      "uri": "https/http.wrappers.dev/u/test/invocation-context"
+    }
+  ],
   "moduleType": {
+    "imports": [
+      {
+        "type": "Context_ResolutionContext"
+      },
+      {
+        "type": "Context_Module"
+      }
+    ],
     "kind": 128,
     "methods": [
       {
