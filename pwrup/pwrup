@@ -147,7 +147,7 @@ main() {
       bin_path="$PWR_BIN_DIR/$bin"
 
       # Print installed msg
-      say "installed - $(ensure "$bin_path" version)"
+      say "installed pwr - $(ensure "$bin_path" version)"
 
       # Check if the default path of the binary is not in PWR_BIN_DIR
       which_path="$(which "$bin")"
@@ -164,7 +164,7 @@ EOF
       fi
     done
 
-    say "done!"
+    say "run 'pwr migrate' to update local configuration to the latest version"
 
   # Install by cloning the repo with the provided branch/tag
   else
@@ -193,7 +193,7 @@ EOF
 
     # Build the repo and install the binaries locally to the .pwr bin directory.
     # --root appends /bin to the directory it is given, so we pass PWR_DIR.
-    ensure cargo install --path ./rust/pwr --bins --locked --force --root "$PWR_DIR"
+    ensure cargo install --path ./packages/pwr --bins --locked --force --root "$PWR_DIR"
 
     say "done"
   fi

@@ -130,9 +130,6 @@ async fn handle_request(
     deps: State<Dependencies>,
     RawBody(body): RawBody,
 ) -> Result<Response<Body>, StatusCode> {
-    println!("Query Params {:?}", query_params);
-    println!("Path Params {:?}", path_params);
-            
     let body: Option<Vec<u8>> = 
         body::to_bytes(body).await.map(|x| x.to_vec()).ok();
         
