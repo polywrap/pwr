@@ -1,6 +1,7 @@
 #import { Module, Response, KeyValuePair, Request } into HttpServer from "wrap://https/http.wrappers.dev/u/test/http-server"
 #import * into Multipart from "wrap://https/http.wrappers.dev/u/test/multipart"
 #import { Module, KeyValuePair } into KeyValueStore from "wrap://https/http.wrappers.dev/u/test/key-value-store"
+#import * into InvocationContext from "https/http.wrappers.dev/u/test/invocation-context"
 
 type Module {
   main(args: [String!]!): Int32!

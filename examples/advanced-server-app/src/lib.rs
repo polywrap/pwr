@@ -1,5 +1,6 @@
 pub mod wrap;
 
+use polywrap_msgpack_serde::{from_slice, to_vec};
 use polywrap_wasm_rs::wrap_debug_log;
 use serde_bytes::ByteBuf;
 pub use wrap::*;
@@ -19,6 +20,13 @@ impl ModuleTrait for Module {
     
         log(format!("Starting server at {port}"));
 
+        KeyValueStoreModule::set(&ArgsSet {
+            key: "port".to_string(),
+            value: ByteBuf::from(to_vec(&port).unwrap())
+        }).unwrap();
+
+        let uri = InvocationContextModule::get_own_context(&ArgsGetOwnContext {})?.origin_uri;
+
         HttpServerModule::start(&imported::http_server_module::ArgsStart {
             port,
             request_timeout: 10000, 
@@ -27,14 +35,14 @@ impl ModuleTrait for Module {
                     path: "/".to_string(),
                     http_method: HttpServerHttpMethod::GET,
                     handler: HttpServerWrapperCallback {
-                        uri: "https/http.wrappers.dev/u/test/advanced-server-app".to_string(),
+                        uri: uri.clone(),
                         method: "routeHome".to_string()
                     }
                 },
             ], 
             on_start: Some(
                 HttpServerWrapperCallback {
-                    uri: "https/http.wrappers.dev/u/test/advanced-server-app".to_string(),
+                    uri,
                     method: "onStart".to_string()
                 }
             ),
@@ -44,7 +52,12 @@ impl ModuleTrait for Module {
     }
 
     fn on_start(_: ArgsOnStart) -> Result<bool, String> {
-        log("Server started".to_string());
+        let port = KeyValueStoreModule::get(&ArgsGet {
+            key: "port".to_string(),
+        })?;
+        let port = from_slice(port.unwrap_or(ByteBuf::from(vec![])).as_ref()).unwrap_or(DEFAULT_PORT);
+
+        log(format!("Server started at: http://localhost:{}", port));
 
         Ok(true)
     }
@@ -54,7 +67,7 @@ impl ModuleTrait for Module {
 
         let result = KeyValueStoreModule::get(&ArgsGet {
             key: "counter".to_string(),
-        }).unwrap();
+        })?;
 
         let counter = result.unwrap_or(ByteBuf::from(vec![0])).to_vec()[0];
 
