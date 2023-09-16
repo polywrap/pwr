@@ -1,0 +1,5 @@
+format: 0.1.0
+description: An example of a PWR HTTP server application with UI
+website: https://polywrap.io
+repository: https://github.com/polywrap/pwr
+readme: ./README.md

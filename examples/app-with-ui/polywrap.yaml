@@ -1,0 +1,9 @@
+format: 0.4.0
+project:
+  name: app-with-ui
+  type: wasm/rust
+source:
+  module: ./Cargo.toml
+  schema: ./polywrap.graphql
+extensions:
+  docs: ./polywrap.docs.yaml
