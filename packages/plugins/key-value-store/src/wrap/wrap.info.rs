@@ -25,10 +25,10 @@ pub fn get_manifest() -> WrapManifest {
               "kind": 8192,
               "name": "getOwnContext",
               "required": true,
-              "type": "Context_ResolutionContext"
+              "type": "InvocationContext_ResolutionContext"
             },
             "required": true,
-            "type": "Context_ResolutionContext"
+            "type": "InvocationContext_ResolutionContext"
           },
           "type": "Method"
         },
@@ -42,23 +42,23 @@ pub fn get_manifest() -> WrapManifest {
             "object": {
               "kind": 8192,
               "name": "getCallerContext",
-              "type": "Context_ResolutionContext"
+              "type": "InvocationContext_ResolutionContext"
             },
-            "type": "Context_ResolutionContext"
+            "type": "InvocationContext_ResolutionContext"
           },
           "type": "Method"
         }
       ],
-      "namespace": "Context",
+      "namespace": "InvocationContext",
       "nativeType": "Module",
-      "type": "Context_Module",
+      "type": "InvocationContext_Module",
       "uri": "https/http.wrappers.dev/u/test/invocation-context"
     }
   ],
   "importedObjectTypes": [
     {
       "kind": 1025,
-      "namespace": "Context",
+      "namespace": "InvocationContext",
       "nativeType": "ResolutionContext",
       "properties": [
         {
@@ -86,17 +86,17 @@ pub fn get_manifest() -> WrapManifest {
           "type": "String"
         }
       ],
-      "type": "Context_ResolutionContext",
+      "type": "InvocationContext_ResolutionContext",
       "uri": "https/http.wrappers.dev/u/test/invocation-context"
     }
   ],
   "moduleType": {
     "imports": [
       {
-        "type": "Context_ResolutionContext"
+        "type": "InvocationContext_ResolutionContext"
       },
       {
-        "type": "Context_Module"
+        "type": "InvocationContext_Module"
       }
     ],
     "kind": 128,
