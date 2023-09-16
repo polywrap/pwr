@@ -1,14 +1,13 @@
 use std::{
     path::Path,
-    sync::{Arc, Mutex}, collections::HashMap,
+    sync::Arc, collections::HashMap,
 };
 
 use polywrap_client::{
-    client::PolywrapClient,
+    client::Client as PolywrapClient,
     core::{
-        client::ClientConfig,
+        client::CoreClientConfig as ClientConfig,
         invoker::Invoker,
-        macros::uri,
         resolution::{
             uri_resolution_context::{UriPackageOrWrapper, UriResolutionContext},
             uri_resolver::UriResolver,
@@ -18,8 +17,8 @@ use polywrap_client::{
     resolvers::resolution_result_cache_resolver::ResolutionResultCacheResolverOptions,
 };
 use polywrap_client_builder::{
-    PolywrapBaseResolver, PolywrapBaseResolverOptions, PolywrapClientConfig,
-    PolywrapClientConfigBuilder,
+    PolywrapBaseResolver, PolywrapBaseResolverOptions, ClientConfig as PolywrapClientConfig,
+    ClientConfigBuilder as PolywrapClientConfigBuilder,
 };
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
 use polywrap_http_server_plugin::HttpServerPlugin;
@@ -42,7 +41,7 @@ impl UriResolver for LocalResolver {
         &self,
         uri: &Uri,
         _client: Arc<dyn Invoker>,
-        _resolution_context: Arc<Mutex<UriResolutionContext>>,
+        _resolution_context: &mut UriResolutionContext
     ) -> Result<UriPackageOrWrapper, polywrap_client::core::error::Error> {
         if uri.authority() == "script" {
             let path = uri.path();

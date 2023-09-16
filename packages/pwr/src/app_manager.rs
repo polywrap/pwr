@@ -163,7 +163,7 @@ fn invoke_with_access_control(
     _allowed_uris: Vec<String>,
     _all_access_controlled_uris: Vec<String>,
 ) -> Result<Vec<u8>, String> {
-    match client.invoke_raw(uri, method, args, None, None) {
+    match client.invoke_raw(uri, method, args, None) {
         Ok(data) => Ok(data),
         Err(e) => Err(format!("{}", e)),
     }

@@ -1,0 +1,9 @@
+type Module {
+  getOwnContext: ResolutionContext!
+  getCallerContext: ResolutionContext
+}
+
+type ResolutionContext {
+  originUri: String!
+  finalUri: String!
+}
