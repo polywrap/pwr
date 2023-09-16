@@ -5,7 +5,7 @@ use clap::{arg, value_parser, Command};
 use colored::Colorize;
 use notify::RecursiveMode;
 use notify_debouncer_mini::new_debouncer;
-use polywrap_client::{client::PolywrapClient, core::uri::Uri};
+use polywrap_client::{client::Client as PolywrapClient, core::uri::Uri};
 use rmp_serde::encode;
 use script_wrap_utils::{create_wrap_from_file, get_script_info_from_file};
 use script_wrap_utils_wasm::{
@@ -598,7 +598,6 @@ async fn invoke_eval(
                 globals,
             })?,
         ),
-        None,
         None,
     );
 

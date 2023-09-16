@@ -15,13 +15,13 @@ members = [
     "packages/easy-error-string",
     "packages/wraps/script-wrap-manager",
     "packages/wraps/multipart",
+    "packages/wraps/wrap-link-deployer",
     "packages/plugins/http-server",
     "packages/plugins/key-value-store",
     "examples/simple-pwr-app",
     "examples/http-server-app",
     "examples/simple-storage-app",
-    "examples/wrap-link-deployer",
-    "examples/advanced-server-app"
+    "examples/advanced-server-app",
 ]
 
 default-members = [
@@ -35,11 +35,11 @@ default-members = [
     "packages/plugins/key-value-store",
     "packages/wraps/script-wrap-manager",
     "packages/wraps/multipart",
+    "packages/wraps/wrap-link-deployer",
     "examples/simple-pwr-app",
     "examples/http-server-app",
     "examples/simple-storage-app",
-    "examples/wrap-link-deployer",
-    "examples/advanced-server-app"
+    "examples/advanced-server-app",
 ]
 
 [workspace.dependencies]
@@ -51,17 +51,17 @@ easy_error_string = { version = "0.1.0", path = "packages/easy-error-string" }
 polywrap_http_server_plugin = { path = "packages/plugins/http-server" }
 polywrap_key_value_store_plugin = { path = "packages/plugins/key-value-store" }
 polywrap_msgpack_serde = "0.0.2-beta.7"
-polywrap_uri = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_core = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_resolvers = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client_builder = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_wasm = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_fs_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_http_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
+polywrap_uri = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_core = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_client = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_resolvers = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_client_builder = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_wasm = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_fs_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
+polywrap_http_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-invoker-context" }
 polywrap-wasm-rs = { version = "0.11.2" }
 tower-http = { version = "0.4.3", features = ["cors"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -74,15 +74,3 @@ reqwest = { version = "0.11.18", features = ["multipart", "json", "blocking"] }
 thiserror = "1.0.37"
 tokio = { version = "1", features = ["full"] }
 
-[patch.crates-io]
-polywrap_uri = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_core = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-wrap_manifest_schemas = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_resolvers = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client_builder = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_client_default_config = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_wasm = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_fs_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }
-polywrap_http_plugin = { git = "https://github.com/polywrap/rust-client", branch = "nerfzael-plugin-option-deser-issue" }

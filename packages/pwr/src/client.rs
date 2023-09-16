@@ -1,17 +1,19 @@
 use std::{sync::{Arc, Mutex}, collections::HashMap};
 
 use polywrap_client::{
-    builder::{PolywrapClientConfig, PolywrapClientConfigBuilder},
-    client::PolywrapClient,
+    builder::{ClientConfig as PolywrapClientConfig, ClientConfigBuilder as PolywrapClientConfigBuilder},
+    client::Client as PolywrapClient,
     core::{
-        error::Error, resolution::uri_resolution_context::UriResolutionContext, uri::Uri,
-        uri_resolver_handler::UriResolverHandler, wrap_loader::WrapLoader, wrapper::GetFileOptions,
-    }, plugin::Invoker,
+        error::Error, uri::Uri,
+        wrapper::GetFileOptions,
+    },
 };
-use polywrap_plugin::package::PluginPackage;
+use polywrap_msgpack_serde::to_vec;
+use polywrap_plugin::{package::PluginPackage, wrap_loader::WrapLoader, uri_resolver_handler::UriResolverHandler, Invoker, InvokerContext, uri};
 use polywrap_http_server_plugin::HttpServerPlugin;
 use polywrap_key_value_store_plugin::KeyValueStorePlugin;
 use polywrap_client_default_config::{SystemClientConfig, Web3ClientConfig};
+use serde::Serialize;
 
 pub trait CoreClient {
     fn try_resolve_uri(&self, uri: &Uri) -> Result<Uri, Error>;
@@ -20,8 +22,7 @@ pub trait CoreClient {
         uri: &Uri,
         method: &str,
         args: Option<&[u8]>,
-        env: Option<&[u8]>,
-        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
+        context: Option<InvokerContext>
     ) -> Result<Vec<u8>, Error>;
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error>;
 }
@@ -38,8 +39,7 @@ impl CoreClient for CoreClientMock {
         _uri: &Uri,
         _method: &str,
         _args: Option<&[u8]>,
-        _env: Option<&[u8]>,
-        _resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
+        _context: Option<InvokerContext>
     ) -> Result<Vec<u8>, Error> {
         Ok(vec![])
     }
@@ -58,10 +58,38 @@ impl PwrClient {
             .add(SystemClientConfig::default().into())
             .add(Web3ClientConfig::default().into())
             .add_package("wrap://https/http.wrappers.dev/u/test/http-server".parse().unwrap(), Arc::new(PluginPackage::from(HttpServerPlugin {})))
-            .add_package("wrap://https/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })));
+            .add_package("wrap://https/http.wrappers.dev/u/test/key-value-store".parse().unwrap(), Arc::new(PluginPackage::from(KeyValueStorePlugin { store: HashMap::new() })))
+            .add_env(
+                uri!("wrapscan.io/polywrap/async-ipfs-uri-resolver@1.0"),
+                to_vec(&IpfsEnv {
+                    provider: "https://ipfs.io".to_string(),
+                    fallback_providers: vec![],
+                    retries: Retries {
+                        try_resolve_uri: 2,
+                        get_file: 2,
+                    },
+                })
+                .unwrap(),
+            );
 
         PwrClient(Arc::new(PolywrapClient::new(config.into())))
     }
+}
+
+#[derive(Serialize)]
+pub struct IpfsEnv {
+    provider: String,
+    #[serde(rename = "fallbackProviders")]
+    fallback_providers: Vec<String>,
+    retries: Retries,
+}
+
+#[derive(Serialize)]
+pub struct Retries {
+    #[serde(rename = "tryResolveUri")]
+    try_resolve_uri: u8,
+    #[serde(rename = "getFile")]
+    get_file: u8,
 }
 
 impl CoreClient for PwrClient {
@@ -79,10 +107,9 @@ impl CoreClient for PwrClient {
         uri: &Uri,
         method: &str,
         args: Option<&[u8]>,
-        env: Option<&[u8]>,
-        resolution_context: Option<Arc<Mutex<UriResolutionContext>>>,
+        context: Option<InvokerContext>
     ) -> Result<Vec<u8>, Error> {
-        self.0.invoke_raw(uri, method, args, env, resolution_context)
+        self.0.invoke_raw(uri, method, args, context)
     }
 
     fn get_manifest(&self, uri: &Uri) -> Result<Vec<u8>, Error> {

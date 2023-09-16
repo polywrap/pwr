@@ -1,0 +1,14 @@
+{
+  "name": "invocation-context-interface",
+  "description": "An interface for wrap invocation context",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "npx polywrap build && copyfiles ./README.md ./build/",
+    "deploy": "pwr deploy"
+  },
+  "devDependencies": {
+    "copyfiles": "2.4.1",
+    "polywrap": "0.8.0"
+  }
+}
