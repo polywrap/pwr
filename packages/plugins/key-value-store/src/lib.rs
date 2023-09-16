@@ -16,28 +16,35 @@ impl Module for KeyValueStorePlugin {
     fn set(
         &mut self,
         args: &ArgsSet,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<bool, PluginError> {
-        self.store.insert(args.key.clone(), args.value.clone().to_vec());
+        let uri = get_caller_uri(invoker)?;
+        let key = format!("{}: {}", uri, args.key);
+
+        self.store.insert(key, args.value.clone().to_vec());
         Ok(true)
     }
 
     fn get(
         &mut self,
         args: &ArgsGet,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<Option<ByteBuf>, PluginError> {
-        let value = self.store.get(&args.key).map(|v| ByteBuf::from(v.clone()));
-        println!("get: {:?}", value);
+        let uri = get_caller_uri(invoker)?;
+        let key = format!("{}: {}", uri, args.key);
+        
+        let value = self.store.get(&key).map(|v| ByteBuf::from(v.clone()));
         Ok(value)
     }
 
     fn remove(
         &mut self,
         args: &ArgsRemove,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<bool, PluginError> {
-        let key = args.key.clone();
+        let uri = get_caller_uri(invoker)?;
+        let key = format!("{}: {}", uri, args.key);
+
         self.store.remove(&key);
         Ok(true)
     }
@@ -45,42 +52,69 @@ impl Module for KeyValueStorePlugin {
     fn has(
         &mut self,
         args: &ArgsHas,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<bool, PluginError> {
-        let has = self.store.contains_key(&args.key);
+        let uri = get_caller_uri(invoker)?;
+        let key = format!("{}: {}", uri, args.key);
+
+
+        let has = self.store.contains_key(&key);
         Ok(has)
     }
 
     fn keys(
         &mut self,
         _: &ArgsKeys,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<Vec<String>, PluginError> {
-        let keys = self.store.keys().map(|k| k.clone()).collect();
+        let uri = get_caller_uri(invoker)?;
+    
+        let keys = self.store.keys()
+            .map(|k| k.clone())
+            .filter(|x| x.starts_with(&format!("{}: ", uri)))
+            .collect();
         Ok(keys)
     }
 
     fn values(
         &mut self,
         _: &ArgsValues,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<Vec<ByteBuf>, PluginError> {
-        let values = self.store.values().map(|v| ByteBuf::from(v.clone())).collect();
+        let uri = get_caller_uri(invoker)?;
+      
+        let values = self.store.iter()
+            .filter(|x| x.0.starts_with(&format!("{}: ", uri)))
+            .map(|x| ByteBuf::from(x.1.clone()))
+            .collect();
         Ok(values)
     }
 
     fn entries(
         &mut self,
         _: &ArgsEntries,
-        _: Arc<dyn Invoker>,
+        invoker: Arc<dyn Invoker>,
     ) -> Result<Vec<KeyValuePair>, PluginError> {
-        let entries = self.store.iter().map(|(k, v)| KeyValuePair {
-            key: k.clone(),
-            value: ByteBuf::from(v.clone()),
-        }).collect();
+        let uri = get_caller_uri(invoker)?;
+      
+        let entries = self.store.iter()
+            .filter(|x| x.0.starts_with(&format!("{}: ", uri)))
+            .map(|(k, v)| KeyValuePair {
+                key: k.clone(),
+                value: ByteBuf::from(v.clone()),
+            })
+            .collect();
         Ok(entries)
     }
+}
 
+fn get_caller_uri(invoker: Arc<dyn Invoker>) -> Result<String, PluginError> {
+    let context = ContextModule::get_caller_context(&ContextModuleArgsGetCallerContext {}, invoker)?;
+
+    let origin_uri = context.ok_or(PluginError::InvocationError { exception: "Key value store can not be called directly".to_string() })?
+        .origin_uri;
+
+    Ok(origin_uri)
 }
 
 #[derive(thiserror::Error, Debug)]

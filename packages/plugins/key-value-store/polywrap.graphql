@@ -1,3 +1,5 @@
+#import * into Context from "https/http.wrappers.dev/u/test/invocation-context"
+
 type Module {
   set(key: String!, value: Bytes!): Boolean!
   get(key: String!): Bytes
