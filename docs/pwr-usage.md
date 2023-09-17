@@ -11,12 +11,20 @@ To run a pwr app from wrapscan.io, run:
 pwr wrapscan.io/pwr/say-hello
 ```
 
+### From wrappers.dev
+To run a pwr app from wrappers.dev, run:
+```bash
+pwr @pwr/say-hello
+```
+```bash
+pwr https/wrappers.dev/u/pwr/say-hello
+```
+
 ### Local directory
 To run a pwr app from a local directory (e.g. `./build`), run:
 ```bash
 pwr ./build
 ```
-or 
 ```bash
 pwr fs/build
 ```
@@ -26,11 +34,9 @@ To run a pwr app from IPFS, run:
 ```bash
 pwr ipfs/Qm...
 ```
-or 
 ```bash
 pwr Qm...
 ```
-or 
 ```bash
 pwr ipfs://Qm...
 ```
@@ -40,7 +46,6 @@ To run a pwr app from ENS, run:
 ```bash
 pwr ens/say-hello.eth
 ```
-or
 ```bash
 pwr say-hello.eth
 ```
