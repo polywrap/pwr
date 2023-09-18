@@ -121,9 +121,11 @@ fn parse_uri(uri: &String) -> Result<Uri, StringError> {
         Uri::try_from(format!("wrap://ipfs/{}", &uri["ipfs://".len()..uri.len()])).map_err_str()?
     } else if uri.starts_with('.') || uri.starts_with('/') {
         Uri::try_from(format!("wrap://file/{}", uri)).map_err_str()?
+    } else if uri.starts_with("@") {
+        Uri::try_from(format!("wrap://https/http.wrappers.dev/u/{}", &uri[1..uri.len()])).map_err_str()?
     } else if !uri.contains('/') {
         Uri::try_from(format!("wrap://pwr/{}", uri)).map_err_str()?
-    } else {
+    } else { 
         Uri::try_from(uri.clone()).map_err_str()?
     };
 

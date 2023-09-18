@@ -133,25 +133,27 @@ async fn handle_request(
     let body: Option<Vec<u8>> = 
         body::to_bytes(body).await.map(|x| x.to_vec()).ok();
         
+    let request = crate::types::Request {
+        headers: headers.into_iter().map(|(k, v)| KeyValuePair {
+            key: k.map(|x| x.to_string()).unwrap_or("".to_string()),
+            value: v.to_str().unwrap().to_string(),
+        }).collect(),
+        params: path_params.into_iter().map(|(k, v)| KeyValuePair {
+            key: k,
+            value: v,
+        }).collect(),
+        query: query_params.into_iter().map(|(k, v)| KeyValuePair {
+            key: k,
+            value: v,
+        }).collect(),
+        body: body.map(|x| ByteBuf::from(x))
+    };
+
     let result = deps.invoker.invoke_raw(
         &uri,
         &method,
         Some(&to_vec(&RequestArgs {
-            request: crate::types::Request {
-                headers: headers.into_iter().map(|(k, v)| KeyValuePair {
-                    key: k.map(|x| x.to_string()).unwrap_or("".to_string()),
-                    value: v.to_str().unwrap().to_string(),
-                }).collect(),
-                params: path_params.into_iter().map(|(k, v)| KeyValuePair {
-                    key: k,
-                    value: v,
-                }).collect(),
-                query: query_params.into_iter().map(|(k, v)| KeyValuePair {
-                    key: k,
-                    value: v,
-                }).collect(),
-                body: body.map(|x| ByteBuf::from(x))
-            }
+            request
         }).unwrap()),
         None,
     ).unwrap();
