@@ -44,4 +44,4 @@ if [[ ":$PATH:" != *":${PWR_BIN_DIR}:"* ]]; then
 fi
 
 echo && echo "Detected your preferred shell is ${PREF_SHELL} and added pwrup to PATH. Run 'source ${PROFILE}' or start a new terminal session to use pwrup."
-echo "Then, simply run 'pwrup' to install PWR (Polywrap Wrapper Runner)."
+echo "Then, simply run 'pwrup' to install PWR (Polywrap Wrap Runner)."
