@@ -1,6 +1,9 @@
 mod get_client;
 use get_client::get_client;
 
+mod shims;
+use shims::*;
+
 use clap::{arg, value_parser, Command};
 use colored::Colorize;
 use notify::RecursiveMode;
@@ -9,7 +12,7 @@ use polywrap_client::{client::Client as PolywrapClient, core::uri::Uri};
 use rmp_serde::encode;
 use script_wrap_utils::{create_wrap_from_file, get_script_info_from_file};
 use script_wrap_utils_wasm::{
-    build_module_from_script, ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI,
+    build_module_from_script, ScriptLanguage, DEFAULT_JS_ENGINE_URI, DEFAULT_PY_ENGINE_URI, ScriptInfo,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -43,7 +46,8 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
                     arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
                         .required(false),
                 )
-                .arg(arg!(-r --release "Release").required(false)),
+                .arg(arg!(-r --release "Release").required(false))
+                .arg(arg!(-s --shims "Include shims").required(false))
         )
         .subcommand(
             Command::new("build")
@@ -64,7 +68,8 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
                 .arg(
                     arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
                         .required(false),
-                ),
+                )
+                .arg(arg!(-s --shims "Include shims").required(false))
         )
         .subcommand(
             Command::new("deploy")
@@ -80,7 +85,8 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
                 .arg(
                     arg!(-t --template <TEMPLATE> "IPFS CID of the template wrap to use")
                         .required(false),
-                ),
+                )
+                .arg(arg!(-s --shims "Include shims").required(false))
         )
         .subcommand(
             Command::new("repl")
@@ -98,7 +104,8 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
                         .required(false),
                 )
                 .arg(arg!(-r --release "Release").required(false))
-                .arg(arg!(-w --watch "Watch the file for changes").required(false)),
+                .arg(arg!(-w --watch "Watch the file for changes").required(false))
+                .arg(arg!(-s --shims "Include shims").required(false))
         )
         .subcommand(
             Command::new("new")
@@ -114,6 +121,7 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
     if let Some(matches) = matches.subcommand_matches("invoke") {
         let file = matches.get_one::<PathBuf>("file");
         let method = matches.get_one::<String>("method");
+        let include_shims = matches.get_flag("shims");
 
         let engine_uri = matches
             .get_one::<String>("engine")
@@ -133,11 +141,14 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
             &Uri::try_from(engine_uri).map_err_str()?,
             template_cid,
             is_release,
+            &language,
+            include_shims
         )
         .await
     } else if let Some(matches) = matches.subcommand_matches("build") {
         let file = matches.get_one::<PathBuf>("file").ok_or_str("File is required")?;
         let output = matches.get_one::<PathBuf>("output");
+        let include_shims = matches.get_flag("shims");
 
         let engine_uri = matches
             .get_one::<String>("engine")
@@ -149,10 +160,11 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
 
         let template_cid = matches.get_one::<String>("template").map(|x| x.as_str());
 
-        execute_build_command(file, output, &Uri::try_from(engine_uri).map_err_str()?).await
+        execute_build_command(file, output, &Uri::try_from(engine_uri).map_err_str()?, include_shims).await
     } else if let Some(matches) = matches.subcommand_matches("deploy") {
         let file = matches.get_one::<PathBuf>("file");
         let output = matches.get_one::<PathBuf>("output");
+        let include_shims = matches.get_flag("shims");
 
         let engine_uri = matches
             .get_one::<String>("engine")
@@ -169,10 +181,13 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
             output,
             &Uri::try_from(engine_uri).map_err_str()?,
             template_cid,
+            &language,
+            include_shims
         )
         .await
     } else if let Some(matches) = matches.subcommand_matches("repl") {
         let file = matches.get_one::<PathBuf>("file");
+        let include_shims = matches.get_flag("shims");
 
         let engine_uri = matches
             .get_one::<String>("engine")
@@ -193,6 +208,8 @@ pub async fn run_script_pwr_app(args: &[String], language: ScriptLanguage) -> Re
             template_cid,
             is_release,
             should_watch,
+            &language,
+            include_shims
         )
         .await
     } else if let Some(matches) = matches.subcommand_matches("new") {
@@ -211,6 +228,8 @@ async fn execute_eval_command(
     engine_uri: &Uri,
     template_cid: Option<&str>,
     is_release: bool,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<i32, StringError> {
     println!("VM loading...");
     let client = Arc::new(get_client());
@@ -237,18 +256,31 @@ async fn execute_eval_command(
         }
 
         if !is_release {
-            eval_with_args(&args, client.clone(), engine_uri).await.unwrap();
+            eval_with_args(&args, client.clone(), engine_uri, language, include_shims).await.unwrap();
         } else {
             deploy_with_args(&args, engine_uri, client.clone()).await.unwrap();
         }
     }
 }
 
-async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine_uri: &Uri) -> Result<i32, StringError> {
+async fn execute_build_command(file: &PathBuf, output: Option<&PathBuf>, _engine_uri: &Uri, include_shims: bool) -> Result<i32, StringError> {
     println!("Building the WRAP...");
 
     let script = get_script_info_from_file(&file.to_string_lossy()).map_err_str()?;
-    let module = build_module_from_script(script, get_bytes_from_url)?;
+    let module = build_module_from_script(match script.language {
+        ScriptLanguage::JavaScript => ScriptInfo {
+            code: if include_shims {
+                get_js_shims() + &script.code
+            } else {
+                script.code
+            },
+            language: ScriptLanguage::JavaScript,
+        },
+        ScriptLanguage::Python => ScriptInfo {
+            code: script.code,
+            language: ScriptLanguage::Python,
+        },
+    }, get_bytes_from_url)?;
 
     let output = output
         .map(|x| x.to_owned())
@@ -288,9 +320,11 @@ async fn execute_deploy_command(
     output: Option<&PathBuf>,
     engine_uri: &Uri,
     _template_cid: Option<&str>,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<i32, StringError> {
     if file.is_some() {
-        execute_build_command(file.ok_or_str("File is required")?, output, engine_uri).await?;
+        execute_build_command(file.ok_or_str("File is required")?, output, engine_uri, include_shims).await?;
     }
 
     println!("Deploying the WRAP...");
@@ -325,6 +359,8 @@ async fn read_file_and_eval(
     engine_uri: &Uri,
     _template_cid: Option<&str>,
     client: Arc<PolywrapClient>,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<String, StringError> {
     if let Some(file) = &file {
         if Path::exists(file) {
@@ -333,7 +369,7 @@ async fn read_file_and_eval(
             if !total_input.is_empty() {
                 println!("Evaluating file: {:?}...", file);
                 let repl_boilerplate = include_str!("./templates/repl.js");
-                invoke_eval(&(repl_boilerplate.to_string() + &total_input), vec![], engine_uri, client.clone()).await?;
+                invoke_eval(&(repl_boilerplate.to_string() + &total_input), vec![], engine_uri, client.clone(), language, include_shims).await?;
             }
         }
     }
@@ -347,6 +383,8 @@ async fn execute_repl_command(
     template_cid: Option<&str>,
     is_release: bool,
     should_watch: bool,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<i32, StringError> {
     println!("REPL loading...");
     let client = Arc::new(get_client());
@@ -364,8 +402,8 @@ async fn execute_repl_command(
     if should_watch {
         if let Some(file) = file {
             println!("Watching file: {:?}", file);
-            read_file_and_eval(Some(file), engine_uri, template_cid, client.clone()).await?;
-            watch(file, engine_uri, template_cid, client.clone()).await?;
+            read_file_and_eval(Some(file), engine_uri, template_cid, client.clone(), language, include_shims).await?;
+            watch(file, engine_uri, template_cid, client.clone(), language, include_shims).await?;
             return Ok(0);
         } else {
             write_err("File not specified");
@@ -374,7 +412,7 @@ async fn execute_repl_command(
         }
     }
 
-    let mut total_input = read_file_and_eval(file, engine_uri, template_cid, client.clone()).await?;
+    let mut total_input = read_file_and_eval(file, engine_uri, template_cid, client.clone(), language, include_shims).await?;
 
     loop {
         let input = {
@@ -396,7 +434,7 @@ async fn execute_repl_command(
             match input.as_str() {
                 "" => {
                     if !total_input.is_empty() {
-                        invoke_eval(&total_input, vec![], engine_uri, client.clone()).await?;
+                        invoke_eval(&total_input, vec![], engine_uri, client.clone(), language.clone(), include_shims).await?;
                     }
 
                     continue;
@@ -405,7 +443,7 @@ async fn execute_repl_command(
             };
 
             let new_total_input = total_input.clone() + "\n" + &input;
-            let result = invoke_eval(&new_total_input, vec![], engine_uri, client.clone()).await?;
+            let result = invoke_eval(&new_total_input, vec![], engine_uri, client.clone(), language, include_shims).await?;
 
             if result == 0 {
                 total_input = new_total_input;
@@ -452,6 +490,8 @@ async fn watch(
     engine_uri: &Uri,
     template_cid: Option<&str>,
     client: Arc<PolywrapClient>,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<(), StringError> {
     // setup debouncer
     let (tx, rx) = std::sync::mpsc::channel();
@@ -473,6 +513,8 @@ async fn watch(
                         engine_uri,
                         template_cid,
                         client.clone(),
+                        language,
+                        include_shims
                     )
                     .await?;
                 }
@@ -545,6 +587,8 @@ async fn eval_with_args(
     args: impl AsRef<Vec<String>>,
     client: Arc<PolywrapClient>,
     engine_uri: &Uri,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<i32, StringError> {
     let user_file = args.as_ref()[0].clone();
     let method = &args.as_ref()[1];
@@ -567,6 +611,8 @@ async fn eval_with_args(
         ],
         engine_uri,
         client,
+        language,
+        include_shims
     )
     .await
 }
@@ -588,13 +634,22 @@ async fn invoke_eval(
     globals: Vec<JsEngineGlobalVar>,
     engine_uri: &Uri,
     client: Arc<PolywrapClient>,
+    language: &ScriptLanguage,
+    include_shims: bool
 ) -> Result<i32, StringError> {
     let result = client.invoke::<JsEngineEvalResult>(
         engine_uri,
         "evalWithGlobals",
         Some(
             &rmp_serde::encode::to_vec_named(&ArgsEvalWithGlobals {
-                src: src.to_string(),
+                src: match language {
+                    ScriptLanguage::JavaScript => if include_shims {
+                        get_js_shims() + src
+                    } else {
+                        src.to_string()
+                    },
+                    ScriptLanguage::Python => src.to_string(),
+                },
                 globals,
             })?,
         ),

@@ -22,6 +22,7 @@ members = [
     "examples/http-server-app",
     "examples/simple-storage-app",
     "examples/advanced-server-app",
+    "examples/app-with-ui",
 ]
 
 default-members = [
@@ -40,6 +41,7 @@ default-members = [
     "examples/http-server-app",
     "examples/simple-storage-app",
     "examples/advanced-server-app",
+    "examples/app-with-ui",
 ]
 
 [workspace.dependencies]

@@ -164,7 +164,7 @@ EOF
       fi
     done
 
-    say "run 'pwr migrate' to update local configuration to the latest version"
+    migrate
 
   # Install by cloning the repo with the provided branch/tag
   else
@@ -195,7 +195,7 @@ EOF
     # --root appends /bin to the directory it is given, so we pass PWR_DIR.
     ensure cargo install --path ./packages/pwr --bins --locked --force --root "$PWR_DIR"
 
-    say "done"
+    migrate
   fi
 }
 
@@ -247,6 +247,10 @@ check_cmd() {
 # command.
 ensure() {
   if ! "$@"; then err "command failed: $*"; fi
+}
+
+migrate() {
+  ensure pwr migrate
 }
 
 # Downloads $1 into $2 or stdout
